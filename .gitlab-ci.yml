@@ -1,0 +1,59 @@
+stages:
+  - lint
+  - test
+  - build
+
+variables:
+  NODE_VERSION: "20"
+  NPM_CACHE_DIR: "$CI_PROJECT_DIR/.npm"
+
+cache:
+  paths:
+    - node_modules/
+    - .npm/
+
+before_script:
+  - node --version
+  - npm --version
+
+# Lint
+lint:
+  stage: lint
+  image: node:20
+  script:
+    - npm ci --legacy-peer-deps
+    - npm run lint
+  only:
+    - merge_requests
+    - main
+    - develop
+
+test:
+  stage: test
+  image: node:20
+  services:
+    - mysql:8.0
+  variables:
+    MYSQL_DATABASE: "test_db"
+    MYSQL_ROOT_PASSWORD: "root"
+    DB_HOST: "mysql"
+    DB_PORT: "3306"
+    DB_USER: "root"
+    DB_PASSWORD: "root"
+    DB_NAME: "test_db"
+    NODE_ENV: "test"
+    USE_LOCAL_STORAGE: "true"
+  script:
+    - npm ci
+    - npm run test
+  artifacts:
+    paths:
+      - coverage/
+    expire_in: 30 days
+  only:
+    - merge_requests
+    - main
+    - develop
+  allow_failure: true
+
+
