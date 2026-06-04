@@ -17,12 +17,16 @@ if (!process.env.PAYPAL_CLIENT || !process.env.PAYPAL_SECRET) {
 }
 
 const app = require('./app');
+const db = require('./DB');
 
 const { PORT } = process.env;
 
-app.listen(PORT, () => {
-  // eslint-disable-next-line no-console
-  console.log(`Server listening on port ${PORT}`);
-  // eslint-disable-next-line no-console
-  console.log('Server is running OK');
-});
+(async () => {
+  await db.connect();
+  app.listen(PORT, () => {
+    // eslint-disable-next-line no-console
+    console.log(`Server listening on port ${PORT}`);
+    // eslint-disable-next-line no-console
+    console.log('Server is running OK');
+  });
+})();
