@@ -1,0 +1,48 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: leopet-mysql
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: integradoradb
+      MYSQL_USER: leopet_user
+      MYSQL_PASSWORD: leopet_pass
+      MYSQL_ROOT_PASSWORD: root_pass
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      args:
+        FRONTEND_REPO: https://github.com/MaycolMont/leopet-fronted-web-main.git
+    container_name: leopet-app
+    restart: unless-stopped
+    ports:
+      - "8181:8181"
+    environment:
+      NODE_ENV: production
+      PORT: 8181
+      MYSQL_DATABASE: integradoradb
+      MYSQL_USER: leopet_user
+      MYSQL_ROOT_PASSWORD: root_pass
+      MYSQL_HOST: mysql
+      MYSQL_HOSTNAME: mysql
+      MYSQL_ROOT_PORT: 3306
+      USE_LOCAL_STORAGE: "true"
+      API_URL: "http://localhost:8181"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  mysql_data:

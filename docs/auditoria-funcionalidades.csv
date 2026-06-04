@@ -1,0 +1,85 @@
+Funcionalidad,Endpoint API,Método,Auth Rol,Frontend,Estado,Mockeado,Observaciones
+"Login",/auth/login,POST,None,✅,,,"Login.jsx + User.jsx service. Devuelve token JWT"
+"Register",/auth/register,POST,None,✅,,,"User.jsx + RegistroLanding.jsx llaman register()"
+"Health Check",/api/health,GET,None,❌,,,"Solo backend, no tiene pantalla en frontend"
+"Listar animales",/animal/get/animals,POST,Auth,✅,,,Animals.jsx llama getAnimals() con filtros especie/manada
+"Listar animales (App)",/animal/get/animalsApp,POST,Auth,❌,,,"Endpoint para app móvil, no usado en web frontend"
+"Listar animales x fundación (App)",/animal/get/animalsFundacionApp,POST,Auth,✅,,,FundacionDetalle.jsx usa getAnimalsFundacionApp()
+"Detalle animal",/animal/get/:animalId,GET,Auth,⚠️,,,"AnimalsDetalle.jsx existe pero usa datos del state (selectedAnimalToHistory). No hay servicio getAnimalById()."
+"Crear animal",/animal/create,POST,Auth,✅,,,CardCreate.jsx (Fundacion/Animales) llama createAnimal()
+"Actualizar animal",/animal/update/:animalId,PUT,Auth,✅,,,CardCreate.jsx edición llama updateAnimal()
+"Eliminar animal",/animal/delete/:animalId,DELETE,Auth,✅,,,CardDelete.jsx llama deleteAnimal()
+"Buscar animal",/animal/search,GET,Auth,❌,,,"No hay servicio ni componente. Búsqueda se hace via POST get/animals con filtros."
+"Listar especies",/animal/especies,GET,Auth,✅,,,Especies.jsx llama getSpecies()
+"Listar fundaciones",/fundacion/,GET,Auth,✅,,,"Fundaciones.jsx (Admin y Donador) llaman getFundaciones()"
+"Animales de fundaciones",/fundacion/animales,GET,Auth,✅,,,getAnimalsByFundation() usado por Fundacion/Animales
+"Padrinos de fundación",/fundacion/padrinos/:fundacionId,GET,None,✅,,,getAnimalesPadrinosFundacion() en service
+"Padrinos con calificación",/fundacion/padrinosCalificacion/:fundacionId,GET,None,✅,,,getAnimalesPadrinosCalificacion() en service
+"Crear fundación",/fundacion/create,POST,Auth,✅,,,Admin/Fundaciones/CardCreate.jsx llama createFundacion()
+"Registrar fundación",/fundacion/register,POST,None,⚠️,,,"registerFundacion() llama a /public/solicitudes, no a /fundacion/register. Discrepancia endpoint."
+"Actualizar fundación",/fundacion/update,PUT,Auth,✅,,,Admin/Fundaciones llama upadteFundacion()
+"Eliminar fundación",/fundacion/delete,POST,Auth,⚠️,,,"BUG: deleteFundacion() en Service/Fundaciones.jsx:119-150 llama a /auth/login en vez de /fundacion/delete"
+"Crear manada",/manada/create,POST,Auth,✅,,,CardCreateManada.jsx llama createManada()
+"Agregar animales a manada",/manada/add_animals,POST,Auth,✅,,,apadrinar() en Manada.jsx
+"Listar manadas",/manada/all,GET,Auth,✅,,,getManadas() en Aminal.jsx
+"Buscar manada",/manada/search,GET,Auth,❌,,,"No hay servicio. Búsqueda via query param en /manada/all."
+"Animales de manada",/manada/:manadaId,GET,Auth,⚠️,,,"Manadas.jsx usa datos pasados por props. No llama endpoint detalle de manada. Filtra animales via getAnimals() con manada param."
+"Eliminar animal de manada",/manada/delete_animal,POST,Auth,✅,,,deleteFromManada() en Manada.jsx
+"Eliminar manada",/manada/delete,POST,Auth,✅,,,deleteManada() en Manada.jsx
+"Actualizar manada",/manada/update_info,POST,Auth,✅,,,updateManada() en Manada.jsx
+"Listar usuarios",/usuario/all,GET,Auth,✅,,,UserManagement.jsx llama getUsers()
+"Actualizar usuario",/usuario/:id,PUT,Auth,✅,,,updateUser() en User.jsx
+"Cambiar contraseña",/usuario/update,PATCH,Auth,✅,,,cambiarContrasenia() + Password.jsx
+"Cambiar estado usuario",/usuario/status/:id,PUT,Auth,✅,,,updateUserStatus() usado en UserManagement.jsx
+"Listar donaciones",/donacion/,GET,Auth,✅,,,getDonaciones() usado en Fundacion/Donaciones.jsx
+"Dinero disponible",/donacion/disponible,GET,Auth,✅,,,getDineroDisponible() en Donacion.jsx
+"Aprobar donación",/donacion/aprobar,PUT,Auth,✅,,,approveDonation() en Manada.jsx
+"Pagar donación",/donacion/pagado,PUT,Auth,❌,,,No implementado en frontend
+"Crear donación",/donacion/crear,POST,Auth,✅,,,subscribir() en Manada.jsx
+"Crear evidencia",/evidencia/crear,POST,Auth,✅,,,createHistoria() + CardHistoria.jsx
+"Actualizar evidencia",/evidencia/update/:id,PUT,Auth,✅,,,updateHistoria() en Donacion.jsx
+"Obtener cuenta bancaria",/cuenta/get/:id,GET,Auth,❌,,,"No hay getCuenta() individual. Solo getCuentaPrincipal y getAll."
+"Cuenta principal",/cuenta/getPrincipal/:id,GET,Auth,✅,,,getCuentaPrincipal() en Cuentas.jsx
+"Listar cuentas bancarias",/cuenta/getAll/:id,GET,Auth,✅,,,getCuentas() en Cuentas.jsx
+"Crear cuenta bancaria",/cuenta/crear,POST,Auth,✅,,,createCuentaBancaria() + createCuenta()
+"Actualizar cuenta bancaria",/cuenta/update/:id,PUT,Auth,✅,,,upadteCuenta() en Fundaciones.jsx
+"Actualizar cuenta por ID",/cuenta/updateCuentaID/:cuenta_id,PUT,Auth,✅,,,updateCuentaBancaria() en Cuentas.jsx
+"Establecer cuenta principal",/cuenta/updatePrincipal/:fundacion_id,PUT,Auth,✅,,,updateCuentaPrincipal() en Cuentas.jsx
+"Eliminar cuenta bancaria",/cuenta/delete/:cuentaId,DELETE,Auth,✅,,,deleteCuentaBancaria() en Cuentas.jsx
+"Crear actualización de animal",/actualizacion/create,POST,Auth,✅,,,UpdateCreate.jsx llama createActualizacion()
+"Listar actualizaciones",/actualizacion/,GET,Auth,✅,,,getActualizacion() usado en Fundacion/Update.jsx
+"Actualizar actualización",/actualizacion/update/:actualizacionId,PUT,Auth,✅,,,updateActualizacion() en Actualizacion.jsx
+"Eliminar actualización",/actualizacion/delete/:actualizacionId,DELETE,Auth,✅,,,deleteActualizacion() + UpdateDelete.jsx
+"Calificar actualización",/actualizacion/create/rating,POST,Auth,✅,,,createRating() en Actualizacion.jsx + AnimalsDetalle.jsx
+"Obtener calificación",/actualizacion/load/rating,POST,Auth,❌,,,"No implementado. Calificaciones se cargan junto con actualización/animal."
+"Crear notificación (Admin)",/notificacion/admin,POST,ADMIN,✅,,,crearNotificacionAdmin() en Notificaciones.jsx
+"Notificaciones de fundación",/notificacion/fundacion,GET,ADMIN_FUND,✅,,,getNotificacionesFundacion() + CentroNotificaciones.jsx
+"Mis notificaciones",/notificacion/,GET,Auth,✅,,,getNotificaciones() en Notificaciones.jsx
+"Actualizar notificación",/notificacion/update/:notificacionId,PUT,Auth,✅,,,updateNotificacion() en Notificaciones.jsx
+"Agregar favorito",/favorito/agregar/:fundacionId,POST,Auth,❌,,,"Favoritos no implementados en frontend web"
+"Eliminar favorito",/favorito/eliminar/:fundacionId,DELETE,Auth,❌,,,"Favoritos no implementados en frontend web"
+"Listar favoritos",/favorito/,GET,Auth,❌,,,"Favoritos no implementados en frontend web"
+"Verificar favorito",/favorito/verificar/:fundacionId,GET,Auth,❌,,,"Favoritos no implementados en frontend web"
+"Crear comisión",/comision/create,POST,Auth,✅,,,createComision() en Comision.jsx
+"Comisiones por fundación",/comision/fundacion,GET,Auth,✅,,,getComisiones() + Comisiones.jsx
+"Crear solicitud (público)",/public/solicitudes,POST,None,✅,,,registerFundacion() llama /public/solicitudes (correcto)
+"Solicitudes listas para crear",/admin/solicitudes/ready-for-creation,GET,ADMIN,✅,,,getSolicitudesReadyForCreation()
+"Listar solicitudes",/admin/solicitudes,GET,ADMIN,✅,,,SolicitudesFundacionManagement.jsx
+"Detalle solicitud",/admin/solicitudes/:solicitudId,GET,ADMIN,✅,,,SolicitudDetalleModal.jsx
+"Aprobar solicitud",/admin/solicitudes/:solicitudId/aprobar,PUT,ADMIN,✅,,,approveSolicitudFundacion()
+"Rechazar solicitud",/admin/solicitudes/:solicitudId/rechazar,PUT,ADMIN,✅,,,rejectSolicitudFundacion()
+"Crear denuncia",/denuncias/,POST,DONADOR,✅,,,BotonDenunciar.jsx llama crearDenuncia()
+"Denuncias agrupadas",/denuncias/agrupadas,GET,ADMIN,✅,,,AdminDenuncias.jsx llama obtenerDenunciasAgrupadas()
+"Rechazar denuncia",/denuncias/:id/rechazar,PUT,ADMIN,❌,,,"AdminDenuncias.jsx permite notificar/advertir pero no rechazar denuncias"
+"Reporte transferencias",/reportes/transferencias,GET,Auth,✅,,,getReport() + Reporte.jsx
+"Crear producto PayPal",/paypal/create/product,POST,Auth,❌,,Sí,"PayPal mockeado con nock en backend. CardPayPal.jsx es UI mockeada sin conexión real a API."
+"Crear plan PayPal",/paypal/create/plan,POST,Auth,❌,,Sí,"PayPal mockeado con nock en backend"
+"Crear suscripción PayPal",/paypal/create/subscription,POST,Auth,❌,,Sí,"Suscripción se crea indirectamente via /donacion/crear"
+"Verificar suscripción PayPal",/paypal/verify/subscription,POST,None,❌,,Sí,"Webhook - no aplica frontend"
+"Pago fallido PayPal",/paypal/verify/payment/failed,POST,None,❌,,Sí,"Webhook - no aplica frontend"
+"Cancelar suscripción PayPal (webhook)",/paypal/cancel/subscription,POST,None,❌,,Sí,"Webhook - no aplica frontend"
+"Cancelar suscripción",/paypal/cancel,POST,Auth,✅,,,"cancelSubscripcion() en Manada.jsx. Backend mockeado con nock."
+"Subir archivo",/otros/uploadFile,POST,Auth,✅,,,uploadPhoto() en Aminal.jsx y Actualizacion.jsx
+"Eliminar archivo",/otros/deleteFile,POST,None,✅,,,deletePhoto() en Actualizacion.jsx
+"Clear DB (test)",/test/clear-db,POST,None,❌,,,"Solo testing backend"
+"Crear donación (test)",/test/create-donation,POST,Auth,❌,,,"Solo testing backend"

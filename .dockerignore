@@ -1,0 +1,17 @@
+node_modules
+.git
+.gitignore
+.env
+.env.example
+__pycache__
+*.md
+test
+tests
+coverage
+mocks
+.DS_Store
+docker-compose.yml
+docker-entrypoint-initdb.d
+tempFiles
+uploads/*
+!uploads/.gitkeep

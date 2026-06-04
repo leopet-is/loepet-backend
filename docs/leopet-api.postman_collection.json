@@ -1,0 +1,772 @@
+{
+  "info": {
+    "name": "LEOPET API",
+    "description": "Colección completa de endpoints del backend LEOPET.\n\nVariables de entorno sugeridas:\n- `base_url`: http://localhost:8181\n- `token`: se asigna automáticamente desde login",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8181", "type": "string" },
+    { "key": "token", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@gmail.com\",\n  \"password\": \"admin\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var json = pm.response.json();",
+                  "  pm.collectionVariables.set('token', json.result.token);",
+                  "  console.log('Token asignado automáticamente');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cedula\": \"0999999999\",\n  \"nombres\": \"Nombre\",\n  \"apellidos\": \"Apellido\",\n  \"telefono\": \"0999999999\",\n  \"email\": \"user@mail.com\",\n  \"password\": \"123456\",\n  \"role\": 3,\n  \"direccion\": \"Dirección\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Animales",
+      "item": [
+        {
+          "name": "Listar animales",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"especie\": \"Perro\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/animal/get/animals?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["animal", "get", "animals"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar animales App",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipoAnimal\": \"Perro\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/animal/get/animalsApp?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["animal", "get", "animalsApp"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar por fundación App",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_fundacion\": 1\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/animal/get/animalsFundacionApp?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["animal", "get", "animalsFundacionApp"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Detalle animal",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/animal/get/1",
+              "host": ["{{base_url}}"],
+              "path": ["animal", "get", "1"]
+            }
+          }
+        },
+        {
+          "name": "Crear animal",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Firulais\",\n  \"especie\": \"Perro\",\n  \"raza\": \"Mestizo\",\n  \"descripcion\": \"Rescatado de la calle\",\n  \"sexo\": true,\n  \"peso\": 15,\n  \"enfermedades\": \"Ninguna\",\n  \"esterilizacion\": true,\n  \"vacunacion\": true,\n  \"desparasitacion\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/animal/create",
+              "host": ["{{base_url}}"],
+              "path": ["animal", "create"]
+            }
+          }
+        },
+        {
+          "name": "Actualizar animal",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Firulais Actualizado\",\n  \"peso\": 16\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/animal/update/1",
+              "host": ["{{base_url}}"],
+              "path": ["animal", "update", "1"]
+            }
+          }
+        },
+        {
+          "name": "Eliminar animal",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/animal/delete/1",
+              "host": ["{{base_url}}"],
+              "path": ["animal", "delete", "1"]
+            }
+          }
+        },
+        {
+          "name": "Buscar animal",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/animal/search?q=Firulais",
+              "host": ["{{base_url}}"],
+              "path": ["animal", "search"],
+              "query": [{ "key": "q", "value": "Firulais" }]
+            }
+          }
+        },
+        {
+          "name": "Especies",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/animal/especies",
+              "host": ["{{base_url}}"],
+              "path": ["animal", "especies"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Fundaciones",
+      "item": [
+        {
+          "name": "Listar fundaciones",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/fundacion/?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["fundacion", ""],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear fundación",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ruc\": \"1234567890001\",\n  \"nombre\": \"Nueva Fundación\",\n  \"direccion\": \"Dirección\",\n  \"telefono\": \"0999999999\",\n  \"comision\": 5,\n  \"user_id\": 5,\n  \"id\": 1\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/fundacion/create",
+              "host": ["{{base_url}}"],
+              "path": ["fundacion", "create"]
+            }
+          }
+        },
+        {
+          "name": "Padrinos de fundación",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/fundacion/padrinos/1?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["fundacion", "padrinos", "1"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Manadas",
+      "item": [
+        {
+          "name": "Crear manada",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Manada Alfa\",\n  \"monto\": 10\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/manada/create",
+              "host": ["{{base_url}}"],
+              "path": ["manada", "create"]
+            }
+          }
+        },
+        {
+          "name": "Listar manadas",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/manada/all?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["manada", "all"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Usuarios",
+      "item": [
+        {
+          "name": "Listar usuarios",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/usuario/all?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["usuario", "all"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar usuario",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cedula\": \"0999999999\",\n  \"nombres\": \"Nombre Actualizado\",\n  \"apellidos\": \"Apellido\",\n  \"telefono\": \"0999999999\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/usuario/2",
+              "host": ["{{base_url}}"],
+              "path": ["usuario", "2"]
+            }
+          }
+        },
+        {
+          "name": "Cambiar contraseña",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 2,\n  \"password\": \"admin\",\n  \"newPassword\": \"nueva123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/usuario/update",
+              "host": ["{{base_url}}"],
+              "path": ["usuario", "update"]
+            }
+          }
+        },
+        {
+          "name": "Cambiar estado",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"habilitado\": false\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/usuario/status/2",
+              "host": ["{{base_url}}"],
+              "path": ["usuario", "status", "2"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Donaciones",
+      "item": [
+        {
+          "name": "Listar donaciones",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/donacion/?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["donacion", ""],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear donación",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"manadaId\": 1\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/donacion/crear",
+              "host": ["{{base_url}}"],
+              "path": ["donacion", "crear"]
+            }
+          }
+        },
+        {
+          "name": "Aprobar donación",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"aprobado\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/donacion/aprobar",
+              "host": ["{{base_url}}"],
+              "path": ["donacion", "aprobar"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cuentas Bancarias",
+      "item": [
+        {
+          "name": "Crear cuenta",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"banco\": \"PICHINCHA\",\n  \"numero\": \"1234567890\",\n  \"tipo\": \"AHORROS\",\n  \"nombre\": \"Fundación Ejemplo\",\n  \"fundacionId\": 1\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/cuenta/crear",
+              "host": ["{{base_url}}"],
+              "path": ["cuenta", "crear"]
+            }
+          }
+        },
+        {
+          "name": "Obtener cuenta principal",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cuenta/getPrincipal/2",
+              "host": ["{{base_url}}"],
+              "path": ["cuenta", "getPrincipal", "2"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Actualizaciones",
+      "item": [
+        {
+          "name": "Crear actualización",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descripcion\": \"Visita al veterinario\",\n  \"estado_salud\": \"Muy Bien\",\n  \"animal_id\": 1,\n  \"fundacion_id\": 1,\n  \"fecha\": \"2024-01-15\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/actualizacion/create",
+              "host": ["{{base_url}}"],
+              "path": ["actualizacion", "create"]
+            }
+          }
+        },
+        {
+          "name": "Listar actualizaciones",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/actualizacion/?fundacionId=1&page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["actualizacion", ""],
+              "query": [
+                { "key": "fundacionId", "value": "1" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Calificar actualización",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"valor\": 5,\n  \"actualizacion_id\": 1\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/actualizacion/create/rating",
+              "host": ["{{base_url}}"],
+              "path": ["actualizacion", "create", "rating"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notificaciones",
+      "item": [
+        {
+          "name": "Crear notificación (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fundacionId\": 1,\n  \"mensaje\": \"Fundación aprobada\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/notificacion/admin",
+              "host": ["{{base_url}}"],
+              "path": ["notificacion", "admin"]
+            }
+          }
+        },
+        {
+          "name": "Mis notificaciones",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/notificacion/",
+              "host": ["{{base_url}}"],
+              "path": ["notificacion", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Favoritos",
+      "item": [
+        {
+          "name": "Agregar favorito",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/favorito/agregar/1",
+              "host": ["{{base_url}}"],
+              "path": ["favorito", "agregar", "1"]
+            }
+          }
+        },
+        {
+          "name": "Listar favoritos",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/favorito/",
+              "host": ["{{base_url}}"],
+              "path": ["favorito", ""]
+            }
+          }
+        },
+        {
+          "name": "Eliminar favorito",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/favorito/eliminar/1",
+              "host": ["{{base_url}}"],
+              "path": ["favorito", "eliminar", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Solicitudes de Fundación",
+      "item": [
+        {
+          "name": "Crear solicitud (público)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ruc\": \"1234567890001\",\n  \"nombre\": \"Mi Fundación\",\n  \"direccion\": \"Dirección\",\n  \"telefono\": \"0999999999\",\n  \"email_contacto\": \"contacto@fundacion.com\",\n  \"nombre_contacto\": \"Juan\",\n  \"apellido_contacto\": \"Pérez\",\n  \"cedula_contacto\": \"0912345678\",\n  \"comentarios\": \"Descripción\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/public/solicitudes",
+              "host": ["{{base_url}}"],
+              "path": ["public", "solicitudes"]
+            }
+          }
+        },
+        {
+          "name": "Listar solicitudes (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/solicitudes?estado=pendiente",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "solicitudes"],
+              "query": [{ "key": "estado", "value": "pendiente" }]
+            }
+          }
+        },
+        {
+          "name": "Aprobar solicitud",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/solicitudes/1/aprobar",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "solicitudes", "1", "aprobar"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Denuncias",
+      "item": [
+        {
+          "name": "Crear denuncia (Donador)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "fundacionId", "value": "1", "type": "text" },
+                { "key": "motivo", "value": "Maltrato animal", "type": "text" },
+                { "key": "archivos", "type": "file", "src": "" }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/denuncias/",
+              "host": ["{{base_url}}"],
+              "path": ["denuncias", ""]
+            }
+          }
+        },
+        {
+          "name": "Denuncias agrupadas (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/denuncias/agrupadas?estado=pendiente",
+              "host": ["{{base_url}}"],
+              "path": ["denuncias", "agrupadas"],
+              "query": [{ "key": "estado", "value": "pendiente" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/health",
+              "host": ["{{base_url}}"],
+              "path": ["api", "health"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
