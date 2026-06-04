@@ -8,11 +8,11 @@ const basename = path.basename(__filename);
 const db = {};
 
 const sequelize = new Sequelize(
-  process.env.MYSQL_DATABASE || process.env.DB_NAME || 'test_db',
-  process.env.MYSQL_USER || process.env.DB_USER || 'root',
-  process.env.MYSQL_ROOT_PASSWORD || process.env.MYSQL_PASSWORD || process.env.DB_PASSWORD || 'root',
+  process.env.MYSQL_DATABASE || process.env.MYSQLDATABASE || process.env.DB_NAME || 'test_db',
+  process.env.MYSQL_USER || process.env.MYSQLUSER || process.env.DB_USER || 'root',
+  process.env.MYSQL_ROOT_PASSWORD || process.env.MYSQL_PASSWORD || process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || 'root',
   {
-    host: process.env.MYSQL_HOST || process.env.DB_HOST || 'localhost',
+    host: process.env.MYSQL_HOST || process.env.MYSQLHOST || process.env.MYSQL_HOSTNAME || process.env.DB_HOST || 'localhost',
     dialect: 'mysql',
     logging: false,
   },
