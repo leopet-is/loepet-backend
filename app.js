@@ -13,10 +13,6 @@ app.use(express.urlencoded({ extended: false }));
 // Servir archivos estáticos desde la carpeta uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Servir frontend estático (Vite build output) en producción
-const frontendPath = path.join(__dirname, 'public');
-app.use(express.static(frontendPath));
-
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
@@ -42,13 +38,5 @@ app.use('/paypal', require('./routes/paypal'));
 app.use('/otros', require('./routes/otros'));
 app.use('/test', require('./routes/test'));
 app.use('/denuncias', require('./routes/denunciaRoutes'));
-
-// SPA fallback: servir index.html para todas las rutas no-API
-app.get('*', (req, res) => {
-  if (req.path.startsWith('/api/')) {
-    return res.status(404).json({ error: 'Not found' });
-  }
-  res.sendFile(path.join(frontendPath, 'index.html'));
-});
 
 module.exports = app;
