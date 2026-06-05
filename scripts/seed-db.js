@@ -9,15 +9,26 @@ const DEFAULT_PASSWORD = 'Leopet2025!';
 async function seedDatabase() {
   try {
     await db.connect();
-    const userCount = await db.Usuario.count();
+    const force = process.argv.includes('--force');
 
-    if (userCount > 0) {
-      console.log(`Ya existen ${userCount} usuarios. Saltando seed.`);
-      await db.sequelize.close();
-      return;
+    if (!force) {
+      const userCount = await db.Usuario.count();
+      if (userCount > 0) {
+        console.log(`Ya existen ${userCount} usuarios. Usa --force para sobreescribir.`);
+        await db.sequelize.close();
+        return;
+      }
     }
 
     await db.sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
+
+    if (force) {
+      const tables = Object.keys(db.sequelize.models);
+      for (const table of tables) {
+        await db.sequelize.query(`DELETE FROM \`${table}\``);
+      }
+      console.log('Tablas limpiadas.');
+    }
 
     const sqlPath = path.join(__dirname, 'integradora.sql');
     const sqlContent = fs.readFileSync(sqlPath, 'utf8');
@@ -49,10 +60,10 @@ async function seedDatabase() {
     console.log(`Contraseña para todos: ${DEFAULT_PASSWORD}`);
     console.log('');
     console.log('Donador:    donador@gmail.com');
-    console.log('Admin:      admin@gmail.com');
     console.log('Fundación:  colitafeliz@gmail.com');
     console.log('Fundación:  refugiohuellitas@gmail.com');
     console.log('Fundación:  leopet@gmail.com');
+    console.log('Admin:      admin@gmail.com');
   } catch (err) {
     console.error('Error:', err);
   } finally {
