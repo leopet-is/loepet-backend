@@ -21,7 +21,7 @@ async function seed() {
 
     await db.sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
 
-    const tables = Object.keys(db.sequelize.models);
+    const tables = Object.keys(db.sequelize.models).map(m => db.sequelize.models[m].tableName);
     for (const t of tables) {
       await db.sequelize.query(`DELETE FROM \`${t}\``);
     }
