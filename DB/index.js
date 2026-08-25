@@ -7,16 +7,25 @@ require('dotenv').config();
 const basename = path.basename(__filename);
 const db = {};
 
-const sequelize = new Sequelize(
-  process.env.MYSQL_DATABASE || process.env.MYSQLDATABASE || process.env.DB_NAME || 'test_db',
-  process.env.MYSQL_USER || process.env.MYSQLUSER || process.env.DB_USER || 'root',
-  process.env.MYSQL_ROOT_PASSWORD || process.env.MYSQL_PASSWORD || process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || 'root',
-  {
-    host: process.env.MYSQL_HOST || process.env.MYSQLHOST || process.env.MYSQL_HOSTNAME || process.env.DB_HOST || 'localhost',
-    dialect: 'mysql',
-    logging: false,
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+  dialect: 'postgres',
+  protocol: 'postgres',
+  logging: false, // Cámbialo a console.log si quieres ver los queries en desarrollo
+  dialectOptions: {
+    ssl: {
+      require: true,
+      // Supabase requiere SSL. En entornos de producción o proveedores como Render,
+      // esta opción evita fallos por certificados autofirmados.
+      rejectUnauthorized: false,
+    },
   },
-);
+  pool: {
+    max: 5,
+    min: 0,
+    acquire: 30000,
+    idle: 10000,
+  },
+});
 
 // Cargar modelos dinámicamente
 fs.readdirSync(__dirname)
@@ -44,7 +53,7 @@ db.sequelize = sequelize;
 db.connect = async () => {
   try {
     await sequelize.authenticate();
-    await sequelize.sync();
+    console.log('Connection has been established successfully.');
   } catch (err) {
     console.error('Unable to connect to the database:', err);
   }
