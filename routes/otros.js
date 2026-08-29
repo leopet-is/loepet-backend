@@ -4,7 +4,7 @@ const express = require('express');
 const { AsyncWrapper } = require('../helpers');
 
 // Controladores
-const amazonS3 = require('../scripts/updateImage');
+const amazonS3 = require('../controllers/uploadController');
 
 // Middlewares
 const passport = require('../middlewares/passport');

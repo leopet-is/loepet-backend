@@ -1,11 +1,6 @@
 const fs = require('fs');
 const db = require('../DB/index');
-
-// Cambiar entre S3 y LocalStorage según configuración
-const USE_LOCAL_STORAGE = process.env.USE_LOCAL_STORAGE === 'true';
-const storage = USE_LOCAL_STORAGE
-  ? require('../lib/Storage/LocalStorage')
-  : require('../lib/Storage/S3');
+const storage = require('../services/storage');
 
 exports.crearDenuncia = async (req, res) => {
   try {
@@ -54,10 +49,10 @@ exports.crearDenuncia = async (req, res) => {
 
 exports.rechazarDenuncia = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { denunciaId } = req.params;
     const { motivo_rechazo: motivoRechazo } = req.body;
 
-    const denuncia = await db.Denuncia.findByPk(id);
+    const denuncia = await db.Denuncia.findByPk(denunciaId);
     if (!denuncia) {
       return res.status(404).json({ ok: false, message: 'Denuncia no encontrada' });
     }
