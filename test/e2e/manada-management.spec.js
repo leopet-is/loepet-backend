@@ -102,7 +102,7 @@ describe('E2E: Manada Management', () => {
 
   it('1. Donor should create a Manada successfully', async () => {
     const res = await request(app)
-      .post('/manada/create')
+      .post('/manada')
       .set('Authorization', `Bearer ${donorToken}`)
       .send({
         nombre: 'Manada E2E Test',
@@ -123,16 +123,14 @@ describe('E2E: Manada Management', () => {
     expect(animalId).toBeDefined();
 
     // Nota: El endpoint espera estructura anidada manada: { animalId: [...] }
-    // y el campo manadaId separado.
     const payload = {
-      manadaId,
       manada: {
         animalId: [animalId],
       },
     };
 
     const res = await request(app)
-      .post('/manada/add_animals')
+      .post(`/manada/${manadaId}/animals`)
       .set('Authorization', `Bearer ${donorToken}`)
       .send(payload);
 

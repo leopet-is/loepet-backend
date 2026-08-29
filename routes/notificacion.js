@@ -42,7 +42,7 @@ router.get(
 );
 
 router.put(
-  '/update/:notificacionId',
+  '/:notificacionId',
   passport,
   AsyncWrapper(notificacionController.updateNotificacion),
 );

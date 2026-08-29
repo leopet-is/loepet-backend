@@ -11,57 +11,57 @@ const validations = require('../controllers/validations');
 
 const router = express.Router();
 
-router.post(
-  '/get/animals',
+router.get(
+  '/',
   passport,
   validations.allAnimals,
   AsyncWrapper(animalController.getAllAnimals),
 );
 
-router.post(
-  '/get/animalsApp',
+router.get(
+  '/app',
   passport,
   validations.allAnimals,
   AsyncWrapper(animalController.getAllAnimalsApp),
 );
 
-router.post(
-  '/get/animalsFundacionApp',
+router.get(
+  '/app/fundacion/:fundacionId',
   passport,
-  validations.allAnimals,
+  validations.fundacionParam,
   AsyncWrapper(animalController.getAllAnimalsFundacionApp),
 );
 
+router.get('/especies', passport, AsyncWrapper(animalController.getEspecies));
+
+router.get('/search', passport, AsyncWrapper(animalController.searchAnimal));
+
 router.get(
-  '/get/:animalId',
+  '/:animalId',
   passport,
   validations.animal,
   AsyncWrapper(animalController.getAnimal),
 );
 
-router.get('/especies', passport, AsyncWrapper(animalController.getEspecies));
-
 router.post(
-  '/create',
+  '/',
   passport,
   validations.createAnimal,
   AsyncWrapper(animalController.createAnimal),
 );
 
 router.put(
-  '/update/:animalId',
+  '/:animalId',
   passport,
   validations.createAnimal,
   AsyncWrapper(animalController.updateAnimal),
 );
 
 router.delete(
-  '/delete/:animalId',
+  '/:animalId',
   passport,
   validations.animal,
   AsyncWrapper(animalController.deleteAnimal),
 );
-
-router.get('/search', passport, AsyncWrapper(animalController.searchAnimal));
 
 module.exports = router;

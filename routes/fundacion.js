@@ -11,11 +11,7 @@ const passport = require('../middlewares/passport');
 
 const router = express.Router();
 
-router.post(
-  '/create',
-  passport,
-  AsyncWrapper(fundacionController.createFundacion),
-);
+router.post('/', passport, AsyncWrapper(fundacionController.createFundacion));
 
 router.get('/', passport, AsyncWrapper(fundacionController.getFundaciones));
 
@@ -31,25 +27,20 @@ router.get(
 );
 
 router.get(
-  '/padrinosCalificacion/:fundacionId',
+  '/padrinos/calificacion/:fundacionId',
   AsyncWrapper(fundacionController.getAnimalPadrinosCalificacion),
 );
 
 router.put(
-  '/update',
+  '/:fundacionId',
   passport,
   AsyncWrapper(fundacionController.updateInfoFundacion),
 );
 
-router.post(
-  '/delete',
+router.delete(
+  '/:fundacionId',
   passport,
   AsyncWrapper(fundacionController.deleteFundacion),
-);
-
-router.post(
-  '/register',
-  AsyncWrapper(fundacionController.registerFundacion),
 );
 
 module.exports = router;

@@ -149,7 +149,7 @@ describe('E2E: Evidence Upload Flow', () => {
     };
 
     const res = await request(app)
-      .post('/evidencia/crear')
+      .post('/evidencia')
       .set('Authorization', `Bearer ${foundationToken}`)
       .send(payload);
 

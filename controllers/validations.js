@@ -1,8 +1,8 @@
-const { body, param } = require('express-validator');
+const { body, param, query } = require('express-validator');
 
 /* Validaciones para Animales */
 module.exports.allAnimals = [
-  body('especie')
+  query('especie')
     .optional()
     .isString()
     .withMessage('La especie debe ser de tipo String'),
@@ -13,6 +13,13 @@ module.exports.animal = [
     .exists()
     .isInt()
     .withMessage('Es necesario el campo animalId'),
+];
+
+module.exports.fundacionParam = [
+  param('fundacionId')
+    .exists()
+    .isInt()
+    .withMessage('Es necesario el campo fundacionId'),
 ];
 
 module.exports.createAnimal = [
@@ -48,10 +55,17 @@ module.exports.login = [
 
 /* Validaciones para cuentasBancarias */
 module.exports.cuentaInfo = [
-  param('id')
+  param('fundacionId')
     .exists()
     .isInt()
-    .withMessage('Es necesario el campo id'),
+    .withMessage('Es necesario el campo fundacionId'),
+];
+
+module.exports.cuentaId = [
+  param('cuentaId')
+    .exists()
+    .isInt()
+    .withMessage('Es necesario el campo cuentaId'),
 ];
 
 module.exports.createUpdateCuentaBancaria = [
@@ -80,9 +94,9 @@ module.exports.createRating = [
     .withMessage('El campo valor es requerido')
     .isInt({ min: 1, max: 5 })
     .withMessage('Las estrellas deben ser un número entre 1 y 5.'),
-  body('actualizacion_id')
+  param('actualizacionId')
     .exists()
-    .withMessage('El campo actualizacion_id es requerido')
+    .withMessage('Es necesario el campo actualizacionId')
     .isInt()
-    .withMessage('El campo actualizacion_id debe ser un número entero'),
+    .withMessage('El campo actualizacionId debe ser un número entero'),
 ];

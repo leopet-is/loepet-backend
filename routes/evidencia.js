@@ -10,14 +10,10 @@ const passport = require('../middlewares/passport');
 
 const router = express.Router();
 
-router.post(
-  '/crear',
-  passport,
-  AsyncWrapper(evidenciaController.crearEvidencia),
-);
+router.post('/', passport, AsyncWrapper(evidenciaController.crearEvidencia));
 
 router.put(
-  '/update/:id',
+  '/:evidenciaId',
   passport,
   AsyncWrapper(evidenciaController.updateEvidencia),
 );

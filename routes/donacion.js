@@ -18,14 +18,18 @@ router.get(
   AsyncWrapper(donacionController.getDineroDisponible),
 );
 
+router.post('/', passport, AsyncWrapper(donacionController.crearDonacion));
+
 router.put(
-  '/aprobar',
+  '/:donacionId/aprobado',
   passport,
   AsyncWrapper(donacionController.aprobarDonacion),
 );
 
-router.put('/pagado', passport, AsyncWrapper(donacionController.pagarDonacion));
-
-router.post('/crear', passport, AsyncWrapper(donacionController.crearDonacion));
+router.put(
+  '/:donacionId/pagado',
+  passport,
+  AsyncWrapper(donacionController.pagarDonacion),
+);
 
 module.exports = router;

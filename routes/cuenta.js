@@ -12,56 +12,56 @@ const validations = require('../controllers/validations');
 const router = express.Router();
 
 router.get(
-  '/get/:id',
+  '/fundacion/:fundacionId',
   passport,
   validations.cuentaInfo,
   AsyncWrapper(cuentaController.getCuentaBancaria),
 );
 
 router.get(
-  '/getPrincipal/:id',
+  '/fundacion/:fundacionId/principal',
   passport,
   validations.cuentaInfo,
   AsyncWrapper(cuentaController.getCuentaBancariaPrincipal),
 );
 
 router.get(
-  '/getAll/:id',
+  '/fundacion/:fundacionId/all',
   passport,
   validations.cuentaInfo,
   AsyncWrapper(cuentaController.getAllCuentaBancaria),
 );
 
+router.post(
+  '/',
+  passport,
+  validations.createUpdateCuentaBancaria,
+  AsyncWrapper(cuentaController.crearCuentaBancaria),
+);
+
 router.put(
-  '/update/:id',
+  '/fundacion/:fundacionId',
   passport,
   validations.createUpdateCuentaBancaria,
   AsyncWrapper(cuentaController.updateCuentaBancaria),
 );
 
 router.put(
-  '/updateCuentaID/:cuenta_id',
-  passport,
-  validations.createUpdateCuentaBancaria,
-  AsyncWrapper(cuentaController.updateCuentaBancariaIDCuenta),
-);
-
-router.put(
-  '/updatePrincipal/:fundacion_id',
+  '/fundacion/:fundacionId/principal',
   passport,
   validations.createUpdateCuentaBancaria,
   AsyncWrapper(cuentaController.updateCuentaPrincipal),
 );
 
-router.post(
-  '/crear',
+router.put(
+  '/:cuentaId',
   passport,
   validations.createUpdateCuentaBancaria,
-  AsyncWrapper(cuentaController.crearCuentaBancaria),
+  AsyncWrapper(cuentaController.updateCuentaBancariaIDCuenta),
 );
 
 router.delete(
-  '/delete/:cuentaId',
+  '/:cuentaId',
   passport,
   validations.createUpdateCuentaBancaria,
   AsyncWrapper(cuentaController.deleteCuenta),

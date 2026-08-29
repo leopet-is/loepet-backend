@@ -6,7 +6,7 @@ exports.agregarFavorito = async (req, res) => {
   await validateRequest(req);
   try {
     const { User } = req;
-    const { fundacionId } = req.params;
+    const { fundacionId } = req.body;
 
     // Validar que la fundación exista
     const fundacion = await db.Fundacion.findByPk(fundacionId);

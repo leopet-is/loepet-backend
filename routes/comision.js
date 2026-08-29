@@ -12,7 +12,7 @@ const passport = require('../middlewares/passport');
 const router = express.Router();
 
 router.post(
-  '/create',
+  '/',
   passport,
   AsyncWrapper(comisionController.crearComision),
 );

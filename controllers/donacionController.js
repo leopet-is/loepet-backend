@@ -183,13 +183,14 @@ exports.crearDonacion = async (req, res) => {
 exports.aprobarDonacion = async (req, res) => {
   await validateRequest(req);
   try {
-    const { id, aprobado } = req.body;
+    const { donacionId } = req.params;
+    const { aprobado } = req.body;
     const update = {
       aprobado,
       updatedAt: Date.now(),
     };
     const donacionInfo = await db.Donacion.update(update, {
-      where: { id },
+      where: { id: donacionId },
     });
 
     const response = {
@@ -216,13 +217,14 @@ exports.aprobarDonacion = async (req, res) => {
 exports.pagarDonacion = async (req, res) => {
   await validateRequest(req);
   try {
-    const { id, status } = req.body;
+    const { donacionId } = req.params;
+    const { status } = req.body;
     const update = {
       pagado: _.isEqual(_.toLower(status), 'success'),
       updatedAt: Date.now(),
     };
     const donacionInfo = await db.Donacion.update(update, {
-      where: { id },
+      where: { id: donacionId },
     });
 
     const response = {

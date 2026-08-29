@@ -169,9 +169,9 @@ describe('Commission System - Corrected Tests', () => {
       const token = loginRes.body.result?.token;
 
       const response = await supertest(app)
-        .post('/actualizacion/create/rating')
+        .post(`/actualizacion/${actualizacion.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: 1, actualizacion_id: actualizacion.id });
+        .send({ valor: 1 });
 
       expect(response.status).toBe(200);
       expect(response.body.mensaje).toContain('Rating registrado');
@@ -212,9 +212,9 @@ describe('Commission System - Corrected Tests', () => {
       const token = loginRes.body.result?.token;
 
       const response = await supertest(app)
-        .post('/actualizacion/create/rating')
+        .post(`/actualizacion/${actualizacion2.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: 3, actualizacion_id: actualizacion2.id });
+        .send({ valor: 3 });
 
       expect(response.status).toBe(200);
       expect(response.body.mensaje).toContain('Rating registrado');
@@ -260,9 +260,9 @@ describe('Commission System - Corrected Tests', () => {
       const token = loginRes.body.result?.token;
 
       const response = await supertest(app)
-        .post('/actualizacion/create/rating')
+        .post(`/actualizacion/${actualizacion3.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: 5, actualizacion_id: actualizacion3.id });
+        .send({ valor: 5 });
 
       expect(response.status).toBe(200);
       expect(response.body.mensaje).toContain('Rating registrado');
@@ -281,9 +281,9 @@ describe('Commission System - Corrected Tests', () => {
       const token = loginRes.body.result?.token;
 
       const response = await supertest(app)
-        .post('/actualizacion/create/rating')
+        .post(`/actualizacion/${actualizacion.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: 0, actualizacion_id: actualizacion.id });
+        .send({ valor: 0 });
 
       expect(response.status).toBe(422);
       expect(response.body.valor).toBeDefined();
@@ -296,9 +296,9 @@ describe('Commission System - Corrected Tests', () => {
       const token = loginRes.body.result?.token;
 
       const response = await supertest(app)
-        .post('/actualizacion/create/rating')
+        .post(`/actualizacion/${actualizacion.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: 6, actualizacion_id: actualizacion.id });
+        .send({ valor: 6 });
 
       expect(response.status).toBe(422);
       expect(response.body.valor).toBeDefined();
@@ -311,9 +311,9 @@ describe('Commission System - Corrected Tests', () => {
       const token = loginRes.body.result?.token;
 
       const response = await supertest(app)
-        .post('/actualizacion/create/rating')
+        .post(`/actualizacion/${actualizacion.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: '5', actualizacion_id: actualizacion.id });
+        .send({ valor: '5' });
 
       // String might be coerced to number by validation - accept either 200 or 422
       expect([200, 422]).toContain(response.status);
@@ -326,9 +326,9 @@ describe('Commission System - Corrected Tests', () => {
       const token = loginRes.body.result?.token;
 
       const response = await supertest(app)
-        .post('/actualizacion/create/rating')
+        .post(`/actualizacion/${actualizacion.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: null, actualizacion_id: actualizacion.id });
+        .send({ valor: null });
 
       expect(response.status).toBe(422);
     });
@@ -345,9 +345,9 @@ describe('Commission System - Corrected Tests', () => {
       const token = loginRes.body.result?.token;
 
       const response = await supertest(app)
-        .post('/actualizacion/create/rating')
+        .post(`/actualizacion/${actualizacion.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: 1, actualizacion_id: actualizacion.id });
+        .send({ valor: 1 });
 
       expect(response.status).toBe(200);
       expect(response.body.mensaje).toBeDefined();
@@ -387,9 +387,9 @@ describe('Commission System - Corrected Tests', () => {
       const token = loginRes.body.result?.token;
 
       const response = await supertest(app)
-        .post('/actualizacion/create/rating')
+        .post(`/actualizacion/${actualizacion4.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: 5, actualizacion_id: actualizacion4.id });
+        .send({ valor: 5 });
 
       expect(response.status).toBe(200);
       expect(response.body.mensaje).toBeDefined();
@@ -408,9 +408,9 @@ describe('Commission System - Corrected Tests', () => {
       const token = loginRes.body.result?.token;
 
       const response = await supertest(app)
-        .post('/actualizacion/create/rating')
+        .post(`/actualizacion/${actualizacion.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: 0, actualizacion_id: actualizacion.id });
+        .send({ valor: 0 });
 
       expect(response.status).toBe(422);
     });
@@ -422,9 +422,9 @@ describe('Commission System - Corrected Tests', () => {
       const token = loginRes.body.result?.token;
 
       const response = await supertest(app)
-        .post('/actualizacion/create/rating')
+        .post(`/actualizacion/${actualizacion.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: 6, actualizacion_id: actualizacion.id });
+        .send({ valor: 6 });
 
       expect(response.status).toBe(422);
     });
@@ -441,9 +441,9 @@ describe('Commission System - Corrected Tests', () => {
       const token = loginRes.body.result?.token;
 
       const response = await supertest(app)
-        .post('/actualizacion/create/rating')
+        .post(`/actualizacion/${actualizacion.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: 3, actualizacion_id: actualizacion.id });
+        .send({ valor: 3 });
 
       expect(response.status).toBe(200);
       expect(response.body.mensaje).toBeDefined();
@@ -456,9 +456,9 @@ describe('Commission System - Corrected Tests', () => {
       const token = loginRes.body.result?.token;
 
       const response = await supertest(app)
-        .post('/actualizacion/create/rating')
+        .post(`/actualizacion/${actualizacion.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: 0, actualizacion_id: actualizacion.id });
+        .send({ valor: 0 });
 
       expect(response.status).toBe(422);
     });
@@ -470,9 +470,9 @@ describe('Commission System - Corrected Tests', () => {
       const token = loginRes.body.result?.token;
 
       const response = await supertest(app)
-        .post('/actualizacion/create/rating')
+        .post('/actualizacion/99999/ratings')
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: 3, actualizacion_id: 99999 });
+        .send({ valor: 3 });
 
       // DB constraint fails, returns 500
       expect(response.status).toBe(500);
@@ -485,9 +485,9 @@ describe('Commission System - Corrected Tests', () => {
       const token = loginRes.body.result?.token;
 
       const response = await supertest(app)
-        .post('/actualizacion/create/rating')
+        .post(`/actualizacion/${actualizacion.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: 1, actualizacion_id: actualizacion.id });
+        .send({ valor: 1 });
 
       expect(response.status).toBe(200);
       expect(response.body.mensaje).toContain('registrado');
@@ -527,9 +527,9 @@ describe('Commission System - Corrected Tests', () => {
       const token = loginRes.body.result?.token;
 
       const response = await supertest(app)
-        .post('/actualizacion/create/rating')
+        .post(`/actualizacion/${actualizacion5.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: 5, actualizacion_id: actualizacion5.id });
+        .send({ valor: 5 });
 
       expect(response.status).toBe(200);
       expect(response.body.mensaje).toContain('registrado');

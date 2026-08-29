@@ -191,9 +191,8 @@ exports.getActualizaciones = async (req, res) => {
 exports.createRating = async (req, res) => {
   await validateRequest(req);
   try {
-    const {
-      valor, actualizacion_id: actualizacionId,
-    } = req.body;
+    const { actualizacionId } = req.params;
+    const { valor } = req.body;
     await db.Rating.create({
       valor,
       actualizacion_id: actualizacionId,
@@ -217,12 +216,10 @@ exports.createRating = async (req, res) => {
 exports.loadRating = async (req, res) => {
   await validateRequest(req);
   try {
-    const {
-      id,
-    } = req.body;
+    const { actualizacionId } = req.params;
     const { count, rows } = await db.Rating.findAndCountAll({
       where: {
-        actualizacion_id: id,
+        actualizacion_id: actualizacionId,
       },
     });
     let promedio = 0;

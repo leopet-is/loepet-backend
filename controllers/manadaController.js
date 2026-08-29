@@ -67,7 +67,8 @@ exports.addAnimals = async (req, res) => {
   const { User } = req;
 
   try {
-    const { manada, manadaId } = req.body;
+    const { manadaId } = req.params;
+    const manada = req.body;
     const animals = _.get(manada, 'animalId');
 
     if (!(await validateManada(manadaId, User.id))) {
@@ -292,7 +293,7 @@ exports.deleteAnimalManada = async (req, res) => {
   await validateRequest(req);
   try {
     const { User } = req;
-    const { manadaId, animalId } = req.body;
+    const { manadaId, animalId } = req.params;
     const validationManada = await validateManada(manadaId, User.id);
 
     if (!validationManada) {
@@ -326,8 +327,8 @@ exports.deleteManada = async (req, res) => {
   await validateRequest(req);
   try {
     const { User } = req;
-    const { id } = req.body;
-    const validationManada = await validateManada(id, User.id);
+    const { manadaId } = req.params;
+    const validationManada = await validateManada(manadaId, User.id);
 
     if (!validationManada) {
       return res
@@ -339,7 +340,7 @@ exports.deleteManada = async (req, res) => {
       updatedAt: Date.now(),
     };
     await db.Manada.update(update, {
-      where: { id },
+      where: { id: manadaId },
     });
     const response = { result: 'Manada eliminada exitosamente' };
     return res.send(response);
@@ -363,10 +364,11 @@ exports.updateInfoManada = async (req, res) => {
   await validateRequest(req);
   try {
     const { User } = req;
+    const { manadaId } = req.params;
     const {
-      id, nombre, monto, galeriamanada,
+      nombre, monto, galeriamanada,
     } = req.body;
-    const validationManada = await validateManada(id, User.id);
+    const validationManada = await validateManada(manadaId, User.id);
     const response = {
       result: 'No tiene credenciales',
     };
@@ -378,7 +380,7 @@ exports.updateInfoManada = async (req, res) => {
         updatedAt: Date.now(),
       };
       await db.Manada.update(update, {
-        where: { id },
+        where: { id: manadaId },
       });
       response.result = 'Informacion actualizada';
     }

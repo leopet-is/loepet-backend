@@ -175,9 +175,9 @@ describe.skip('ActualizacionController - createRating integration', () => {
     // Enviar calificación
     const ratingValue = 3; // 3 de 5 estrellas
     const response = await supertest(app)
-      .post('/actualizacion/create/rating')
+      .post(`/actualizacion/${actualizacion.id}/ratings`)
       .set('Authorization', `Bearer ${token}`)
-      .send({ valor: ratingValue, actualizacion_id: actualizacion.id });
+      .send({ valor: ratingValue });
 
     expect(response.status).toBe(200);
     expect(response.body.mensaje).toBe('Rating registrado exitosamente.');
@@ -199,9 +199,9 @@ describe.skip('ActualizacionController - createRating integration', () => {
     const { token } = loginRes.body.result;
 
     const response = await supertest(app)
-      .post('/actualizacion/create/rating')
+      .post(`/actualizacion/${actualizacion.id}/ratings`)
       .set('Authorization', `Bearer ${token}`)
-      .send({ valor: 6, actualizacion_id: actualizacion.id }); // Valor inválido
+      .send({ valor: 6 }); // Valor inválido
 
     expect(response.status).toBe(422);
     expect(response.body.valor[0]).toContain('Las estrellas deben ser un número entre 1 y 5.');
@@ -215,9 +215,9 @@ describe.skip('ActualizacionController - createRating integration', () => {
     const token = loginRes.body.result?.token;
 
     const response = await supertest(app)
-      .post('/actualizacion/create/rating')
+      .post('/actualizacion/99999/ratings')
       .set('Authorization', `Bearer ${token}`)
-      .send({ valor: 3, actualizacion_id: 99999 }); // ID no existente
+      .send({ valor: 3 }); // ID no existente
 
     // El controlador actual retorna 500 por error de FK, no 404
     expect(response.status).toBe(500);
@@ -241,9 +241,9 @@ describe.skip('ActualizacionController - createRating integration', () => {
     const token = loginRes.body.result?.token;
 
     const response = await supertest(app)
-      .post('/actualizacion/create/rating')
+      .post(`/actualizacion/${actualizacion2.id}/ratings`)
       .set('Authorization', `Bearer ${token}`)
-      .send({ valor: 3, actualizacion_id: actualizacion2.id });
+      .send({ valor: 3 });
 
     expect(response.status).toBe(200);
     expect(response.body.mensaje).toBe('Rating registrado exitosamente.');

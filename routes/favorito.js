@@ -12,14 +12,14 @@ const router = express.Router();
 
 // Agregar fundación a favoritos
 router.post(
-  '/agregar/:fundacionId',
+  '/',
   passport,
   AsyncWrapper(favoritoController.agregarFavorito),
 );
 
 // Eliminar fundación de favoritos
 router.delete(
-  '/eliminar/:fundacionId',
+  '/:fundacionId',
   passport,
   AsyncWrapper(favoritoController.eliminarFavorito),
 );
@@ -33,7 +33,7 @@ router.get(
 
 // Verificar si una fundación es favorita
 router.get(
-  '/verificar/:fundacionId',
+  '/:fundacionId',
   passport,
   AsyncWrapper(favoritoController.verificarFavorito),
 );

@@ -16,17 +16,17 @@ const db = require('../DB/index');
 exports.updateUserStatus = async (req, res) => {
   await validateRequest(req);
   try {
-    const { id } = req.params;
+    const { usuarioId } = req.params;
     const { habilitado } = req.body;
 
     // Un admin no se puede deshabilitar a sí mismo
-    if (req.User.id === parseInt(id, 10)) {
+    if (req.User.id === parseInt(usuarioId, 10)) {
       return res.status(400).send({ error: 'No puedes deshabilitar tu propia cuenta.' });
     }
 
     await db.Usuario.update(
       { habilitado },
-      { where: { id } },
+      { where: { id: usuarioId } },
     );
 
     const response = {
@@ -85,7 +85,7 @@ exports.getInfo = async (req, res) => {
 exports.updateInfo = async (req, res) => {
   await validateRequest(req);
   try {
-    const { id } = req.params;
+    const { usuarioId } = req.params;
     const {
       cedula, nombres, apellidos, direccion, telefono,
     } = req.body;
@@ -98,7 +98,7 @@ exports.updateInfo = async (req, res) => {
       updatedAt: Date.now(),
     };
     const UserInfo = await db.Usuario.update(update, {
-      where: { id },
+      where: { id: usuarioId },
     });
 
     const response = {
@@ -124,11 +124,12 @@ exports.updateInfo = async (req, res) => {
 exports.updatePassword = async (req, res) => {
   await validateRequest(req);
   try {
-    const { id, password, newPassword } = req.body;
+    const { usuarioId } = req.params;
+    const { password, newPassword } = req.body;
 
     const oldPassword = await db.Usuario.findOne({
       where: {
-        id,
+        id: usuarioId,
       },
     });
 
@@ -145,7 +146,7 @@ exports.updatePassword = async (req, res) => {
       updatedAt: Date.now(),
     };
     const UserInfo = await db.Usuario.update(update, {
-      where: { id },
+      where: { id: usuarioId },
     });
     const response = {
       message: 'Correo actualizado',

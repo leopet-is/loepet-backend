@@ -40,9 +40,9 @@ router.get(
   reportController.obtenerDenunciasPorFundacion,
 );
 
-// PUT /denuncias/:id/rechazar - Solo Admin puede rechazar denuncias
+// PUT /denuncias/:denunciaId - Solo Admin puede rechazar denuncias
 router.put(
-  '/:id/rechazar',
+  '/:denunciaId',
   auth,
   checkRole([ROL.ADMIN.ROL_ID]),
   denunciaController.rechazarDenuncia,

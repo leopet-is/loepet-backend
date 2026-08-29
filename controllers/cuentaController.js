@@ -15,10 +15,10 @@ const db = require('../DB/index');
 exports.getCuentaBancaria = async (req, res) => {
   await validateRequest(req);
   try {
-    const { id } = req.params;
+    const { fundacionId } = req.params;
     const result = await db.CuentaBancaria.findOne({
       where: {
-        fundacion_id: id,
+        fundacion_id: fundacionId,
       },
     });
     const response = {
@@ -39,10 +39,10 @@ exports.getCuentaBancaria = async (req, res) => {
 exports.getCuentaBancariaPrincipal = async (req, res) => {
   await validateRequest(req);
   try {
-    const { id } = req.params;
+    const { fundacionId } = req.params;
     const result = await db.CuentaBancaria.findOne({
       where: {
-        fundacion_id: id,
+        fundacion_id: fundacionId,
         principal: true,
       },
     });
@@ -61,13 +61,13 @@ exports.getCuentaBancariaPrincipal = async (req, res) => {
 exports.getAllCuentaBancaria = async (req, res) => {
   await validateRequest(req);
   try {
-    const { id } = req.params;
+    const { fundacionId } = req.params;
     const limit = parseInt(req.query.limit || '1', 10);
     const page = parseInt(req.query.page || '1', 10);
     let result = [];
     const cuentas = await db.CuentaBancaria.findAndCountAll({
       where: {
-        fundacion_id: id,
+        fundacion_id: fundacionId,
       },
     });
     const { rows, count } = cuentas;
@@ -137,7 +137,7 @@ exports.crearCuentaBancaria = async (req, res) => {
 exports.updateCuentaBancaria = async (req, res) => {
   await validateRequest(req);
   try {
-    const { id } = req.params;
+    const { fundacionId } = req.params;
     const {
       banco, numero, tipo, nombre,
     } = req.body;
@@ -149,7 +149,7 @@ exports.updateCuentaBancaria = async (req, res) => {
       updatedAt: Date.now(),
     };
     const cuenta = await db.CuentaBancaria.update(update, {
-      where: { fundacion_id: id },
+      where: { fundacion_id: fundacionId },
     });
 
     const response = {
@@ -170,7 +170,7 @@ exports.updateCuentaBancaria = async (req, res) => {
 exports.updateCuentaBancariaIDCuenta = async (req, res) => {
   await validateRequest(req);
   try {
-    const { cuenta_id: cuentaId } = req.params;
+    const { cuentaId } = req.params;
     const {
       banco, numero, tipo, nombre,
     } = req.body;
@@ -203,7 +203,7 @@ exports.updateCuentaBancariaIDCuenta = async (req, res) => {
 exports.updateCuentaPrincipal = async (req, res) => {
   await validateRequest(req);
   try {
-    const { fundacion_id: fundacionId } = req.params;
+    const { fundacionId } = req.params;
     const {
       id,
     } = req.body;

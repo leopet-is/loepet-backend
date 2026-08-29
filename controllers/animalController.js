@@ -156,7 +156,8 @@ exports.getAllAnimals = async (req, res) => {
   await validateRequest(req);
   try {
     const { User } = req;
-    const { especie = {}, manada = {} } = req.body;
+    const { especie } = req.query;
+    const manadaId = req.query.manada ? parseInt(req.query.manada, 10) : null;
     const { q } = req.query;
     const page = parseInt(req.query.page || '1', 10);
     const limit = parseInt(req.query.limit || '1', 10);
@@ -164,7 +165,7 @@ exports.getAllAnimals = async (req, res) => {
     let query = {};
     let responseBody;
     let result = [];
-    if (!_.isNumber(manada)) {
+    if (!manadaId) {
       query = {
         where: {
           ...(!_.isEmpty(especie) ? { especie } : {}),
@@ -186,7 +187,7 @@ exports.getAllAnimals = async (req, res) => {
     } else {
       query = {
         where: {
-          id: manada,
+          id: manadaId,
         },
       };
       const responseManada = await db.Manada.findOne(query);
@@ -196,7 +197,7 @@ exports.getAllAnimals = async (req, res) => {
       ) {
         query = {
           where: {
-            manada_id: manada,
+            manada_id: manadaId,
           },
         };
         responseBody = await db.ManadaAnimal.findAndCountAll(query);
@@ -243,33 +244,22 @@ exports.getAllAnimals = async (req, res) => {
 exports.getAllAnimalsApp = async (req, res) => {
   await validateRequest(req);
   try {
-    const { tipoAnimal = {} } = req.body;
+    const { tipoAnimal } = req.query;
     const page = parseInt(req.query.page || '1', 10);
     const limit = parseInt(req.query.limit || '1', 10);
     let total;
     let query = {};
     let responseBody;
-    if (!_.isNull(tipoAnimal)) {
-      if (tipoAnimal == 'TODOS') {
-        query = {
-          where: {
-            visible: true,
-          },
-          order: [['id', 'DESC']],
-          offset: (page - 1) * limit,
-          limit,
-        };
-      } else {
-        query = {
-          where: {
-            especie: tipoAnimal,
-            visible: true,
-          },
-          order: [['id', 'DESC']],
-          offset: (page - 1) * limit,
-          limit,
-        };
-      }
+    query = {
+      where: {
+        visible: true,
+      },
+      order: [['id', 'DESC']],
+      offset: (page - 1) * limit,
+      limit,
+    };
+    if (!_.isEmpty(tipoAnimal) && tipoAnimal !== 'TODOS') {
+      query.where.especie = tipoAnimal;
     }
 
     responseBody = await db.Animal.findAndCountAll(query);
@@ -304,30 +294,28 @@ exports.getAllAnimalsApp = async (req, res) => {
 exports.getAllAnimalsFundacionApp = async (req, res) => {
   await validateRequest(req);
   try {
-    const { id_fundacion = {} } = req.body;
+    const { fundacionId } = req.params;
     const page = parseInt(req.query.page || '1', 10);
     const limit = parseInt(req.query.limit || '1', 10);
     let total;
     let query = {};
     let responseBody;
-    if (!_.isNull(id_fundacion)) {
-      query = {
-        where: {
-          fundacion_id: id_fundacion,
-          visible: true,
-        },
-        order: [['id', 'DESC']],
-        offset: (page - 1) * limit,
-        limit,
-      };
-    }
+    query = {
+      where: {
+        fundacion_id: fundacionId,
+        visible: true,
+      },
+      order: [['id', 'DESC']],
+      offset: (page - 1) * limit,
+      limit,
+    };
 
     responseBody = await db.Animal.findAndCountAll(query);
     const { rows, count } = responseBody;
     total = count;
     const result = await Promise.all(rows.map(async (animals) => {
-      const fundacionId = _.get(animals, 'fundacion_id');
-      const fundacion = await getFundacionInfo(fundacionId);
+      const animalFundacionId = _.get(animals, 'fundacion_id');
+      const fundacion = await getFundacionInfo(animalFundacionId);
       return parseData(animals, fundacion);
     }));
 

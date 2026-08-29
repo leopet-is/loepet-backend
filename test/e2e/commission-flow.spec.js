@@ -154,7 +154,7 @@ describe.skip('E2E: Commission Flow - Money by Stars', () => {
       // ============================================
 
       const evidenciaRes = await request(app)
-        .post('/actualizacion/create')
+        .post('/actualizacion')
         .set('Authorization', `Bearer ${fundacionToken}`)
         .send({
           descripcion: 'Evidencia de cuidado - E2E Test',
@@ -201,7 +201,7 @@ describe.skip('E2E: Commission Flow - Money by Stars', () => {
       // ============================================
 
       const markReadRes = await request(app)
-        .put(`/notificacion/update/${notificacion.id}`)
+        .put(`/notificacion/${notificacion.id}`)
         .set('Authorization', `Bearer ${donadorToken}`)
         .send({
           leido: true,
@@ -220,11 +220,10 @@ describe.skip('E2E: Commission Flow - Money by Stars', () => {
       // ============================================
 
       const ratingRes = await request(app)
-        .post('/actualizacion/create/rating')
+        .post(`/actualizacion/${actualizacion.id}/ratings`)
         .set('Authorization', `Bearer ${donadorToken}`)
         .send({
           valor: 4, // 4 stars = 80%
-          actualizacion_id: actualizacion.id,
         });
 
       expect(ratingRes.status).toBe(200);
@@ -314,11 +313,10 @@ describe.skip('E2E: Commission Flow - Money by Stars', () => {
       });
 
       const res = await request(app)
-        .post('/actualizacion/create/rating')
+        .post(`/actualizacion/${actualizacionSinDonacion.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
         .send({
           valor: 5,
-          actualizacion_id: actualizacionSinDonacion.id,
         });
 
       expect(res.status).toBe(404);
@@ -335,21 +333,19 @@ describe.skip('E2E: Commission Flow - Money by Stars', () => {
       const { token } = loginRes.body.result;
 
       const res1 = await request(app)
-        .post('/actualizacion/create/rating')
+        .post(`/actualizacion/${actualizacion.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
         .send({
           valor: 0, // Invalid: < 1
-          actualizacion_id: actualizacion.id,
         });
 
       expect(res1.status).toBe(422); // Validation error
 
       const res2 = await request(app)
-        .post('/actualizacion/create/rating')
+        .post(`/actualizacion/${actualizacion.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
         .send({
           valor: 6, // Invalid: > 5
-          actualizacion_id: actualizacion.id,
         });
 
       expect(res2.status).toBe(422); // Validation error
@@ -363,11 +359,10 @@ describe.skip('E2E: Commission Flow - Money by Stars', () => {
       const { token } = loginRes.body.result;
 
       const res = await request(app)
-        .post('/actualizacion/create/rating')
+        .post('/actualizacion/99999/ratings')
         .set('Authorization', `Bearer ${token}`)
         .send({
-          valor: 5,
-          actualizacion_id: 99999, // Non-existent
+          valor: 5, // Non-existent
         });
 
       expect(res.status).toBe(404);
@@ -447,11 +442,10 @@ describe.skip('E2E: Commission Flow - Money by Stars', () => {
 
         // Test: calificar con N estrellas
         const res = await request(app)
-          .post('/actualizacion/create/rating')
+          .post(`/actualizacion/${actualizacionCalc.id}/ratings`)
           .set('Authorization', `Bearer ${token}`)
           .send({
             valor: stars,
-            actualizacion_id: actualizacionCalc.id,
           });
 
         expect(res.status).toBe(200);

@@ -128,7 +128,7 @@ describe('E2E: Duplicate Reports Prevention', () => {
   describe('First Report Generation', () => {
     it('should get available animals/manadas for report', async () => {
       const res = await request(app)
-        .get(`/fundacion/padrinosCalificacion/${fundacionProfile.id}`)
+        .get(`/fundacion/padrinos/calificacion/${fundacionProfile.id}`)
         .set('Authorization', `Bearer ${adminToken}`)
         .query({ page: 1, limit: 15 });
 
@@ -143,7 +143,7 @@ describe('E2E: Duplicate Reports Prevention', () => {
     it('should create first commission report successfully', async () => {
       // Primero obtener los animales disponibles
       const getAnimalsRes = await request(app)
-        .get(`/fundacion/padrinosCalificacion/${fundacionProfile.id}`)
+        .get(`/fundacion/padrinos/calificacion/${fundacionProfile.id}`)
         .set('Authorization', `Bearer ${adminToken}`)
         .query({ page: 1, limit: 15 });
 
@@ -155,7 +155,7 @@ describe('E2E: Duplicate Reports Prevention', () => {
 
       // Crear el reporte
       const res = await request(app)
-        .post('/comision/create')
+        .post('/comision')
         .set('Authorization', `Bearer ${adminToken}`)
         .send({
           fundacionId: fundacionProfile.id,
@@ -193,7 +193,7 @@ describe('E2E: Duplicate Reports Prevention', () => {
     it('should NOT show already reported animals/manadas', async () => {
       // Intentar obtener animales disponibles de nuevo
       const res = await request(app)
-        .get(`/fundacion/padrinosCalificacion/${fundacionProfile.id}`)
+        .get(`/fundacion/padrinos/calificacion/${fundacionProfile.id}`)
         .set('Authorization', `Bearer ${adminToken}`)
         .query({ page: 1, limit: 15 });
 
@@ -210,7 +210,7 @@ describe('E2E: Duplicate Reports Prevention', () => {
 
       // Este test valida que el backend rechaza reportes sin animales
       const res = await request(app)
-        .post('/comision/create')
+        .post('/comision')
         .set('Authorization', `Bearer ${adminToken}`)
         .send({
           fundacionId: fundacionProfile.id,
@@ -253,7 +253,7 @@ describe('E2E: Duplicate Reports Prevention', () => {
 
       // Ahora debería poder obtener los animales de nuevo
       const res = await request(app)
-        .get(`/fundacion/padrinosCalificacion/${fundacionProfile.id}`)
+        .get(`/fundacion/padrinos/calificacion/${fundacionProfile.id}`)
         .set('Authorization', `Bearer ${adminToken}`)
         .query({ page: 1, limit: 15 });
 
@@ -266,7 +266,7 @@ describe('E2E: Duplicate Reports Prevention', () => {
 
     it('should create second report successfully after 30 days', async () => {
       const getAnimalsRes = await request(app)
-        .get(`/fundacion/padrinosCalificacion/${fundacionProfile.id}`)
+        .get(`/fundacion/padrinos/calificacion/${fundacionProfile.id}`)
         .set('Authorization', `Bearer ${adminToken}`)
         .query({ page: 1, limit: 15 });
 
@@ -275,7 +275,7 @@ describe('E2E: Duplicate Reports Prevention', () => {
       const total_comision = animales.reduce((sum, a) => sum + (a.montocomision || 0), 0);
 
       const res = await request(app)
-        .post('/comision/create')
+        .post('/comision')
         .set('Authorization', `Bearer ${adminToken}`)
         .send({
           fundacionId: fundacionProfile.id,
@@ -312,7 +312,7 @@ describe('E2E: Duplicate Reports Prevention', () => {
   describe('Validation: Missing animals array', () => {
     it('should reject report without animals array', async () => {
       const res = await request(app)
-        .post('/comision/create')
+        .post('/comision')
         .set('Authorization', `Bearer ${adminToken}`)
         .send({
           fundacionId: fundacionProfile.id,
@@ -327,7 +327,7 @@ describe('E2E: Duplicate Reports Prevention', () => {
 
     it('should reject report with empty animals array', async () => {
       const res = await request(app)
-        .post('/comision/create')
+        .post('/comision')
         .set('Authorization', `Bearer ${adminToken}`)
         .send({
           fundacionId: fundacionProfile.id,

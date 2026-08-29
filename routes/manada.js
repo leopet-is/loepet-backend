@@ -11,36 +11,32 @@ const passport = require('../middlewares/passport');
 
 const router = express.Router();
 
-router.post('/create', passport, AsyncWrapper(manadaController.createManada));
+router.post('/', passport, AsyncWrapper(manadaController.createManada));
+
+router.get('/', passport, AsyncWrapper(manadaController.getManadas));
+
+router.get('/search', passport, AsyncWrapper(manadaController.searchManada));
 
 router.post(
-  '/add_animals',
+  '/:manadaId/animals',
   passport,
   AsyncWrapper(manadaController.addAnimals),
 );
 
-router.get('/all', passport, AsyncWrapper(manadaController.getManadas));
-
-router.get('/search', passport, AsyncWrapper(manadaController.searchManada));
-
 router.get(
-  '/:manadaId',
+  '/:manadaId/animals',
   passport,
   AsyncWrapper(manadaController.getAnimalManadas),
 );
 
-router.post(
-  '/delete_animal',
+router.delete(
+  '/:manadaId/animals/:animalId',
   passport,
   AsyncWrapper(manadaController.deleteAnimalManada),
 );
 
-router.post('/delete', passport, AsyncWrapper(manadaController.deleteManada));
+router.put('/:manadaId', passport, AsyncWrapper(manadaController.updateInfoManada));
 
-router.post(
-  '/update_info',
-  passport,
-  AsyncWrapper(manadaController.updateInfoManada),
-);
+router.delete('/:manadaId', passport, AsyncWrapper(manadaController.deleteManada));
 
 module.exports = router;

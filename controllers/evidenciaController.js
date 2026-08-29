@@ -53,7 +53,7 @@ exports.crearEvidencia = async (req, res) => {
 exports.updateEvidencia = async (req, res) => {
   await validateRequest(req);
   try {
-    const { id } = req.params;
+    const { evidenciaId } = req.params;
     const { User } = req;
     const { descripcion, galeria } = req.body;
     if (!(await validateAdminFund(User.id))) {
@@ -67,7 +67,7 @@ exports.updateEvidencia = async (req, res) => {
       updatedAt: Date.now(),
     };
     const evidencia = await db.Evidencia.update(update, {
-      where: { id },
+      where: { id: evidenciaId },
     });
 
     const response = {

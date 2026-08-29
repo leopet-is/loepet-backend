@@ -12,7 +12,7 @@ const validations = require('../controllers/validations');
 const router = express.Router();
 
 router.post(
-  '/create',
+  '/',
   passport,
   AsyncWrapper(actualizacionController.createActualizacion),
 );
@@ -23,28 +23,29 @@ router.get(
   AsyncWrapper(actualizacionController.getActualizaciones),
 );
 
-router.put(
-  '/update/:actualizacionId',
-  passport,
-  AsyncWrapper(actualizacionController.updateActualizacion),
-);
-
-router.delete(
-  '/delete/:actualizacionId',
-  passport,
-  AsyncWrapper(actualizacionController.deleteActualizacion),
-);
-
 router.post(
-  '/create/rating',
+  '/:actualizacionId/ratings',
   passport,
   validations.createRating,
   AsyncWrapper(actualizacionController.createRating),
 );
 
-router.post(
-  '/load/rating',
+router.get(
+  '/:actualizacionId/ratings',
   passport,
   AsyncWrapper(actualizacionController.loadRating),
 );
+
+router.put(
+  '/:actualizacionId',
+  passport,
+  AsyncWrapper(actualizacionController.updateActualizacion),
+);
+
+router.delete(
+  '/:actualizacionId',
+  passport,
+  AsyncWrapper(actualizacionController.deleteActualizacion),
+);
+
 module.exports = router;

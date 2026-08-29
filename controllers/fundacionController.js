@@ -169,8 +169,9 @@ exports.registerFundacion = async (req, res) => {
 exports.updateInfoFundacion = async (req, res) => {
   await validateRequest(req);
   try {
+    const { fundacionId } = req.params;
     const {
-      id, ruc, nombre, direccion, telefono, aprobado, comision,
+      ruc, nombre, direccion, telefono, aprobado, comision,
     } = req.body;
     const update = {
       ...(!_.isEmpty(ruc) ? { ruc } : {}),
@@ -182,7 +183,7 @@ exports.updateInfoFundacion = async (req, res) => {
       updatedAt: Date.now(),
     };
     const fundacion = await db.Fundacion.update(update, {
-      where: { id },
+      where: { id: fundacionId },
     });
 
     const response = {
@@ -474,7 +475,7 @@ exports.getAnimalPadrinosCalificacion = async (req, res) => {
 exports.deleteFundacion = async (req, res) => {
   await validateRequest(req);
   try {
-    const { fundacionId } = req.body;
+    const { fundacionId } = req.params;
     const update = {
       aprobado: false,
       updatedAt: Date.now(),
