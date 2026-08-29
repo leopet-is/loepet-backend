@@ -19,11 +19,9 @@ async function seed() {
       return;
     }
 
-    await db.sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
-
     const tables = Object.keys(db.sequelize.models).map(m => db.sequelize.models[m].tableName);
     for (const t of tables) {
-      await db.sequelize.query(`DELETE FROM \`${t}\``);
+      await db.sequelize.query(`DELETE FROM "${t}" CASCADE`);
     }
 
     const pw = await bcrypt.hash(PASSWORD, 10);
@@ -162,8 +160,6 @@ async function seed() {
       { ruc: '0997778889001', nombre: 'Ángeles Peludos', direccion: 'Urdesa Central, Calle 3era', telefono: '0943210987', email_contacto: 'angelespeludos@fund.org', cedula_contacto: '0956789012', nombre_contacto: 'Luisa', apellido_contacto: 'Vargas', comentarios: 'Buscamos crear un futuro mejor para todos los animales abandonados. Conoce más en @AngelesPeludosFundacion en Facebook.', estado: 'pendiente', createdAt: new Date('2025-10-23T18:55:00') },
     ]);
     console.log('  10 solicitudes_fundacion');
-
-    await db.sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
 
     console.log('\n=== SEED COMPLETADO ===');
     console.log(`Contraseña: ${PASSWORD}`);
