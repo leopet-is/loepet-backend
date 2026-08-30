@@ -1,21 +1,18 @@
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: leopet-mysql
+  postgres:
+    image: postgres:16
+    container_name: leopet-postgres
     restart: unless-stopped
     ports:
-      - "3306:3306"
+      - "5432:5432"
     environment:
-      MYSQL_DATABASE: integradoradb
-      MYSQL_USER: leopet_user
-      MYSQL_PASSWORD: leopet_pass
-      MYSQL_ROOT_PASSWORD: root_pass
-    command: --default-authentication-plugin=mysql_native_password
+      POSTGRES_DB: leopet_dev
+      POSTGRES_USER: leopet
+      POSTGRES_PASSWORD: leopet
     volumes:
-      - mysql_data:/var/lib/mysql
-      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - pg_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD-SHELL", "pg_isready -U leopet -d leopet_dev"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -29,17 +26,15 @@ services:
     environment:
       NODE_ENV: production
       PORT: 8181
-      MYSQL_DATABASE: integradoradb
-      MYSQL_USER: leopet_user
-      MYSQL_ROOT_PASSWORD: root_pass
-      MYSQL_HOST: mysql
-      MYSQL_HOSTNAME: mysql
-      MYSQL_ROOT_PORT: 3306
-      USE_LOCAL_STORAGE: "true"
+      DATABASE_URL: postgresql://leopet:leopet@postgres:5432/leopet_dev
+      DB_SSL: "false"
+      STORAGE_PROVIDER: local
       API_URL: "http://localhost:8181"
+    env_file:
+      - .env
     depends_on:
-      mysql:
+      postgres:
         condition: service_healthy
 
 volumes:
-  mysql_data:
+  pg_data:

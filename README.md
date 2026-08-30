@@ -9,10 +9,11 @@ Backend del proyecto de Materia Integradora — Grupo #3
 - **Runtime:** Node.js 20+
 - **Framework:** Express
 - **ORM:** Sequelize
-- **BD:** MySQL 8.0
+- **BD:** PostgreSQL (Supabase en producción / local en Docker para desarrollo)
 - **Auth:** JWT (jsonwebtoken)
 - **PayPal:** API de suscripciones (con mock automático en desarrollo)
-- **Storage:** Local (desarrollo) / DigitalOcean Spaces (producción)
+- **Storage:** Local (desarrollo) / Supabase Storage (producción)
+- **Correo:** Resend (modo `console` en desarrollo sin API key / API Resend en producción)
 
 ---
 
@@ -39,48 +40,37 @@ npm install
 
 ### 2. Crear archivo `.env`
 
-El `.env` no está en el repo (está en `.gitignore`). Copiar el siguiente contenido como base:
-
-```env
-# Servidor
-PORT=8181
-
-# Base de datos MySQL
-MYSQL_DATABASE=integradoradb
-MYSQL_USER=leopet_user
-MYSQL_ROOT_PASSWORD=leopet_pass
-MYSQL_HOSTNAME=localhost
-MYSQL_ROOT_PORT=3306
-
-# Almacenamiento local (desarrollo)
-USE_LOCAL_STORAGE=true
-API_URL=http://localhost:8181
-
-# JWT (cambiar en producción)
-# JWT_SECRET=mi-secreto-seguro
-```
-
-### 3. Levantar MySQL con Docker
+El `.env` no está en el repo (está en `.gitignore`). Copiar el ejemplo como base y adaptarlo:
 
 ```bash
-docker compose up -d mysql
+cp .env.example .env
 ```
 
-Esto crea un contenedor `leopet-mysql` con MySQL 8.0, la base `integradoradb`, y ejecuta automáticamente el script `scripts/integradora.sql` que crea las tablas y carga datos de prueba.
+Con la configuración de desarrollo local (ya viene por defecto en `.env.example`): la BD apunta a `postgresql://leopet:leopet@localhost:5432/leopet_dev`, `DB_SSL=false`, `STORAGE_PROVIDER=local` y el correo en modo `console` (sin `RESEND_API_KEY` solo se imprime en los logs).
 
-### 4. Verificar que MySQL esté listo
+> **Importante:** en desarrollo la BD es un Postgres local; la de Supabase no se toca.
+
+### 3. Levantar Postgres con Docker
 
 ```bash
-docker compose ps mysql
+docker compose up -d postgres
 ```
 
-Esperar hasta que el estado sea `(healthy)`.
+Esto crea:
+- `leopet-postgres`: PostgreSQL 16 con la base `leopet_dev` (usuario/contraseña `leopet`).
 
-### 5. Iniciar el servidor
-
-**Opción A — Con nodemon (desarrollo, hot-reload):**
+### 4. Verificar que estén listos
 
 ```bash
+docker compose ps
+```
+
+Esperar hasta que el estado de `leopet-postgres` sea `(healthy)`.
+
+### 5. Aplicar migraciones e iniciar el servidor
+
+```bash
+npm run db:migrate
 npm start
 ```
 
@@ -99,11 +89,19 @@ curl http://localhost:8181/api/health
 # → {"status":"OK","timestamp":"..."}
 ```
 
+### 6. Probar el correo (opcional)
+
+```bash
+npm run email:test
+```
+
+Si no hay `RESEND_API_KEY` (desarrollo) el correo solo se imprime en la consola (modo `console`). Con la API key se envía por Resend y puedes verlo en el dashboard de https://resend.com.
+
 ---
 
 ## Credenciales de prueba
 
-Los datos se cargan automáticamente desde `scripts/integradora.sql`.
+Los datos de ejemplo pueden cargarse con `npm run db:migrate` y luego opcionalmente con `node scripts/seed-v2.js` (posterior a las migraciones).
 
 | Rol | Email | Contraseña |
 |---|---|---|
@@ -168,14 +166,14 @@ npm test
 wsl tmux attach -t leopet
 # Salir sin cerrar: Ctrl+B, luego D
 
-# Detener MySQL
+# Detener el entorno (Postgres y app)
 docker compose down
 
-# Ver logs de MySQL
-docker compose logs mysql
+# Ver logs de Postgres
+docker compose logs postgres
 
-# Acceder a MySQL desde el contenedor
-docker exec -it leopet-mysql mysql -uroot -pleopet_pass integradoradb
+# Acceder a Postgres desde el contenedor
+docker exec -it leopet-postgres psql -U leopet -d leopet_dev
 
 # Ver procesos del servidor
 ps aux | grep "node server"
@@ -185,26 +183,25 @@ ps aux | grep "node server"
 
 ## Variables de entorno
 
-Todas las variables que usa el proyecto están documentadas en el análisis interno. Resumen rápido:
+Variables principales (`cp .env.example .env` para desarrollo; en producción se definen en el proveedor):
 
 | Variable | Obligatoria | Descripción |
 |---|---|---|
 | `PORT` | Sí | Puerto del servidor |
-| `MYSQL_DATABASE` | Sí | Nombre de la BD |
-| `MYSQL_USER` | Sí | Usuario de BD |
-| `MYSQL_ROOT_PASSWORD` | Sí | Contraseña de BD |
-| `MYSQL_HOSTNAME` | Sí | Host de BD |
-| `MYSQL_ROOT_PORT` | Sí | Puerto de BD |
-| `USE_LOCAL_STORAGE` | No | `true` = guarda archivos local |
-| `S3_BUCKET` | Si no usa local | Bucket S3/Spaces |
-| `DIGITAL_ENDPOINT` | Si no usa local | Endpoint Spaces |
-| `DIGITAL_ACCESS_KEY_ID` | Si no usa local | Access key |
-| `DIGITAL_SECRET_ACCESS_KEY` | Si no usa local | Secret key |
-| `API_URL` | No | URL base para archivos locales |
+| `DATABASE_URL` | Sí | Cadena de conexión PostgreSQL (ej. Supabase o local `...@localhost:5432/leopet_dev`) |
+| `DB_SSL` | No | `true` obliga SSL (producción/Supabase). En dev local dejar `false` o vacío |
+| `STORAGE_PROVIDER` | No | `local` (desarrollo) o `supabase` (producción) |
+| `SUPABASE_URL` | En prod | URL del proyecto Supabase |
+| `SUPABASE_KEY` | En prod | Anon o service-role key de Supabase |
+| `SUPABASE_BUCKET` | No | Bucket de imágenes en Supabase (default `uploads`) |
+| `API_URL` | No | URL base para archivos del storage local (dev: `http://localhost:8181`) |
+| `RESEND_API_KEY` | No (usa `console` si falta) | API key de Resend (desarrollo: omitir → solo imprime) |
+| `RESEND_FROM` | No | Remitente por defecto (debe usar dominio verificado en Resend) |
+| `MAIL_TO` | No | Destinatario de `npm run email:test` (default `dev@test.com`) |
 | `JWT_SECRET` | No (default: `secret`) | Clave para firmar tokens |
 | `PAYPAL_CLIENT` | No (usa mock si falta) | Client ID de PayPal |
 | `PAYPAL_SECRET` | No (usa mock si falta) | Secret de PayPal |
-| `PAYPAL_URI` | No | URL API de PayPal |
+| `PAYPAL_URI` | No | URL API de PayPal (dev: sandbox) |
 | `NODE_ENV` | No | `development`, `test` o `production` |
 
 ---
@@ -213,5 +210,5 @@ Todas las variables que usa el proyecto están documentadas en el análisis inte
 
 El repositorio incluye dos archivos Docker con propósitos distintos:
 
-- **`Dockerfile`**: Empaqueta solo el backend Node.js para deploy. No incluye BD.
-- **`docker-compose.yml`**: Levanta MySQL 8.0 local para desarrollo. Creado porque el proyecto no tenía una forma de levantar la BD en Docker (el `Dockerfile` existente solo contenía el backend).
+- **`Dockerfile`**: Empaqueta el backend Node.js para deploy (Render/VPS). No incluye BD ni correo.
+- **`docker-compose.yml`**: Entorno local — levanta **PostgreSQL 16** (dev) y, opcionalmente, la propia app (`docker compose up app`). La BD y credenciales reales de producción viven fuera del Dockerfile (Supabase + variables del proveedor).
