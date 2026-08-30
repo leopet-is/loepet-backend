@@ -15,10 +15,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
       },
       total_comision: {
-        type: DataTypes.DOUBLE(11, 2),
+        type: DataTypes.DECIMAL(11, 2),
       },
       total_pago: {
-        type: DataTypes.DOUBLE(11, 2),
+        type: DataTypes.DECIMAL(11, 2),
       },
     },
     {

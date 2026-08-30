@@ -12,13 +12,13 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
       },
       monto: {
-        type: DataTypes.DOUBLE(10, 2),
+        type: DataTypes.DECIMAL(10, 2),
       },
       comision: {
-        type: DataTypes.DOUBLE(10, 2),
+        type: DataTypes.DECIMAL(10, 2),
       },
       monto_a_pagar: {
-        type: DataTypes.DOUBLE(10, 2),
+        type: DataTypes.DECIMAL(10, 2),
       },
       createdAt: {
         type: DataTypes.DATE,
