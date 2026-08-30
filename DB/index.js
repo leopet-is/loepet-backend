@@ -7,18 +7,26 @@ require('dotenv').config();
 const basename = path.basename(__filename);
 const db = {};
 
+// Forzar SSL en produccion (Supabase/Render) o cuando DB_SSL=true.
+// Si DB_SSL se define explicitamente (true/false) esa decision manda
+// (p. ej. local: NODE_ENV=production + DB_SSL=false para Postgres local sin TLS).
+const sslRequired = process.env.DB_SSL
+  ? process.env.DB_SSL === 'true'
+  : process.env.NODE_ENV === 'production';
+
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: 'postgres',
   protocol: 'postgres',
   logging: false, // Cámbialo a console.log si quieres ver los queries en desarrollo
-  dialectOptions: {
-    ssl: {
-      require: true,
-      // Supabase requiere SSL. En entornos de producción o proveedores como Render,
-      // esta opción evita fallos por certificados autofirmados.
-      rejectUnauthorized: false,
-    },
-  },
+  dialectOptions: sslRequired
+    ? {
+      ssl: {
+        require: true,
+        // Supabase requiere SSL con certificados autofirmados.
+        rejectUnauthorized: false,
+      },
+    }
+    : {},
   pool: {
     max: 5,
     min: 0,

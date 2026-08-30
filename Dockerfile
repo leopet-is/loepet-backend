@@ -12,6 +12,9 @@ COPY . .
 
 RUN mkdir -p tempFiles uploads
 
+ENV NODE_ENV=production
+ENV PORT=8181
+
 EXPOSE 8181
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
