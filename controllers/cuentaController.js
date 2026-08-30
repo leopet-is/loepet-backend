@@ -2,8 +2,6 @@
 
 const _ = require('lodash');
 
-const { validateRequest } = require('../helpers');
-
 const db = require('../DB/index');
 
 /**
@@ -13,7 +11,6 @@ const db = require('../DB/index');
  * @return {Object} response
  */
 exports.getCuentaBancaria = async (req, res) => {
-  await validateRequest(req);
   try {
     const { fundacionId } = req.params;
     const result = await db.CuentaBancaria.findOne({
@@ -37,7 +34,6 @@ exports.getCuentaBancaria = async (req, res) => {
 };
 
 exports.getCuentaBancariaPrincipal = async (req, res) => {
-  await validateRequest(req);
   try {
     const { fundacionId } = req.params;
     const result = await db.CuentaBancaria.findOne({
@@ -59,7 +55,6 @@ exports.getCuentaBancariaPrincipal = async (req, res) => {
 };
 
 exports.getAllCuentaBancaria = async (req, res) => {
-  await validateRequest(req);
   try {
     const { fundacionId } = req.params;
     const limit = parseInt(req.query.limit || '1', 10);
@@ -100,7 +95,6 @@ exports.getAllCuentaBancaria = async (req, res) => {
  * @return {Object} response
  */
 exports.crearCuentaBancaria = async (req, res) => {
-  await validateRequest(req);
   try {
     const {
       banco, numero, tipo, nombre, fundacionId,
@@ -135,7 +129,6 @@ exports.crearCuentaBancaria = async (req, res) => {
  * @return {Object} response
  */
 exports.updateCuentaBancaria = async (req, res) => {
-  await validateRequest(req);
   try {
     const { fundacionId } = req.params;
     const {
@@ -168,7 +161,6 @@ exports.updateCuentaBancaria = async (req, res) => {
 };
 
 exports.updateCuentaBancariaIDCuenta = async (req, res) => {
-  await validateRequest(req);
   try {
     const { cuentaId } = req.params;
     const {
@@ -201,7 +193,6 @@ exports.updateCuentaBancariaIDCuenta = async (req, res) => {
 };
 
 exports.updateCuentaPrincipal = async (req, res) => {
-  await validateRequest(req);
   try {
     const { fundacionId } = req.params;
     const {
@@ -238,7 +229,6 @@ exports.updateCuentaPrincipal = async (req, res) => {
 };
 
 exports.deleteCuenta = async (req, res) => {
-  await validateRequest(req);
   try {
     const { cuentaId } = req.params;
 

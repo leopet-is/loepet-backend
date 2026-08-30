@@ -1,7 +1,6 @@
 /* eslint-disable camelcase */
 const _ = require('lodash');
 
-const { validateRequest } = require('../helpers');
 const {
   getFundacionInfo,
   parseDataNotificacion,
@@ -10,7 +9,6 @@ const {
 const db = require('../DB/index');
 
 exports.getNotificaciones = async (req, res) => {
-  await validateRequest(req);
   try {
     const { User } = req;
     const query = {
@@ -95,7 +93,6 @@ exports.getNotificaciones = async (req, res) => {
 };
 
 exports.updateNotificacion = async (req, res) => {
-  await validateRequest(req);
   try {
     const { notificacionId } = req.params;
     const {

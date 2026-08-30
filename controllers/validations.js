@@ -1,4 +1,9 @@
-const { body, param, query } = require('express-validator');
+const {
+  body,
+  param,
+  query,
+  validationResult,
+} = require('express-validator');
 
 const {
   esCedulaValida,
@@ -6,12 +11,29 @@ const {
   esTelefonoEcuador,
 } = require('../utils/validators');
 
+/* Middleware que evalúa el resultado de las validaciones y corta la petición
+ * con un 400 Bad Request cuando algún campo es inválido. */
+const validate = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      status: 'fail',
+      errors: errors.array().map((error) => ({
+        campo: error.param,
+        mensaje: error.msg,
+      })),
+    });
+  }
+  return next();
+};
+
 /* Validaciones para Animales */
 module.exports.allAnimals = [
   query('especie')
     .optional()
     .isString()
     .withMessage('La especie debe ser de tipo String'),
+  validate,
 ];
 
 module.exports.animal = [
@@ -19,6 +41,7 @@ module.exports.animal = [
     .exists()
     .isInt()
     .withMessage('Es necesario el campo animalId'),
+  validate,
 ];
 
 module.exports.fundacionParam = [
@@ -26,6 +49,7 @@ module.exports.fundacionParam = [
     .exists()
     .isInt()
     .withMessage('Es necesario el campo fundacionId'),
+  validate,
 ];
 
 module.exports.createAnimal = [
@@ -45,6 +69,7 @@ module.exports.createAnimal = [
     .optional()
     .isString()
     .withMessage('El campo descripcion debe ser de tipo String'),
+  validate,
 ];
 
 /* Validaciones para Usuarios */
@@ -57,6 +82,7 @@ module.exports.login = [
     .exists()
     .isString()
     .withMessage('Es necesario contrasena'),
+  validate,
 ];
 
 /* Validaciones para cuentasBancarias */
@@ -65,6 +91,7 @@ module.exports.cuentaInfo = [
     .exists()
     .isInt()
     .withMessage('Es necesario el campo fundacionId'),
+  validate,
 ];
 
 module.exports.cuentaId = [
@@ -72,6 +99,7 @@ module.exports.cuentaId = [
     .exists()
     .isInt()
     .withMessage('Es necesario el campo cuentaId'),
+  validate,
 ];
 
 module.exports.createUpdateCuentaBancaria = [
@@ -91,6 +119,7 @@ module.exports.createUpdateCuentaBancaria = [
     .optional()
     .isString()
     .withMessage('El campo nombre debe ser de tipo String'),
+  validate,
 ];
 
 /* Validaciones para SolicitudFundacion */
@@ -151,6 +180,7 @@ module.exports.createSolicitudFundacion = [
     .isString()
     .isLength({ max: 255 })
     .withMessage('El campo apellido_contacto no puede superar 255 caracteres'),
+  validate,
 ];
 
 /* Validaciones para crear una fundacion (rol administrador de plataforma) */
@@ -194,6 +224,7 @@ module.exports.createFundacion = [
     .optional()
     .isInt()
     .withMessage('El campo id (solicitud) debe ser un numero entero'),
+  validate,
 ];
 
 /* Validaciones para actualizar la informacion de una fundacion */
@@ -230,6 +261,7 @@ module.exports.updateInfoFundacion = [
     .optional()
     .isNumeric()
     .withMessage('El campo comision debe ser numerico'),
+  validate,
 ];
 
 /* Validaciones para Rating */
@@ -244,4 +276,5 @@ module.exports.createRating = [
     .withMessage('Es necesario el campo actualizacionId')
     .isInt()
     .withMessage('El campo actualizacionId debe ser un número entero'),
+  validate,
 ];

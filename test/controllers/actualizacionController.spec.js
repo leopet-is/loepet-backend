@@ -191,7 +191,7 @@ describe.skip('ActualizacionController - createRating integration', () => {
     expect(ratingGuardado.valor).toBe(ratingValue);
   });
 
-  it('should return 422 if rating value is invalid', async () => {
+  it('should return 400 if rating value is invalid', async () => {
     const loginRes = await supertest(app)
       .post('/auth/login')
       .send({ email: donadorUser.email, password: testPassword });
@@ -203,8 +203,10 @@ describe.skip('ActualizacionController - createRating integration', () => {
       .set('Authorization', `Bearer ${token}`)
       .send({ valor: 6 }); // Valor inválido
 
-    expect(response.status).toBe(422);
-    expect(response.body.valor[0]).toContain('Las estrellas deben ser un número entre 1 y 5.');
+    expect(response.status).toBe(400);
+    expect(response.body.status).toBe('fail');
+    expect(response.body.errors[0].campo).toBe('valor');
+    expect(response.body.errors[0].mensaje).toContain('Las estrellas deben ser un número entre 1 y 5.');
   });
 
   it('should return 500 if actualizacion_id is not found (FK constraint)', async () => {

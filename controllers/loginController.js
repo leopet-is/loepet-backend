@@ -4,7 +4,6 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const { ROL } = require('../constants');
-const { validateRequest } = require('../helpers');
 
 const db = require('../DB/index');
 
@@ -69,7 +68,6 @@ const { Usuario, AdminFund } = db;
  * @return {Object} response
  */
 exports.login = async (req, res) => {
-  await validateRequest(req);
   try {
     const { email, password } = req.body;
     const unAuthorizedResponse = 'Credenciales incorrectas.';
@@ -156,7 +154,6 @@ exports.login = async (req, res) => {
  * @return {Object} response
  */
 exports.register = async (req, res) => {
-  await validateRequest(req);
   try {
     const {
       cedula,

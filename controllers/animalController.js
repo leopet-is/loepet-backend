@@ -2,7 +2,6 @@
 const _ = require('lodash');
 const { Op } = require('sequelize');
 
-const { validateRequest } = require('../helpers');
 const { STATUS_ANIMAL } = require('../constants');
 const {
   getFundacionInfo,
@@ -256,7 +255,6 @@ const db = require('../DB/index');
  * @return {Object} response
  */
 exports.createAnimal = async (req, res) => {
-  await validateRequest(req);
   try {
     const { User } = req;
     const {
@@ -318,7 +316,6 @@ exports.createAnimal = async (req, res) => {
  * @return {Object} response
  */
 exports.updateAnimal = async (req, res) => {
-  await validateRequest(req);
   try {
     const { User } = req;
     const { animalId } = req.params;
@@ -384,7 +381,6 @@ exports.updateAnimal = async (req, res) => {
  * @return {Object} response
  */
 exports.getAllAnimals = async (req, res) => {
-  await validateRequest(req);
   try {
     const { User } = req;
     const { especie } = req.query;
@@ -473,7 +469,6 @@ exports.getAllAnimals = async (req, res) => {
 };
 
 exports.getAllAnimalsApp = async (req, res) => {
-  await validateRequest(req);
   try {
     const { tipoAnimal } = req.query;
     const page = parseInt(req.query.page || '1', 10);
@@ -523,7 +518,6 @@ exports.getAllAnimalsApp = async (req, res) => {
 };
 
 exports.getAllAnimalsFundacionApp = async (req, res) => {
-  await validateRequest(req);
   try {
     const { fundacionId } = req.params;
     const page = parseInt(req.query.page || '1', 10);
@@ -606,7 +600,6 @@ exports.getEspecies = async (req, res) => {
  * @return {Object} response
  */
 exports.getAnimal = async (req, res) => {
-  await validateRequest(req);
   try {
     const { animalId } = req.params;
     let result = [];
@@ -641,7 +634,6 @@ exports.getAnimal = async (req, res) => {
  * @return {Object} response
  */
 exports.searchAnimal = async (req, res) => {
-  await validateRequest(req);
   try {
     const { q } = req.query;
     let result = [];
@@ -676,7 +668,6 @@ exports.searchAnimal = async (req, res) => {
  * @return {Object} response
  */
 exports.deleteAnimal = async (req, res) => {
-  await validateRequest(req);
   try {
     const { User } = req;
     const { animalId } = req.params;

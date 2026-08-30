@@ -2,7 +2,6 @@
 const _ = require('lodash');
 const { Op } = require('sequelize');
 
-const { validateRequest } = require('../helpers');
 const { createProductManada } = require('./helpersPayPal');
 
 const {
@@ -231,7 +230,6 @@ const NUMERO_MAXIMO_FOTOS = 4;
  * @return {Object} response
  */
 exports.createManada = async (req, res) => {
-  await validateRequest(req);
   const { User } = req;
 
   try {
@@ -272,7 +270,6 @@ exports.createManada = async (req, res) => {
  * @return {Object} response
  */
 exports.addAnimals = async (req, res) => {
-  await validateRequest(req);
   const { User } = req;
 
   try {
@@ -321,7 +318,6 @@ exports.addAnimals = async (req, res) => {
  */
 exports.getManadas = async (req, res) => {
   // FIX NUMERO DE FOTOS
-  await validateRequest(req);
   try {
     const { User } = req;
     const { q } = req.query;
@@ -404,7 +400,6 @@ exports.getManadas = async (req, res) => {
  * @return {Object} response
  */
 exports.getAnimalManadas = async (req, res) => {
-  await validateRequest(req);
   try {
     const { User } = req;
     const { manadaId } = req.params;
@@ -499,7 +494,6 @@ exports.searchManada = async (req, res) => {
  * @return {Object} response
  */
 exports.deleteAnimalManada = async (req, res) => {
-  await validateRequest(req);
   try {
     const { User } = req;
     const { manadaId, animalId } = req.params;
@@ -533,7 +527,6 @@ exports.deleteAnimalManada = async (req, res) => {
  * @return {Object} response
  */
 exports.deleteManada = async (req, res) => {
-  await validateRequest(req);
   try {
     const { User } = req;
     const { manadaId } = req.params;
@@ -570,7 +563,6 @@ exports.deleteManada = async (req, res) => {
  * @return {Object} response
  */
 exports.updateInfoManada = async (req, res) => {
-  await validateRequest(req);
   try {
     const { User } = req;
     const { manadaId } = req.params;

@@ -274,7 +274,7 @@ describe('Commission System - Corrected Tests', () => {
       await Animal.destroy({ where: { id: animal3.id } });
     });
 
-    it('ECT-SR-1: Invalid rating (0) → 422 error', async () => {
+    it('ECT-SR-1: Invalid rating (0) → 400 error', async () => {
       const loginRes = await supertest(app)
         .post('/auth/login')
         .send({ email: donadorUser.email, password: testPassword });
@@ -285,11 +285,12 @@ describe('Commission System - Corrected Tests', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({ valor: 0 });
 
-      expect(response.status).toBe(422);
-      expect(response.body.valor).toBeDefined();
+      expect(response.status).toBe(400);
+      expect(response.body.status).toBe('fail');
+      expect(response.body.errors).toBeDefined();
     });
 
-    it('ECT-SR-2: Invalid rating (6) → 422 error', async () => {
+    it('ECT-SR-2: Invalid rating (6) → 400 error', async () => {
       const loginRes = await supertest(app)
         .post('/auth/login')
         .send({ email: donadorUser.email, password: testPassword });
@@ -300,8 +301,9 @@ describe('Commission System - Corrected Tests', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({ valor: 6 });
 
-      expect(response.status).toBe(422);
-      expect(response.body.valor).toBeDefined();
+      expect(response.status).toBe(400);
+      expect(response.body.status).toBe('fail');
+      expect(response.body.errors).toBeDefined();
     });
 
     it('ECT-SR-3: Invalid rating (string) → should handle gracefully', async () => {
@@ -315,11 +317,11 @@ describe('Commission System - Corrected Tests', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({ valor: '5' });
 
-      // String might be coerced to number by validation - accept either 200 or 422
-      expect([200, 422]).toContain(response.status);
+      // String might be coerced to number by validation - accept either 200 or 400/422
+      expect([200, 400, 422]).toContain(response.status);
     });
 
-    it('ECT-SR-4: Invalid rating (null) → 422 error', async () => {
+    it('ECT-SR-4: Invalid rating (null) → 400 error', async () => {
       const loginRes = await supertest(app)
         .post('/auth/login')
         .send({ email: donadorUser.email, password: testPassword });
@@ -330,7 +332,7 @@ describe('Commission System - Corrected Tests', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({ valor: null });
 
-      expect(response.status).toBe(422);
+      expect(response.status).toBe(400);
     });
   });
 
@@ -401,7 +403,7 @@ describe('Commission System - Corrected Tests', () => {
       await Animal.destroy({ where: { id: animal4.id } });
     });
 
-    it('BVA-R-1: Below minimum (0) → 422', async () => {
+    it('BVA-R-1: Below minimum (0) → 400', async () => {
       const loginRes = await supertest(app)
         .post('/auth/login')
         .send({ email: donadorUser.email, password: testPassword });
@@ -412,10 +414,10 @@ describe('Commission System - Corrected Tests', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({ valor: 0 });
 
-      expect(response.status).toBe(422);
+      expect(response.status).toBe(400);
     });
 
-    it('BVA-R-7: Above maximum (6) → 422', async () => {
+    it('BVA-R-7: Above maximum (6) → 400', async () => {
       const loginRes = await supertest(app)
         .post('/auth/login')
         .send({ email: donadorUser.email, password: testPassword });
@@ -426,7 +428,7 @@ describe('Commission System - Corrected Tests', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({ valor: 6 });
 
-      expect(response.status).toBe(422);
+      expect(response.status).toBe(400);
     });
   });
 
@@ -449,7 +451,7 @@ describe('Commission System - Corrected Tests', () => {
       expect(response.body.mensaje).toBeDefined();
     });
 
-    it('DT-2: Invalid rating (0) → 422', async () => {
+    it('DT-2: Invalid rating (0) → 400', async () => {
       const loginRes = await supertest(app)
         .post('/auth/login')
         .send({ email: donadorUser.email, password: testPassword });
@@ -460,7 +462,7 @@ describe('Commission System - Corrected Tests', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({ valor: 0 });
 
-      expect(response.status).toBe(422);
+      expect(response.status).toBe(400);
     });
 
     it('DT-3: Valid rating but invalid actualizacion_id → DB constraint error', async () => {

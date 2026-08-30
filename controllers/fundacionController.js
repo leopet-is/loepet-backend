@@ -4,7 +4,6 @@ const _ = require('lodash');
 const bcrypt = require('bcrypt');
 const { Op } = require('sequelize');
 
-const { validateRequest } = require('../helpers');
 const {
   getCuentaBancaria,
   validateAdminFund,
@@ -45,13 +44,11 @@ const db = require('../DB/index');
  *                 mensaje: { type: string }
  *                 result: { $ref: '#/components/schemas/Fundacion' }
  *       '400':
- *         description: Error de validacion de los datos de entrada
+ *         description: Error de validacion de los datos de entrada (formato de RUC/cedula/telefono o digito verificador incorrecto)
  *       '401':
  *         description: No autorizado para realizar la operacion
  *       '409':
  *         description: Ya existe una fundacion o solicitud registrada con ese RUC
- *       '422':
- *         description: RUC/cedula con digito verificador incorrecto o telefono con formato no valido
  *       '500':
  *         description: Error interno del servidor
  *   get:
@@ -174,13 +171,11 @@ const db = require('../DB/index');
  *       '200':
  *         description: Informacion de la fundacion actualizada
  *       '400':
- *         description: Error de validacion de los datos de entrada
+ *         description: Error de validacion de los datos de entrada (formato de RUC/cedula/telefono o digito verificador incorrecto)
  *       '401':
  *         description: No autorizado para realizar la operacion
  *       '409':
  *         description: El RUC ya pertenece a otra fundacion o a una solicitud registrada
- *       '422':
- *         description: RUC/cedula con digito verificador incorrecto o telefono con formato no valido
  *       '500':
  *         description: Error interno del servidor
  *   delete:
@@ -209,7 +204,6 @@ const db = require('../DB/index');
  * @return {Object} response
  */
 exports.createFundacion = async (req, res) => {
-  await validateRequest(req);
   try {
     const { User } = req;
     const {
@@ -335,7 +329,6 @@ exports.createFundacion = async (req, res) => {
  * @return {Object} response
  */
 exports.registerFundacion = async (req, res) => {
-  await validateRequest(req);
   try {
     const {
       ruc, nombre, direccion, telefono, comision,
@@ -375,7 +368,6 @@ exports.registerFundacion = async (req, res) => {
  * @return {Object} response
  */
 exports.updateInfoFundacion = async (req, res) => {
-  await validateRequest(req);
   try {
     const { fundacionId } = req.params;
     const {
@@ -447,7 +439,6 @@ exports.updateInfoFundacion = async (req, res) => {
  * @return {Object} response
  */
 exports.getFundaciones = async (req, res) => {
-  await validateRequest(req);
   try {
     const { q } = req.query;
     const limit = parseInt(req.query.limit || '1', 10);
@@ -506,7 +497,6 @@ exports.getFundaciones = async (req, res) => {
  */
 exports.getAnimalFundaciones = async (req, res) => {
   console.log('--- CONTROLLER GET_ANIMAL_FUNDACIONES ALCANZADO ---');
-  await validateRequest(req);
   try {
     const { User } = req;
     const { q } = req.query;
@@ -550,7 +540,6 @@ exports.getAnimalFundaciones = async (req, res) => {
 };
 
 exports.getAnimalPadrinosFundacion = async (req, res) => {
-  await validateRequest(req);
   try {
     const { fundacionId } = req.params;
     const limit = parseInt(req.query.limit || '1', 10);
@@ -610,7 +599,6 @@ exports.getAnimalPadrinosFundacion = async (req, res) => {
 };
 
 exports.getAnimalPadrinosCalificacion = async (req, res) => {
-  await validateRequest(req);
   try {
     const { fundacionId } = req.params;
     const limit = parseInt(req.query.limit || '1', 10);
@@ -712,7 +700,6 @@ exports.getAnimalPadrinosCalificacion = async (req, res) => {
  * @return {Object} response
  */
 exports.deleteFundacion = async (req, res) => {
-  await validateRequest(req);
   try {
     const { fundacionId } = req.params;
     const update = {

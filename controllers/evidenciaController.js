@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
 
 const _ = require('lodash');
-const { validateRequest } = require('../helpers');
 const { validateAdminFund } = require('./helpers');
 
 const db = require('../DB/index');
@@ -84,7 +83,6 @@ const db = require('../DB/index');
  * @return {Object} response
  */
 exports.crearEvidencia = async (req, res) => {
-  await validateRequest(req);
   try {
     const { User } = req;
     const { donacion, descripcion, galeria } = req.body;
@@ -122,7 +120,6 @@ exports.crearEvidencia = async (req, res) => {
  * @return {Object} response
  */
 exports.updateEvidencia = async (req, res) => {
-  await validateRequest(req);
   try {
     const { evidenciaId } = req.params;
     const { User } = req;

@@ -339,7 +339,7 @@ describe.skip('E2E: Commission Flow - Money by Stars', () => {
           valor: 0, // Invalid: < 1
         });
 
-      expect(res1.status).toBe(422); // Validation error
+      expect(res1.status).toBe(400); // Validation error
 
       const res2 = await request(app)
         .post(`/actualizacion/${actualizacion.id}/ratings`)
@@ -348,7 +348,7 @@ describe.skip('E2E: Commission Flow - Money by Stars', () => {
           valor: 6, // Invalid: > 5
         });
 
-      expect(res2.status).toBe(422); // Validation error
+      expect(res2.status).toBe(400); // Validation error
     });
 
     it('should reject rating for non-existent actualizacion', async () => {

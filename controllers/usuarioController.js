@@ -3,7 +3,6 @@ const _ = require('lodash');
 const bcrypt = require('bcrypt');
 
 const { Op } = require('sequelize');
-const { validateRequest } = require('../helpers');
 
 const db = require('../DB/index');
 
@@ -14,7 +13,6 @@ const db = require('../DB/index');
  * @return {Object} response
  */
 exports.updateUserStatus = async (req, res) => {
-  await validateRequest(req);
   try {
     const { usuarioId } = req.params;
     const { habilitado } = req.body;
@@ -50,7 +48,6 @@ exports.updateUserStatus = async (req, res) => {
  * @return {Object} response
  */
 exports.getInfo = async (req, res) => {
-  await validateRequest(req);
   try {
     const { id } = req.params;
     let UserInfo = await db.Usuario.findOne({
@@ -83,7 +80,6 @@ exports.getInfo = async (req, res) => {
  * @return {Object} response
  */
 exports.updateInfo = async (req, res) => {
-  await validateRequest(req);
   try {
     const { usuarioId } = req.params;
     const {
@@ -122,7 +118,6 @@ exports.updateInfo = async (req, res) => {
  * @return {Object} response
  */
 exports.updatePassword = async (req, res) => {
-  await validateRequest(req);
   try {
     const { usuarioId } = req.params;
     const { password, newPassword } = req.body;
@@ -170,7 +165,6 @@ exports.updatePassword = async (req, res) => {
  * @return {Object} response
  */
 exports.getAllUsers = async (req, res) => {
-  await validateRequest(req);
   try {
     const page = parseInt(req.query.page || '1', 10);
     const limit = parseInt(req.query.limit || '10', 10);

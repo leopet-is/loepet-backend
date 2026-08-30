@@ -1,7 +1,6 @@
 const _ = require('lodash');
 const { Op } = require('sequelize');
 
-const { validateRequest } = require('../helpers');
 const db = require('../DB/index');
 const { SOLICITUD_FUNDACION_ESTADO } = require('../constants');
 
@@ -43,7 +42,7 @@ const { SOLICITUD_FUNDACION_ESTADO } = require('../constants');
  *                 result: { $ref: '#/components/schemas/SolicitudFundacion' }
  *       '409':
  *         description: Ya existe una solicitud registrada con ese RUC o correo, o el RUC ya pertenece a una fundacion registrada
- *       '422':
+ *       '400':
  *         description: Campos requeridos invalidos o faltantes (RUC/cedula con digito verificador incorrecto, telefono o email con formato no valido)
  *       '500':
  *         description: Error interno del servidor
@@ -171,7 +170,6 @@ const { SOLICITUD_FUNDACION_ESTADO } = require('../constants');
  * @return {Object} response
  */
 exports.createSolicitudFundacion = async (req, res) => {
-  await validateRequest(req);
   try {
     const {
       ruc,
@@ -257,7 +255,6 @@ exports.createSolicitudFundacion = async (req, res) => {
  * @return {Object} response
  */
 exports.getAllSolicitudesFundacion = async (req, res) => {
-  await validateRequest(req);
   try {
     const { q, estado } = req.query;
     const page = parseInt(req.query.page || '1', 10);
@@ -312,7 +309,6 @@ exports.getAllSolicitudesFundacion = async (req, res) => {
  * @return {Object} response
  */
 exports.aprobarSolicitudFundacion = async (req, res) => {
-  await validateRequest(req);
   try {
     const { solicitudId } = req.params;
 
@@ -361,7 +357,6 @@ exports.aprobarSolicitudFundacion = async (req, res) => {
  * @return {Object} response
  */
 exports.rechazarSolicitudFundacion = async (req, res) => {
-  await validateRequest(req);
   try {
     const { solicitudId } = req.params;
     const { notas_admin: notasAdmin } = req.body;
@@ -414,7 +409,6 @@ exports.rechazarSolicitudFundacion = async (req, res) => {
  * @return {Object} response
  */
 exports.getSolicitudesReadyForCreation = async (req, res) => {
-  await validateRequest(req);
   try {
     const solicitudes = await db.SolicitudFundacion.findAll({
       where: {
@@ -445,7 +439,6 @@ exports.getSolicitudesReadyForCreation = async (req, res) => {
  * @return {Object} response
  */
 exports.getSolicitudFundacion = async (req, res) => {
-  await validateRequest(req);
   try {
     const { solicitudId } = req.params;
 

@@ -115,23 +115,25 @@ describe('Validacion de RUC, cédula y teléfono en solicitudes y fundaciones', 
       expect(res.body.error).toContain('fundación');
     });
 
-    it('rechaza un RUC con formato invalido (422)', async () => {
+    it('rechaza un RUC con formato invalido (400)', async () => {
       const res = await request(app)
         .post('/public/solicitudes')
         .send(payloadSolicitud('1234567890123', `${EMAIL_BASE}-ruc-invalido@leopet.test`));
 
-      expect(res.status).toBe(422);
+      expect(res.status).toBe(400);
+      expect(res.body.status).toBe('fail');
+      expect(res.body.errors[0].campo).toBe('ruc');
     });
 
-    it('rechaza un RUC con verificador incorrecto (422)', async () => {
+    it('rechaza un RUC con verificador incorrecto (400)', async () => {
       const res = await request(app)
         .post('/public/solicitudes')
         .send(payloadSolicitud('1710034066001', `${EMAIL_BASE}-verif@leopet.test`));
 
-      expect(res.status).toBe(422);
+      expect(res.status).toBe(400);
     });
 
-    it('rechaza un email invalido (422)', async () => {
+    it('rechaza un email invalido (400)', async () => {
       const res = await request(app)
         .post('/public/solicitudes')
         .send(payloadSolicitud(
@@ -140,10 +142,10 @@ describe('Validacion de RUC, cédula y teléfono en solicitudes y fundaciones', 
           { email_contacto: 'no-soy-un-email' },
         ));
 
-      expect(res.status).toBe(422);
+      expect(res.status).toBe(400);
     });
 
-    it('rechaza una cedula de contacto invalida (422)', async () => {
+    it('rechaza una cedula de contacto invalida (400)', async () => {
       const res = await request(app)
         .post('/public/solicitudes')
         .send(payloadSolicitud(
@@ -152,10 +154,10 @@ describe('Validacion de RUC, cédula y teléfono en solicitudes y fundaciones', 
           { cedula_contacto: '1710034066' },
         ));
 
-      expect(res.status).toBe(422);
+      expect(res.status).toBe(400);
     });
 
-    it('rechaza un telefono con formato invalido (422)', async () => {
+    it('rechaza un telefono con formato invalido (400)', async () => {
       const res = await request(app)
         .post('/public/solicitudes')
         .send(payloadSolicitud(
@@ -164,7 +166,7 @@ describe('Validacion de RUC, cédula y teléfono en solicitudes y fundaciones', 
           { telefono: '1111111111' },
         ));
 
-      expect(res.status).toBe(422);
+      expect(res.status).toBe(400);
     });
   });
 
@@ -235,7 +237,7 @@ describe('Validacion de RUC, cédula y teléfono en solicitudes y fundaciones', 
       expect(res.body.error).toContain('solicitud de fundacion');
     });
 
-    it('rechaza crear fundacion con RUC sin verificador valido (422)', async () => {
+    it('rechaza crear fundacion con RUC sin verificador valido (400)', async () => {
       const res = await request(app)
         .post('/fundacion')
         .set('Authorization', `Bearer ${adminToken}`)
@@ -245,7 +247,7 @@ describe('Validacion de RUC, cédula y teléfono en solicitudes y fundaciones', 
           direccion: 'Quito',
         });
 
-      expect(res.status).toBe(422);
+      expect(res.status).toBe(400);
     });
 
     it('actualiza el RUC de una fundacion (200)', async () => {
@@ -273,13 +275,13 @@ describe('Validacion de RUC, cédula y teléfono en solicitudes y fundaciones', 
       expect(res.status).toBe(409);
     });
 
-    it('rechaza actualizar el RUC con formato invalido (422)', async () => {
+    it('rechaza actualizar el RUC con formato invalido (400)', async () => {
       const res = await request(app)
         .put(`/fundacion/${fundacionAId}`)
         .set('Authorization', `Bearer ${adminToken}`)
         .send({ ruc: '12345' });
 
-      expect(res.status).toBe(422);
+      expect(res.status).toBe(400);
     });
   });
 });

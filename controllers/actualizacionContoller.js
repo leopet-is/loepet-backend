@@ -1,6 +1,5 @@
 const _ = require('lodash');
 
-const { validateRequest } = require('../helpers');
 const { validateAdminFund } = require('./helpers');
 const db = require('../DB/index');
 const {
@@ -8,7 +7,6 @@ const {
 } = require('../services/notificacionService');
 
 exports.createActualizacion = async (req, res) => {
-  await validateRequest(req);
   try {
     const {
       descripcion,
@@ -51,7 +49,6 @@ exports.createActualizacion = async (req, res) => {
 };
 
 exports.updateActualizacion = async (req, res) => {
-  await validateRequest(req);
   try {
     const { User } = req;
     const { actualizacionId } = req.params;
@@ -89,7 +86,6 @@ exports.updateActualizacion = async (req, res) => {
 };
 
 exports.deleteActualizacion = async (req, res) => {
-  await validateRequest(req);
   try {
     const { User } = req;
     const { actualizacionId } = req.params;
@@ -132,7 +128,6 @@ exports.deleteActualizacion = async (req, res) => {
 };
 
 exports.getActualizaciones = async (req, res) => {
-  await validateRequest(req);
   try {
     const { fundacionId } = req.query;
     const limit = parseInt(req.query.limit || '1', 10);
@@ -189,7 +184,6 @@ exports.getActualizaciones = async (req, res) => {
 };
 
 exports.createRating = async (req, res) => {
-  await validateRequest(req);
   try {
     const { actualizacionId } = req.params;
     const { valor } = req.body;
@@ -214,7 +208,6 @@ exports.createRating = async (req, res) => {
 };
 
 exports.loadRating = async (req, res) => {
-  await validateRequest(req);
   try {
     const { actualizacionId } = req.params;
     const { count, rows } = await db.Rating.findAndCountAll({

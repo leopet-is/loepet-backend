@@ -1,7 +1,5 @@
 /* eslint-disable no-console */
 
-const { validateRequest } = require('../helpers');
-
 const db = require('../DB/index');
 
 /**
@@ -19,7 +17,6 @@ const db = require('../DB/index');
  */
 exports.getComisionesPorFundacion = async (req, res) => {
   console.log('Received request for getComisionesPorFundacion.');
-  await validateRequest(req);
   try {
     const { fundacionId } = req.User; // Tomado del usuario autenticado
     console.log('Fundacion ID:', fundacionId);
@@ -54,7 +51,6 @@ exports.getComisionesPorFundacion = async (req, res) => {
 
 exports.crearComision = async (req, res) => {
   console.log(req.body);
-  await validateRequest(req);
   try {
     const {
       fundacionId, total_comision: totalComision, total_pago: totalPago, animales,

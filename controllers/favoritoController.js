@@ -1,9 +1,7 @@
 /* eslint-disable camelcase */
-const { validateRequest } = require('../helpers');
 const db = require('../DB/index');
 
 exports.agregarFavorito = async (req, res) => {
-  await validateRequest(req);
   try {
     const { User } = req;
     const { fundacionId } = req.body;
@@ -51,7 +49,6 @@ exports.agregarFavorito = async (req, res) => {
 };
 
 exports.eliminarFavorito = async (req, res) => {
-  await validateRequest(req);
   try {
     const { User } = req;
     const { fundacionId } = req.params;
@@ -83,7 +80,6 @@ exports.eliminarFavorito = async (req, res) => {
 };
 
 exports.obtenerFavoritos = async (req, res) => {
-  await validateRequest(req);
   try {
     const { User } = req;
 
@@ -120,7 +116,6 @@ exports.obtenerFavoritos = async (req, res) => {
 };
 
 exports.verificarFavorito = async (req, res) => {
-  await validateRequest(req);
   try {
     const { User } = req;
     const { fundacionId } = req.params;

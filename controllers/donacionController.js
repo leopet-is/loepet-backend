@@ -5,7 +5,6 @@ const dayjs = require('dayjs');
 const { Op } = require('sequelize');
 
 const { getEvidencia } = require('./helpers');
-const { validateRequest } = require('../helpers');
 const { createPlanManada } = require('./helpersPayPal');
 
 const db = require('../DB/index');
@@ -165,7 +164,6 @@ const db = require('../DB/index');
  * @return  {Object} response
  */
 exports.getDonaciones = async (req, res) => {
-  await validateRequest(req);
   try {
     const { User } = req;
     const { q } = req.query;
@@ -233,7 +231,6 @@ exports.getDonaciones = async (req, res) => {
  * @return  {Object} response
  */
 exports.getDineroDisponible = async (req, res) => {
-  await validateRequest(req);
   try {
     const { User } = req;
     const query = {
@@ -279,7 +276,6 @@ exports.getDineroDisponible = async (req, res) => {
  * @return  {Object} response
  */
 exports.crearDonacion = async (req, res) => {
-  await validateRequest(req);
   try {
     const { manadaId } = req.body;
     const manada = await db.Manada.findOne({
@@ -329,7 +325,6 @@ exports.crearDonacion = async (req, res) => {
  * @return {Object} response
  */
 exports.aprobarDonacion = async (req, res) => {
-  await validateRequest(req);
   try {
     const { donacionId } = req.params;
     const { aprobado } = req.body;
@@ -363,7 +358,6 @@ exports.aprobarDonacion = async (req, res) => {
  * @return {Object} response
  */
 exports.pagarDonacion = async (req, res) => {
-  await validateRequest(req);
   try {
     const { donacionId } = req.params;
     const { status } = req.body;
