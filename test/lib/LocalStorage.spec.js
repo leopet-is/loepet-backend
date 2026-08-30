@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const LocalStorage = require('../../lib/Storage/LocalStorage');
+const LocalStorage = require('../../services/storage/LocalStorage');
 
 describe('LocalStorage', () => {
   const UPLOAD_DIR = path.join(__dirname, '../../uploads');

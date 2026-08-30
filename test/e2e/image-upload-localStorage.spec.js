@@ -6,7 +6,7 @@ const db = require('../../DB/index');
 const app = require('../../app');
 
 // Activar LocalStorage para este test suite
-process.env.USE_LOCAL_STORAGE = 'true';
+process.env.STORAGE_PROVIDER = 'local';
 process.env.API_URL = 'http://localhost:8181';
 
 describe('Image Upload with LocalStorage - E2E', () => {
@@ -17,8 +17,8 @@ describe('Image Upload with LocalStorage - E2E', () => {
   const TEST_IMAGE_PATH = path.join(__dirname, '../fixtures/test-upload.jpg');
 
   beforeAll(async () => {
-    // Guardar el valor original de USE_LOCAL_STORAGE
-    process.env.USE_LOCAL_STORAGE_ORIGINAL = process.env.USE_LOCAL_STORAGE;
+    // Guardar el valor original de STORAGE_PROVIDER
+    process.env.STORAGE_PROVIDER_ORIGINAL = process.env.STORAGE_PROVIDER;
 
     await db.connect();
     const { Usuario, Fundacion, AdminFund } = db;
@@ -78,10 +78,10 @@ describe('Image Upload with LocalStorage - E2E', () => {
 
   afterAll(async () => {
     // Restaurar variable de entorno
-    if (process.env.USE_LOCAL_STORAGE_ORIGINAL) {
-      process.env.USE_LOCAL_STORAGE = process.env.USE_LOCAL_STORAGE_ORIGINAL;
+    if (process.env.STORAGE_PROVIDER_ORIGINAL) {
+      process.env.STORAGE_PROVIDER = process.env.STORAGE_PROVIDER_ORIGINAL;
     } else {
-      delete process.env.USE_LOCAL_STORAGE;
+      delete process.env.STORAGE_PROVIDER;
     }
 
     // Limpiar imagen de prueba

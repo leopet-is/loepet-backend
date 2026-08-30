@@ -55,8 +55,8 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       ready_for_creation: {
-        type: DataTypes.TINYINT(1),
-        defaultValue: 0,
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
         allowNull: false,
       },
       notas_admin: {

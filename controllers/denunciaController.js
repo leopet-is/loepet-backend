@@ -17,9 +17,7 @@ exports.crearDenuncia = async (req, res) => {
       await Promise.all(req.files.map(async (file) => {
         const { path: filePath, originalname: fileName } = file;
         try {
-          const location = await storage.updateFile(fileName, filePath, {
-            Bucket: process.env.S3_BUCKET,
-          });
+          const location = await storage.updateFile(fileName, filePath);
           archivosUrls.push(location);
         } catch (err) {
           console.error('Error subiendo archivo:', err);

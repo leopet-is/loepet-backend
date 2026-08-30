@@ -145,7 +145,7 @@ exports.aprobarSolicitudFundacion = async (req, res) => {
     const update = {
       estado: SOLICITUD_FUNDACION_ESTADO.APROBADA,
       notas_admin: 'Solicitud aprobada. Pendiente creación de usuario.',
-      ready_for_creation: 1,
+      ready_for_creation: true,
       updatedAt: Date.now(),
     };
 
@@ -237,7 +237,7 @@ exports.getSolicitudesReadyForCreation = async (req, res) => {
     const solicitudes = await db.SolicitudFundacion.findAll({
       where: {
         estado: SOLICITUD_FUNDACION_ESTADO.APROBADA,
-        ready_for_creation: 1,
+        ready_for_creation: true,
       },
       order: [['createdAt', 'ASC']],
     });

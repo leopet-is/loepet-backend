@@ -47,7 +47,7 @@ Este test valida que las fundaciones puedan cumplir con su compromiso de transpa
 *   **HU: "Como Fundación, quiero enviar evidencias programadas (fotos) de mis animales."**
     *   **Verificación (Paso 1 - Subida):** Se simula la carga de un archivo de imagen mediante `POST /otros/uploadFile`. Se valida que el servidor guarde el archivo físicamente en la carpeta `uploads/` y devuelva una URL válida.
     *   **Verificación (Paso 2 - Registro):** Se utiliza la URL devuelta para crear un registro formal de evidencia vinculado a una donación mediante `POST /evidencia/crear`. Se valida que los datos se guarden correctamente en la base de datos.
-    *   *Técnica:* Se fuerza `process.env.USE_LOCAL_STORAGE = 'true'` para evitar el uso del SDK de AWS S3.
+    *   *Técnica:* Se fuerza `process.env.STORAGE_PROVIDER = 'local'` para usar el almacenamiento local (evita el bucket de Supabase).
 
 **Comando de Ejecución:**
 ```bash

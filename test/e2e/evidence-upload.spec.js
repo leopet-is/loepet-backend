@@ -1,4 +1,4 @@
-process.env.USE_LOCAL_STORAGE = 'true'; // Force Local Storage for this test
+process.env.STORAGE_PROVIDER = 'local'; // Force Local Storage for this test
 
 const request = require('supertest');
 const bcrypt = require('bcrypt');
@@ -28,9 +28,7 @@ describe('E2E: Evidence Upload Flow', () => {
     }
 
     // 1. Limpiar BD
-    await db.sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
     await db.sequelize.sync({ force: true });
-    await db.sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
 
     // 2. Crear Fundación
     const foundationUser = await db.Usuario.create({

@@ -40,7 +40,7 @@ describe('E2E: Duplicate Reports Prevention', () => {
       role: 1, // ADMIN
       telefono: '0999999999',
       direccion: 'Test Address',
-      habilitado: 1,
+      habilitado: true,
     });
 
     adminToken = jwt.sign(admin.get({ plain: true }), 'secret', { expiresIn: 28800 });
@@ -55,7 +55,7 @@ describe('E2E: Duplicate Reports Prevention', () => {
       role: 3, // DONADOR
       telefono: '0999999998',
       direccion: 'Test Address',
-      habilitado: 1,
+      habilitado: true,
     });
 
     donadorUser = donador.get({ plain: true });

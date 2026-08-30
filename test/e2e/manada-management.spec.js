@@ -21,9 +21,7 @@ describe('E2E: Manada Management', () => {
 
   beforeAll(async () => {
     // 1. Limpiar la base de datos
-    await db.sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
     await db.sequelize.sync({ force: true });
-    await db.sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
 
     // 2. Crear Fundación (Usuario + Perfil + AdminFund)
     const foundationUser = await db.Usuario.create({
@@ -122,11 +120,8 @@ describe('E2E: Manada Management', () => {
     expect(manadaId).toBeDefined();
     expect(animalId).toBeDefined();
 
-    // Nota: El endpoint espera estructura anidada manada: { animalId: [...] }
     const payload = {
-      manada: {
-        animalId: [animalId],
-      },
+      animalId: [animalId],
     };
 
     const res = await request(app)

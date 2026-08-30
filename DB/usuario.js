@@ -27,9 +27,9 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
       },
       habilitado: {
-        type: DataTypes.TINYINT(1),
+        type: DataTypes.BOOLEAN,
         allowNull: false,
-        defaultValue: 1,
+        defaultValue: true,
       },
       createdAt: {
         type: DataTypes.DATE,

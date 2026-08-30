@@ -84,7 +84,7 @@ exports.createFundacion = async (req, res) => {
 
         await db.SolicitudFundacion.update(
           {
-            ready_for_creation: 0,
+            ready_for_creation: false,
             notas_admin: `Solicitud aprobada. Usuario creado con contraseña temporal: ${tempPassword}`,
           },
           { where: { id: solicitudId } },
