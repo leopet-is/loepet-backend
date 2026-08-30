@@ -43,6 +43,8 @@ const { SOLICITUD_FUNDACION_ESTADO } = require('../constants');
  *                 result: { $ref: '#/components/schemas/SolicitudFundacion' }
  *       '400':
  *         description: Ya existe una solicitud con ese RUC o correo
+ *       '422':
+ *         description: Campos requeridos invalidos o faltantes (p. ej. email no valido)
  *       '500':
  *         description: Error interno del servidor
  *
@@ -183,10 +185,12 @@ exports.createSolicitudFundacion = async (req, res) => {
       comentarios,
     } = req.body;
 
+    const emailNormalizado = _.trim(_.toLower(emailContacto));
+
     // Validar si ya existe una solicitud con el mismo RUC o email de contacto
     const existingSolicitud = await db.SolicitudFundacion.findOne({
       where: {
-        [Op.or]: [{ ruc }, { email_contacto: emailContacto }],
+        [Op.or]: [{ ruc }, { email_contacto: emailNormalizado }],
       },
     });
 
@@ -201,7 +205,7 @@ exports.createSolicitudFundacion = async (req, res) => {
       nombre,
       direccion,
       telefono,
-      email_contacto: emailContacto,
+      email_contacto: emailNormalizado,
       nombre_contacto: nombreContacto,
       apellido_contacto: apellidoContacto,
       cedula_contacto: cedulaContacto,
@@ -215,6 +219,10 @@ exports.createSolicitudFundacion = async (req, res) => {
     };
     return res.send(response);
   } catch (error) {
+    if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
+      const messages = _.map(error.errors, 'message');
+      return res.status(400).send({ error: messages });
+    }
     console.log('ERROR', error);
     const responseError = {
       message: 'Something bad happened!',

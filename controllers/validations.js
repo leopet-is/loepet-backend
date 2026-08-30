@@ -87,6 +87,45 @@ module.exports.createUpdateCuentaBancaria = [
     .withMessage('El campo nombre debe ser de tipo String'),
 ];
 
+/* Validaciones para SolicitudFundacion */
+module.exports.createSolicitudFundacion = [
+  body('ruc')
+    .exists()
+    .withMessage('Es necesario el campo ruc')
+    .isString(),
+  body('nombre')
+    .exists()
+    .withMessage('Es necesario el campo nombre')
+    .isString(),
+  body('direccion')
+    .exists()
+    .withMessage('Es necesario el campo direccion')
+    .isString(),
+  body('telefono')
+    .exists()
+    .withMessage('Es necesario el campo telefono')
+    .isString(),
+  body('email_contacto')
+    .exists()
+    .withMessage('Es necesario el campo email_contacto')
+    .trim()
+    .toLowerCase()
+    .isEmail()
+    .withMessage('El campo email_contacto debe ser un correo electronico valido'),
+  body('cedula_contacto')
+    .exists()
+    .withMessage('Es necesario el campo cedula_contacto')
+    .isString(),
+  body('nombre_contacto')
+    .exists()
+    .withMessage('Es necesario el campo nombre_contacto')
+    .isString(),
+  body('apellido_contacto')
+    .exists()
+    .withMessage('Es necesario el campo apellido_contacto')
+    .isString(),
+];
+
 /* Validaciones para Rating */
 module.exports.createRating = [
   body('valor')
