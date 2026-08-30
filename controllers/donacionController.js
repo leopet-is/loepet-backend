@@ -11,6 +11,154 @@ const { createPlanManada } = require('./helpersPayPal');
 const db = require('../DB/index');
 
 /**
+ * @openapi
+ * tags:
+ *   - name: Donaciones
+ *
+ * /donacion:
+ *   get:
+ *     tags: [Donaciones]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Obtiene las donaciones de una fundacion con paginacion (rol admin de fundacion)
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         schema: { type: string }
+ *         description: Busqueda por nombre del animal
+ *       - in: query
+ *         name: page
+ *         schema: { type: integer, default: 1 }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer, default: 1 }
+ *     responses:
+ *       '200':
+ *         description: Lista paginada de donaciones con donador, animal y evidencia
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 limit: { type: integer }
+ *                 page: { type: integer }
+ *                 totalPages: { type: integer }
+ *                 total: { type: integer }
+ *                 result:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id: { type: integer }
+ *                       donador: { type: string }
+ *                       animal: { type: string }
+ *                       dinero: { type: number }
+ *                       status: { type: boolean, description: Campo aprobado de la donacion }
+ *                       fecha: { type: string }
+ *                       evidencia: { type: object }
+ *       '500':
+ *         description: Error interno del servidor
+ *   post:
+ *     tags: [Donaciones]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Crea una donacion para una manada (rol donador)
+ *     description: Retorna el link de pago (PayPal) generado para la donacion. En pruebas sin credenciales PayPal se usa un mock.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/DonacionRequest'
+ *     responses:
+ *       '200':
+ *         description: Donacion realizada exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: { type: string }
+ *                 result: { type: object, description: Link o respuesta del plan de pago }
+ *       '500':
+ *         description: Error interno del servidor
+ *
+ * /donacion/disponible:
+ *   get:
+ *     tags: [Donaciones]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Obtiene el dinero disponible de una fundacion (rol admin de fundacion)
+ *     description: Suma de donaciones aprobadas y no pagadas de los animales de la fundacion.
+ *     responses:
+ *       '200':
+ *         description: Monto disponible
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 result: { type: number }
+ *       '500':
+ *         description: Error interno del servidor
+ *
+ * /donacion/{donacionId}/aprobado:
+ *   put:
+ *     tags: [Donaciones]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Aprueba o rechaza la evidencia de una donacion (rol donador)
+ *     parameters:
+ *       - in: path
+ *         name: donacionId
+ *         required: true
+ *         schema: { type: integer }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [aprobado]
+ *             properties:
+ *               aprobado: { type: boolean, example: true }
+ *     responses:
+ *       '200':
+ *         description: Donacion actualizada
+ *       '500':
+ *         description: Error interno del servidor
+ *
+ * /donacion/{donacionId}/pagado:
+ *   put:
+ *     tags: [Donaciones]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Actualiza el estado de pago de una donacion (rol admin de plataforma)
+ *     parameters:
+ *       - in: path
+ *         name: donacionId
+ *         required: true
+ *         schema: { type: integer }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [status]
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [success, failed]
+ *                 example: success
+ *     responses:
+ *       '200':
+ *         description: Donacion actualizada
+ *       '500':
+ *         description: Error interno del servidor
+ */
+
+/**
  * Funcion para obtener todas las donaciones
  * @param  {*} req
  * @param  {*} res

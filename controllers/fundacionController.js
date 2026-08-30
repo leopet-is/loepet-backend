@@ -17,6 +17,182 @@ const {
 const db = require('../DB/index');
 
 /**
+ * @openapi
+ * tags:
+ *   - name: Fundaciones
+ *
+ * /fundacion:
+ *   post:
+ *     tags: [Fundaciones]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Crea una fundacion (rol administrador de plataforma)
+ *     description: Tambien se puede utilizar para aprobar/crear la fundacion ligada a una solicitud enviando `id` (solicitud) y `user_id`.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/FundacionRequest'
+ *     responses:
+ *       '200':
+ *         description: Fundacion creada exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 mensaje: { type: string }
+ *                 result: { $ref: '#/components/schemas/Fundacion' }
+ *       '400':
+ *         description: Ya existe una fundacion registrada con ese RUC
+ *       '401':
+ *         description: No autorizado para realizar la operacion
+ *       '500':
+ *         description: Error interno del servidor
+ *   get:
+ *     tags: [Fundaciones]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Obtiene las fundaciones con paginacion
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         schema: { type: string }
+ *         description: Busqueda por nombre de la fundacion
+ *       - in: query
+ *         name: page
+ *         schema: { type: integer, default: 1 }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer, default: 1 }
+ *     responses:
+ *       '200':
+ *         description: Lista paginada de fundaciones
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Paginacion'
+ *       '500':
+ *         description: Error interno del servidor
+ *
+ * /fundacion/animales:
+ *   get:
+ *     tags: [Fundaciones]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Obtiene los animales de las fundaciones aprobadas con paginacion
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         schema: { type: string }
+ *         description: Busqueda por nombre del animal
+ *       - in: query
+ *         name: page
+ *         schema: { type: integer, default: 1 }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer, default: 1 }
+ *     responses:
+ *       '200':
+ *         description: Lista paginada de animales
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Paginacion'
+ *       '500':
+ *         description: Error interno del servidor
+ *
+ * /fundacion/padrinos/{fundacionId}:
+ *   get:
+ *     tags: [Fundaciones]
+ *     summary: Obtiene el historial de padrinos de los animales de una fundacion
+ *     parameters:
+ *       - in: path
+ *         name: fundacionId
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       '200':
+ *         description: Lista de padrinos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 result:
+ *                   type: array
+ *                   items: { type: object }
+ *       '500':
+ *         description: Error interno del servidor
+ *
+ * /fundacion/padrinos/calificacion/{fundacionId}:
+ *   get:
+ *     tags: [Fundaciones]
+ *     summary: Obtiene la calificacion de padrinos de una fundacion
+ *     parameters:
+ *       - in: path
+ *         name: fundacionId
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       '200':
+ *         description: Calificaciones de los padrinos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 result:
+ *                   type: array
+ *                   items: { type: object }
+ *       '500':
+ *         description: Error interno del servidor
+ *
+ * /fundacion/{fundacionId}:
+ *   put:
+ *     tags: [Fundaciones]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Actualiza la informacion de una fundacion (rol administrador de plataforma)
+ *     parameters:
+ *       - in: path
+ *         name: fundacionId
+ *         required: true
+ *         schema: { type: integer }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/FundacionRequest'
+ *     responses:
+ *       '200':
+ *         description: Informacion de la fundacion actualizada
+ *       '401':
+ *         description: No autorizado para realizar la operacion
+ *       '500':
+ *         description: Error interno del servidor
+ *   delete:
+ *     tags: [Fundaciones]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Elimina una fundacion (borrado logico, rol administrador de plataforma)
+ *     parameters:
+ *       - in: path
+ *         name: fundacionId
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       '200':
+ *         description: Fundacion eliminada exitosamente
+ *       '401':
+ *         description: No autorizado para realizar la operacion
+ *       '500':
+ *         description: Error interno del servidor
+ */
+
+/**
  * Funcion para crear una fundacion por parte del administrador de la plataforma en la BD
  * @param  {*} req
  * @param  {*} res

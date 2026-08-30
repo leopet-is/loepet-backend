@@ -2,6 +2,55 @@ const fs = require('fs');
 const db = require('../DB/index');
 const storage = require('../services/storage');
 
+/**
+ * @openapi
+ * tags:
+ *   - name: Denuncias
+ *
+ * /denuncias:
+ *   post:
+ *     tags: [Denuncias]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Crea una denuncia contra una fundacion (rol donador)
+ *     description: Se envian como formulario multipart con hasta 5 archivos de evidencia.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required: [fundacionId, motivo]
+ *             properties:
+ *               fundacionId:
+ *                 type: integer
+ *                 description: Id de la fundacion denunciada
+ *               motivo:
+ *                 type: string
+ *                 description: Motivo de la denuncia
+ *               archivos:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *                 description: Hasta 5 archivos de evidencia
+ *     responses:
+ *       '201':
+ *         description: Denuncia creada exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ok: { type: boolean, example: true }
+ *                 data: { $ref: '#/components/schemas/Denuncia' }
+ *       '400':
+ *         description: Faltan datos requeridos
+ *       '403':
+ *         description: Acceso denegado (permisos insuficientes)
+ *       '500':
+ *         description: Error interno del servidor
+ */
 exports.crearDenuncia = async (req, res) => {
   try {
     const { fundacionId, motivo } = req.body;
@@ -45,6 +94,45 @@ exports.crearDenuncia = async (req, res) => {
   }
 };
 
+/**
+ * @openapi
+ * /denuncias/{denunciaId}:
+ *   put:
+ *     tags: [Denuncias]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Rechaza una denuncia indicando el motivo (rol administrador de plataforma)
+ *     parameters:
+ *       - in: path
+ *         name: denunciaId
+ *         required: true
+ *         schema: { type: integer }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [motivo_rechazo]
+ *             properties:
+ *               motivo_rechazo: { type: string }
+ *     responses:
+ *       '200':
+ *         description: Denuncia rechazada correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ok: { type: boolean, example: true }
+ *                 message: { type: string }
+ *       '404':
+ *         description: Denuncia no encontrada
+ *       '403':
+ *         description: Acceso denegado (permisos insuficientes)
+ *       '500':
+ *         description: Error interno del servidor
+ */
 exports.rechazarDenuncia = async (req, res) => {
   try {
     const { denunciaId } = req.params;

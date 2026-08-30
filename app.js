@@ -3,6 +3,8 @@ require('dotenv').config();
 const cors = require('cors');
 const express = require('express');
 const path = require('path');
+const swaggerJsdoc = require('swagger-jsdoc');
+const openapiComponents = require('./docs/openapi-components');
 
 const app = express();
 
@@ -38,5 +40,41 @@ app.use('/paypal', require('./routes/paypal'));
 app.use('/otros', require('./routes/otros'));
 app.use('/test', require('./routes/test'));
 app.use('/denuncias', require('./routes/denunciaRoutes'));
+
+// Documentacion de la API (Swagger/OpenAPI renderizada con Scalar)
+const swaggerSpec = swaggerJsdoc({
+  definition: {
+    openapi: '3.1.0',
+    info: {
+      title: 'LEOPET API',
+      version: '1.0.0',
+      description:
+        'Documentacion de la API de LEOPET. Autenticación mediante token JWT enviado como `Authorization: Bearer <token>`.',
+    },
+    servers: [{ url: 'http://localhost:8181' }],
+    components: openapiComponents,
+  },
+  apis: ['./controllers/*.js'],
+});
+
+// El paquete de Scalar es ESM-only; se carga con import() diferido para ser
+// compatible con Node 20 (entorno del contenedor) y con los tests de Jest.
+let apiDocsMiddleware;
+async function getApiDocsMiddleware() {
+  if (!apiDocsMiddleware) {
+    const { apiReference } = await import('@scalar/express-api-reference');
+    apiDocsMiddleware = apiReference({ spec: { content: swaggerSpec } });
+  }
+  return apiDocsMiddleware;
+}
+
+app.use('/api-docs', async (req, res, next) => {
+  try {
+    const middleware = await getApiDocsMiddleware();
+    middleware(req, res, next);
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = app;

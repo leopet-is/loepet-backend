@@ -147,6 +147,19 @@ curl http://localhost:8181/fundacion/ \
   -H "Authorization: Bearer TU_TOKEN"
 ```
 
+### Documentación de la API (Scalar)
+
+La API expone su documentación interactiva (OpenAPI 3.1) en:
+
+```bash
+# Abrir en el navegador
+http://localhost:8181/api-docs
+```
+
+La documentación se genera a partir de anotaciones `@openapi` (JSDoc) en
+`controllers/*.js` usando `swagger-jsdoc`. Para probar los endpoints
+autenticados usa el botón **Authorize** y pega el token del `login`.
+
 ### Tests automatizados
 
 ```bash

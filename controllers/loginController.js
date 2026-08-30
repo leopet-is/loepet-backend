@@ -11,6 +11,56 @@ const db = require('../DB/index');
 const { Usuario, AdminFund } = db;
 
 /**
+ * @openapi
+ * tags:
+ *   - name: Autenticacion
+ *
+ * /auth/login:
+ *   post:
+ *     tags: [Autenticacion]
+ *     summary: Inicio de sesion de usuarios (admin, admin de fundacion o donador)
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/LoginRequest'
+ *     responses:
+ *       '200':
+ *         description: Usuario autenticado. Retorna el token JWT a usar en los demas endpoints.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthResponse'
+ *       '401':
+ *         description: Credenciales incorrectas o usuario deshabilitado
+ *       '500':
+ *         description: Error interno del servidor
+ *
+ * /auth/register:
+ *   post:
+ *     tags: [Autenticacion]
+ *     summary: Registro de usuarios (donadores o administradores de fundacion)
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/RegisterRequest'
+ *     responses:
+ *       '201':
+ *         description: Usuario registrado correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthResponse'
+ *       '400':
+ *         description: El correo ya se encuentra registrado o datos invalidos
+ *       '500':
+ *         description: Error interno del servidor
+ */
+
+/**
  * Funcion encargada del inicio de sesion de todos los usuarios:
  * SuperAdmin, Administrador Plataforma, Donador.
  * Retorna un token que se utilizara en la llamada de todos los endpoints

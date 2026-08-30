@@ -19,6 +19,237 @@ const {
 const db = require('../DB/index');
 
 /**
+ * @openapi
+ * tags:
+ *   - name: Animales
+ *
+ * /animal:
+ *   get:
+ *     tags: [Animales]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Obtiene todos los animales con paginacion
+ *     description: Si se envia el parametro `manada` se listan los animales de esa manada (debe pertenecer al usuario). Soporta filtros por especie y busqueda por nombre.
+ *     parameters:
+ *       - in: query
+ *         name: especie
+ *         schema: { type: string }
+ *         description: Filtro por especie (PERRO, GATO, etc.)
+ *       - in: query
+ *         name: manada
+ *         schema: { type: integer }
+ *         description: Id de una manada para listar solo sus animales
+ *       - in: query
+ *         name: q
+ *         schema: { type: string }
+ *         description: Busqueda por nombre del animal
+ *       - in: query
+ *         name: page
+ *         schema: { type: integer, default: 1 }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer, default: 1 }
+ *     responses:
+ *       '200':
+ *         description: Lista paginada de animales
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Paginacion'
+ *       '500':
+ *         description: Error interno del servidor
+ *   post:
+ *     tags: [Animales]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Crea un animal (rol administrador de fundacion)
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/AnimalRequest'
+ *     responses:
+ *       '200':
+ *         description: Animal creado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 mensaje: { type: string }
+ *                 result: { $ref: '#/components/schemas/Animal' }
+ *       '401':
+ *         description: No autorizado para realizar la operacion
+ *       '500':
+ *         description: Error interno del servidor
+ *
+ * /animal/app:
+ *   get:
+ *     tags: [Animales]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Obtiene los animales visibles para la aplicacion movil con paginacion
+ *     parameters:
+ *       - in: query
+ *         name: tipoAnimal
+ *         schema: { type: string }
+ *         description: Filtro por especie. Enviar `TODOS` (o no enviar) para listar todos.
+ *       - in: query
+ *         name: page
+ *         schema: { type: integer, default: 1 }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer, default: 1 }
+ *     responses:
+ *       '200':
+ *         description: Lista paginada de animales
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Paginacion'
+ *       '500':
+ *         description: Error interno del servidor
+ *
+ * /animal/app/fundacion/{fundacionId}:
+ *   get:
+ *     tags: [Animales]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Obtiene los animales visibles de una fundacion con paginacion
+ *     parameters:
+ *       - in: path
+ *         name: fundacionId
+ *         required: true
+ *         schema: { type: integer }
+ *       - in: query
+ *         name: page
+ *         schema: { type: integer, default: 1 }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer, default: 1 }
+ *     responses:
+ *       '200':
+ *         description: Lista paginada de animales de la fundacion
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Paginacion'
+ *       '500':
+ *         description: Error interno del servidor
+ *
+ * /animal/especies:
+ *   get:
+ *     tags: [Animales]
+ *     summary: Lista las especies distintas de los animales visibles
+ *     responses:
+ *       '200':
+ *         description: Arreglo de especies
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 result:
+ *                   type: array
+ *                   items: { type: string }
+ *       '500':
+ *         description: Error interno del servidor
+ *
+ * /animal/search:
+ *   get:
+ *     tags: [Animales]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Busca animales por nombre
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         required: true
+ *         schema: { type: string }
+ *         description: Texto a buscar en el nombre del animal
+ *     responses:
+ *       '200':
+ *         description: Arreglo de animales encontrados
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 result:
+ *                   type: array
+ *                   items: { $ref: '#/components/schemas/Animal' }
+ *       '500':
+ *         description: Error interno del servidor
+ *
+ * /animal/{animalId}:
+ *   get:
+ *     tags: [Animales]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Obtiene la informacion de un animal por id
+ *     parameters:
+ *       - in: path
+ *         name: animalId
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       '200':
+ *         description: Informacion del animal (arreglo vacio si no existe)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 result:
+ *                   oneOf:
+ *                     - { $ref: '#/components/schemas/Animal' }
+ *                     - { type: array, items: { type: string } }
+ *       '500':
+ *         description: Error interno del servidor
+ *   put:
+ *     tags: [Animales]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Actualiza la informacion de un animal (rol administrador de fundacion)
+ *     parameters:
+ *       - in: path
+ *         name: animalId
+ *         required: true
+ *         schema: { type: integer }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/AnimalRequest'
+ *     responses:
+ *       '200':
+ *         description: Informacion del animal actualizada
+ *       '401':
+ *         description: No autorizado para realizar la operacion
+ *       '500':
+ *         description: Error interno del servidor
+ *   delete:
+ *     tags: [Animales]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Elimina un animal (borrado logico, rol administrador de fundacion)
+ *     parameters:
+ *       - in: path
+ *         name: animalId
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       '200':
+ *         description: Animal eliminado exitosamente
+ *       '401':
+ *         description: No autorizado para realizar la operacion
+ *       '500':
+ *         description: Error interno del servidor
+ */
+
+/**
  * Funcion para crear un animal en la BD
  * @param  {*} req
  * @param  {*} res

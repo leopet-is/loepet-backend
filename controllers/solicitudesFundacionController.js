@@ -6,6 +6,163 @@ const db = require('../DB/index');
 const { SOLICITUD_FUNDACION_ESTADO } = require('../constants');
 
 /**
+ * @openapi
+ * tags:
+ *   - name: Solicitudes de fundacion
+ *
+ * /public/solicitudes:
+ *   post:
+ *     tags: [Solicitudes de fundacion]
+ *     summary: Envia una solicitud de fundacion desde el landing page (publico)
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [ruc, nombre, direccion, email_contacto, cedula_contacto, nombre_contacto, apellido_contacto]
+ *             properties:
+ *               ruc: { type: string }
+ *               nombre: { type: string }
+ *               direccion: { type: string }
+ *               telefono: { type: string }
+ *               email_contacto: { type: string, format: email }
+ *               cedula_contacto: { type: string }
+ *               nombre_contacto: { type: string }
+ *               apellido_contacto: { type: string }
+ *               comentarios: { type: string }
+ *     responses:
+ *       '200':
+ *         description: Solicitud de fundacion enviada exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 mensaje: { type: string }
+ *                 result: { $ref: '#/components/schemas/SolicitudFundacion' }
+ *       '400':
+ *         description: Ya existe una solicitud con ese RUC o correo
+ *       '500':
+ *         description: Error interno del servidor
+ *
+ * /admin/solicitudes:
+ *   get:
+ *     tags: [Solicitudes de fundacion]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Obtiene las solicitudes de fundacion con paginacion (rol administrador)
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         schema: { type: string }
+ *         description: Busqueda por nombre de fundacion o de la persona de contacto
+ *       - in: query
+ *         name: estado
+ *         schema: { type: string, enum: [pendiente, aprobada, rechazada] }
+ *       - in: query
+ *         name: page
+ *         schema: { type: integer, default: 1 }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer, default: 10 }
+ *     responses:
+ *       '200':
+ *         description: Lista paginada de solicitudes
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Paginacion'
+ *       '500':
+ *         description: Error interno del servidor
+ *
+ * /admin/solicitudes/ready-for-creation:
+ *   get:
+ *     tags: [Solicitudes de fundacion]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Obtiene solicitudes aprobadas que estan listas para crear el usuario/fundacion
+ *     responses:
+ *       '200':
+ *         description: Arreglo de solicitudes listas para creacion
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 result:
+ *                   type: array
+ *                   items: { $ref: '#/components/schemas/SolicitudFundacion' }
+ *       '500':
+ *         description: Error interno del servidor
+ *
+ * /admin/solicitudes/{solicitudId}:
+ *   get:
+ *     tags: [Solicitudes de fundacion]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Obtiene los detalles de una solicitud
+ *     parameters:
+ *       - in: path
+ *         name: solicitudId
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       '200':
+ *         description: Detalle de la solicitud
+ *       '404':
+ *         description: Solicitud no encontrada
+ *       '500':
+ *         description: Error interno del servidor
+ *
+ * /admin/solicitudes/{solicitudId}/aprobar:
+ *   put:
+ *     tags: [Solicitudes de fundacion]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Aprueba una solicitud (la deja lista para crear usuario/fundacion)
+ *     parameters:
+ *       - in: path
+ *         name: solicitudId
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       '200':
+ *         description: Solicitud aprobada exitosamente
+ *       '404':
+ *         description: Solicitud no encontrada
+ *       '500':
+ *         description: Error interno del servidor
+ *
+ * /admin/solicitudes/{solicitudId}/rechazar:
+ *   put:
+ *     tags: [Solicitudes de fundacion]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Rechaza una solicitud indicando el motivo en notas
+ *     parameters:
+ *       - in: path
+ *         name: solicitudId
+ *         required: true
+ *         schema: { type: integer }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/RechazarSolicitudRequest'
+ *     responses:
+ *       '200':
+ *         description: Solicitud rechazada exitosamente
+ *       '400':
+ *         description: El motivo del rechazo es requerido
+ *       '404':
+ *         description: Solicitud no encontrada
+ *       '500':
+ *         description: Error interno del servidor
+ */
+
+/**
  * Funcion para crear una solicitud de fundacion desde el Landing Page
  * @param  {*} req
  * @param  {*} res

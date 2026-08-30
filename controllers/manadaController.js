@@ -16,6 +16,215 @@ const db = require('../DB/index');
 const NUMERO_MAXIMO_FOTOS = 4;
 
 /**
+ * @openapi
+ * tags:
+ *   - name: Manadas
+ *
+ * /manada:
+ *   post:
+ *     tags: [Manadas]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Crea una manada (rol donador)
+ *     description: Al crear la manada se solicita el producto/plan en PayPal (en pruebas sin credenciales PayPal se usa un mock).
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ManadaRequest'
+ *     responses:
+ *       '200':
+ *         description: Manada creada exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 mensaje: { type: string }
+ *                 result: { $ref: '#/components/schemas/Manada' }
+ *       '401':
+ *         description: No autorizado para realizar la operacion
+ *       '500':
+ *         description: Error interno del servidor
+ *   get:
+ *     tags: [Manadas]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Obtiene las manadas del donador con paginacion
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         schema: { type: string }
+ *         description: Busqueda por nombre de la manada
+ *       - in: query
+ *         name: page
+ *         schema: { type: integer, default: 1 }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer, default: 1 }
+ *     responses:
+ *       '200':
+ *         description: Manadas del donador (incluye numero de apadrinados y fotos)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 limit: { type: integer }
+ *                 page: { type: integer }
+ *                 totalPages: { type: integer }
+ *                 count: { type: integer }
+ *                 result:
+ *                   type: array
+ *                   items: { $ref: '#/components/schemas/Manada' }
+ *       '500':
+ *         description: Error interno del servidor
+ *
+ * /manada/search:
+ *   get:
+ *     tags: [Manadas]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Busca manadas por nombre
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       '200':
+ *         description: Arreglo de manadas encontradas
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 result:
+ *                   type: array
+ *                   items: { $ref: '#/components/schemas/Manada' }
+ *       '500':
+ *         description: Error interno del servidor
+ *
+ * /manada/{manadaId}:
+ *   put:
+ *     tags: [Manadas]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Actualiza la informacion de una manada (rol donador propietario)
+ *     parameters:
+ *       - in: path
+ *         name: manadaId
+ *         required: true
+ *         schema: { type: integer }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ManadaRequest'
+ *     responses:
+ *       '200':
+ *         description: Informacion de la manada actualizada
+ *       '500':
+ *         description: Error interno del servidor
+ *   delete:
+ *     tags: [Manadas]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Elimina una manada (borrado logico, rol donador propietario)
+ *     parameters:
+ *       - in: path
+ *         name: manadaId
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       '200':
+ *         description: Manada eliminada exitosamente
+ *       '401':
+ *         description: No autorizado para realizar la operacion
+ *       '500':
+ *         description: Error interno del servidor
+ *
+ * /manada/{manadaId}/animals:
+ *   post:
+ *     tags: [Manadas]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Agrega animales a una manada (rol donador propietario)
+ *     parameters:
+ *       - in: path
+ *         name: manadaId
+ *         required: true
+ *         schema: { type: integer }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [animalId]
+ *             properties:
+ *               animalId:
+ *                 type: array
+ *                 items: { type: integer }
+ *                 description: Ids de los animales a agregar
+ *     responses:
+ *       '200':
+ *         description: Animales agregados exitosamente a la manada
+ *       '401':
+ *         description: No autorizado para realizar la operacion
+ *       '500':
+ *         description: Error interno del servidor
+ *   get:
+ *     tags: [Manadas]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Obtiene los animales asociados a una manada
+ *     parameters:
+ *       - in: path
+ *         name: manadaId
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       '200':
+ *         description: Arreglo de animales de la manada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 result:
+ *                   type: array
+ *                   items: { type: object }
+ *       '500':
+ *         description: Error interno del servidor
+ *
+ * /manada/{manadaId}/animals/{animalId}:
+ *   delete:
+ *     tags: [Manadas]
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Elimina un animal de una manada (rol donador propietario)
+ *     parameters:
+ *       - in: path
+ *         name: manadaId
+ *         required: true
+ *         schema: { type: integer }
+ *       - in: path
+ *         name: animalId
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       '200':
+ *         description: Animal eliminado de la manada
+ *       '401':
+ *         description: No autorizado para realizar la operacion
+ *       '500':
+ *         description: Error interno del servidor
+ */
+
+/**
  * Funcion para crear una manada en la BD
  * @param  {*} req
  * @param  {*} res
