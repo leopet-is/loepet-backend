@@ -3,7 +3,8 @@ module.exports = (sequelize, DataTypes) => {
     'Fundacion',
     {
       ruc: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(13),
+        unique: true,
       },
       nombre: {
         type: DataTypes.STRING,

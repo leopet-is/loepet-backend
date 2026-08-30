@@ -128,7 +128,12 @@ const components = {
       type: 'object',
       required: ['ruc', 'nombre', 'direccion'],
       properties: {
-        ruc: { type: 'string', example: '1790012345001' },
+        ruc: {
+          type: 'string',
+          description: 'RUC de 13 digitos con digito verificador SRI valido',
+          pattern: '^\\d{13}$',
+          example: '1790012345001',
+        },
         nombre: { type: 'string', example: 'Fundacion Patitas' },
         direccion: { type: 'string', example: 'Quito, Ecuador' },
         telefono: { type: 'string', example: '022345678' },
@@ -181,7 +186,11 @@ const components = {
       type: 'object',
       properties: {
         id: { type: 'integer' },
-        ruc: { type: 'string' },
+        ruc: {
+          type: 'string',
+          description: 'RUC de 13 digitos con digito verificador SRI valido',
+          pattern: '^\\d{13}$',
+        },
         nombre: { type: 'string' },
         direccion: { type: 'string' },
         telefono: { type: 'string' },

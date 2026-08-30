@@ -22,12 +22,12 @@ const { SOLICITUD_FUNDACION_ESTADO } = require('../constants');
  *             type: object
  *             required: [ruc, nombre, direccion, email_contacto, cedula_contacto, nombre_contacto, apellido_contacto]
  *             properties:
- *               ruc: { type: string }
- *               nombre: { type: string }
- *               direccion: { type: string }
- *               telefono: { type: string }
+ *               ruc: { type: string, description: 'RUC de 13 digitos con digito verificador SRI valido', pattern: '^\\d{13}$', example: '1710034065001' }
+ *               nombre: { type: string, example: 'Fundacion Patitas' }
+ *               direccion: { type: string, example: 'Quito, Ecuador' }
+ *               telefono: { type: string, description: 'Movil 09XXXXXXXX o fijo 0[2-7]XXXXXXX', example: '0987654321' }
  *               email_contacto: { type: string, format: email }
- *               cedula_contacto: { type: string }
+ *               cedula_contacto: { type: string, description: 'Cedula ecuatoriana de 10 digitos valida', pattern: '^\\d{10}$', example: '1710034065' }
  *               nombre_contacto: { type: string }
  *               apellido_contacto: { type: string }
  *               comentarios: { type: string }
@@ -41,10 +41,10 @@ const { SOLICITUD_FUNDACION_ESTADO } = require('../constants');
  *               properties:
  *                 mensaje: { type: string }
  *                 result: { $ref: '#/components/schemas/SolicitudFundacion' }
- *       '400':
- *         description: Ya existe una solicitud con ese RUC o correo
+ *       '409':
+ *         description: Ya existe una solicitud registrada con ese RUC o correo, o el RUC ya pertenece a una fundacion registrada
  *       '422':
- *         description: Campos requeridos invalidos o faltantes (p. ej. email no valido)
+ *         description: Campos requeridos invalidos o faltantes (RUC/cedula con digito verificador incorrecto, telefono o email con formato no valido)
  *       '500':
  *         description: Error interno del servidor
  *
@@ -186,22 +186,34 @@ exports.createSolicitudFundacion = async (req, res) => {
     } = req.body;
 
     const emailNormalizado = _.trim(_.toLower(emailContacto));
+    const rucNormalizado = _.trim(String(ruc));
 
     // Validar si ya existe una solicitud con el mismo RUC o email de contacto
     const existingSolicitud = await db.SolicitudFundacion.findOne({
       where: {
-        [Op.or]: [{ ruc }, { email_contacto: emailNormalizado }],
+        [Op.or]: [{ ruc: rucNormalizado }, { email_contacto: emailNormalizado }],
       },
     });
 
     if (existingSolicitud) {
-      return res.status(400).send({
+      return res.status(409).send({
         error: 'Ya existe una solicitud registrada con este RUC o correo electrónico.',
       });
     }
 
+    // Verificar si el RUC ya corresponde a una fundacion registrada
+    const existingFundacion = await db.Fundacion.findOne({
+      where: { ruc: rucNormalizado },
+    });
+
+    if (existingFundacion) {
+      return res.status(409).send({
+        error: 'Ya se encuentra registrada una fundación con este RUC.',
+      });
+    }
+
     const solicitud = await db.SolicitudFundacion.create({
-      ruc,
+      ruc: rucNormalizado,
       nombre,
       direccion,
       telefono,
@@ -219,7 +231,12 @@ exports.createSolicitudFundacion = async (req, res) => {
     };
     return res.send(response);
   } catch (error) {
-    if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      return res.status(409).send({
+        error: 'Ya existe una solicitud registrada con este RUC o correo electrónico.',
+      });
+    }
+    if (error.name === 'SequelizeValidationError') {
       const messages = _.map(error.errors, 'message');
       return res.status(400).send({ error: messages });
     }

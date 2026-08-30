@@ -45,9 +45,13 @@ const db = require('../DB/index');
  *                 mensaje: { type: string }
  *                 result: { $ref: '#/components/schemas/Fundacion' }
  *       '400':
- *         description: Ya existe una fundacion registrada con ese RUC
+ *         description: Error de validacion de los datos de entrada
  *       '401':
  *         description: No autorizado para realizar la operacion
+ *       '409':
+ *         description: Ya existe una fundacion o solicitud registrada con ese RUC
+ *       '422':
+ *         description: RUC/cedula con digito verificador incorrecto o telefono con formato no valido
  *       '500':
  *         description: Error interno del servidor
  *   get:
@@ -169,8 +173,14 @@ const db = require('../DB/index');
  *     responses:
  *       '200':
  *         description: Informacion de la fundacion actualizada
+ *       '400':
+ *         description: Error de validacion de los datos de entrada
  *       '401':
  *         description: No autorizado para realizar la operacion
+ *       '409':
+ *         description: El RUC ya pertenece a otra fundacion o a una solicitud registrada
+ *       '422':
+ *         description: RUC/cedula con digito verificador incorrecto o telefono con formato no valido
  *       '500':
  *         description: Error interno del servidor
  *   delete:
@@ -211,13 +221,30 @@ exports.createFundacion = async (req, res) => {
         .status(401)
         .send({ error: 'No esta autorizado para realizar esta operacion!' });
     }
-    if (await validateFundacion(ruc)) {
-      return res.status(400).send({
+
+    const rucNormalizado = _.trim(String(ruc));
+
+    if (await validateFundacion(rucNormalizado)) {
+      return res.status(409).send({
         error: 'Ya se encuentra registrada una fundacion con ese RUC',
       });
     }
+
+    // Si no se esta creando desde una solicitud aprobada, el RUC no debe
+    // coincidir con una solicitud existente (aun no aprobada).
+    if (!solicitudId) {
+      const existingSolicitud = await db.SolicitudFundacion.findOne({
+        where: { ruc: rucNormalizado },
+      });
+      if (existingSolicitud) {
+        return res.status(409).send({
+          error: 'Ya existe una solicitud de fundacion registrada con ese RUC',
+        });
+      }
+    }
+
     const fundacion = await db.Fundacion.create({
-      ruc,
+      ruc: rucNormalizado,
       nombre,
       direccion,
       telefono,
@@ -286,6 +313,11 @@ exports.createFundacion = async (req, res) => {
     };
     return res.send(response);
   } catch (error) {
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      return res.status(409).send({
+        error: 'Ya se encuentra registrada una fundacion con ese RUC',
+      });
+    }
     console.log('ERROR', error);
     const responseError = {
       message: 'Something bad happened!',
@@ -350,7 +382,6 @@ exports.updateInfoFundacion = async (req, res) => {
       ruc, nombre, direccion, telefono, aprobado, comision,
     } = req.body;
     const update = {
-      ...(!_.isEmpty(ruc) ? { ruc } : {}),
       ...(!_.isEmpty(nombre) ? { nombre } : {}),
       ...(!_.isEmpty(direccion) ? { direccion } : {}),
       ...(!_.isEmpty(telefono) ? { telefono } : {}),
@@ -358,6 +389,33 @@ exports.updateInfoFundacion = async (req, res) => {
       ...(!_.isEmpty(comision) ? { comision } : {}),
       updatedAt: Date.now(),
     };
+
+    if (!_.isEmpty(ruc)) {
+      const rucNormalizado = _.trim(String(ruc));
+
+      // Verificar que el RUC no pertenezca a otra fundacion
+      const existingFundacion = await db.Fundacion.findOne({
+        where: { id: { [Op.ne]: fundacionId }, ruc: rucNormalizado },
+      });
+      if (existingFundacion) {
+        return res.status(409).send({
+          error: 'Ya se encuentra registrada una fundacion con ese RUC',
+        });
+      }
+
+      // Verificar que el RUC no pertenezca a una solicitud pendiente
+      const existingSolicitud = await db.SolicitudFundacion.findOne({
+        where: { ruc: rucNormalizado },
+      });
+      if (existingSolicitud) {
+        return res.status(409).send({
+          error: 'Ya existe una solicitud de fundacion registrada con ese RUC',
+        });
+      }
+
+      update.ruc = rucNormalizado;
+    }
+
     const fundacion = await db.Fundacion.update(update, {
       where: { id: fundacionId },
     });
@@ -368,6 +426,11 @@ exports.updateInfoFundacion = async (req, res) => {
     };
     return res.send(response);
   } catch (error) {
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      return res.status(409).send({
+        error: 'Ya se encuentra registrada una fundacion con ese RUC',
+      });
+    }
     console.log('ERROR', error);
     const responseError = {
       message: 'Something bad happened!',

@@ -7,11 +7,11 @@ const fundacionController = require('../controllers/fundacionController');
 
 // Middlewares
 const passport = require('../middlewares/passport');
-// Const validations = require("../controllers/validations");
+const validations = require('../controllers/validations');
 
 const router = express.Router();
 
-router.post('/', passport, AsyncWrapper(fundacionController.createFundacion));
+router.post('/', passport, validations.createFundacion, AsyncWrapper(fundacionController.createFundacion));
 
 router.get('/', passport, AsyncWrapper(fundacionController.getFundaciones));
 
@@ -34,6 +34,8 @@ router.get(
 router.put(
   '/:fundacionId',
   passport,
+  validations.fundacionParam,
+  validations.updateInfoFundacion,
   AsyncWrapper(fundacionController.updateInfoFundacion),
 );
 
