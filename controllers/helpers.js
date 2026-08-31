@@ -422,15 +422,15 @@ exports.validateFundacion = async (ruc) => {
 
 /**
  * Funcion para actualizar el estado de una animal cuando es apadrinado,
- * el estado se cambia de "NO APADRINADO" a "APADRINADO"
+ * el estado se cambia de "DISPONIBLE" a "EN_PROCESO"
  * @param  {Int} animalId
  */
 exports.changeStatus = async (animalId) => {
   try {
     const animal = await db.Animal.findOne({ where: { id: animalId } });
-    if (_.isEqual(animal.status, STATUS_ANIMAL.NO_APADRINADO)) {
+    if (_.isEqual(animal.status, STATUS_ANIMAL.DISPONIBLE)) {
       const update = {
-        status: STATUS_ANIMAL.APADRINADO,
+        status: STATUS_ANIMAL.EN_PROCESO,
       };
       await db.Animal.update(update, {
         where: { id: animalId },

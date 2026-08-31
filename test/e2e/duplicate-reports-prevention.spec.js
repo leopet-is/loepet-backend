@@ -84,7 +84,7 @@ describe('E2E: Duplicate Reports Prevention', () => {
     // Crear ANIMALES
     animal1 = await db.Animal.create({
       nombre: 'Perrito 1',
-      status: 'NO_APADRINADO',
+      status: 'DISPONIBLE',
       especie: 'Perro',
       raza: 'Mestizo',
       descripcion: 'Animal de prueba 1',
@@ -95,7 +95,7 @@ describe('E2E: Duplicate Reports Prevention', () => {
 
     animal2 = await db.Animal.create({
       nombre: 'Perrito 2',
-      status: 'NO_APADRINADO',
+      status: 'DISPONIBLE',
       especie: 'Perro',
       raza: 'Mestizo',
       descripcion: 'Animal de prueba 2',

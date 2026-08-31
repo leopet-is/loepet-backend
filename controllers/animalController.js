@@ -274,7 +274,7 @@ exports.createAnimal = async (req, res) => {
     }
     const animal = await db.Animal.create({
       nombre,
-      status: STATUS_ANIMAL.NO_APADRINADO,
+      status: STATUS_ANIMAL.DISPONIBLE,
       especie,
       raza,
       descripcion,

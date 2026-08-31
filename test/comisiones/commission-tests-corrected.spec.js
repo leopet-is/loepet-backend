@@ -82,7 +82,7 @@ describe('Commission System - Corrected Tests', () => {
     // Crear animal
     animal = await Animal.create({
       nombre: 'Comision Test Animal',
-      status: 'NO_APADRINADO',
+      status: 'DISPONIBLE',
       especie: 'Perro',
       raza: 'Mestizo',
       descripcion: 'Animal de prueba',
@@ -181,7 +181,7 @@ describe('Commission System - Corrected Tests', () => {
       // Create new setup for this test
       const animal2 = await Animal.create({
         nombre: 'ECT Test Animal 2',
-        status: 'NO_APADRINADO',
+        status: 'DISPONIBLE',
         especie: 'Gato',
         raza: 'Mestizo',
         descripcion: 'Animal de prueba 2',
@@ -229,7 +229,7 @@ describe('Commission System - Corrected Tests', () => {
     it('ECT-WN-3: Valid rating (5) → 200 created successfully', async () => {
       const animal3 = await Animal.create({
         nombre: 'ECT Test Animal 3',
-        status: 'NO_APADRINADO',
+        status: 'DISPONIBLE',
         especie: 'Pajaro',
         raza: 'Mestizo',
         descripcion: 'Animal de prueba 3',
@@ -358,7 +358,7 @@ describe('Commission System - Corrected Tests', () => {
     it('BVA-N-5: Maximum valid boundary (5) → 200', async () => {
       const animal4 = await Animal.create({
         nombre: 'BVA Test Animal',
-        status: 'NO_APADRINADO',
+        status: 'DISPONIBLE',
         especie: 'Reptil',
         raza: 'Mestizo',
         descripcion: 'Animal de prueba 4',
@@ -498,7 +498,7 @@ describe('Commission System - Corrected Tests', () => {
     it('DT-CALC-5: 5 stars → Valid rating accepted', async () => {
       const animal5 = await Animal.create({
         nombre: 'DTT Test Animal',
-        status: 'NO_APADRINADO',
+        status: 'DISPONIBLE',
         especie: 'Pez',
         raza: 'Mestizo',
         descripcion: 'Animal de prueba 5',

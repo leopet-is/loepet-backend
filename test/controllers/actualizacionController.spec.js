@@ -88,7 +88,7 @@ describe.skip('ActualizacionController - createRating integration', () => {
     // Crear animal
     animal = await Animal.create({
       nombre: 'Animal Test',
-      status: 'NO_APADRINADO',
+      status: 'DISPONIBLE',
       especie: 'Perro',
       raza: 'Mestizo',
       descripcion: 'Animal de prueba',

@@ -59,7 +59,7 @@ describe('E2E: Manada Management', () => {
       raza: 'Mestizo',
       edad: 2,
       peso: 10,
-      sexo: true,
+      sexo: 'MACHO',
       descripcion: 'Perro para pruebas de manada',
       fundacion_id: fundacionId,
       visible: true,
