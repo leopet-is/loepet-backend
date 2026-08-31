@@ -39,6 +39,8 @@ module.exports = (sequelize, DataTypes) => {
           model: 'usuario',
           key: 'id',
         },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       fundacionId: {
         type: DataTypes.INTEGER,
@@ -47,6 +49,8 @@ module.exports = (sequelize, DataTypes) => {
           model: 'fundacion',
           key: 'id',
         },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
     },
     {
@@ -59,10 +63,14 @@ module.exports = (sequelize, DataTypes) => {
     Denuncia.belongsTo(models.Usuario, {
       foreignKey: 'usuarioId',
       as: 'donador',
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
     });
     Denuncia.belongsTo(models.Fundacion, {
       foreignKey: 'fundacionId',
       as: 'fundacion',
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
     });
   };
 

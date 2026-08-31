@@ -1,42 +1,78 @@
 module.exports = (sequelize, DataTypes) => {
-  const donacion = sequelize.define(
+  const Donacion = sequelize.define(
     'Donacion',
     {
       donador_id: {
         type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'usuario',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       animal_id: {
         type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'animal',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       monto: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: false,
       },
       aprobado: {
         type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
       },
       pagado: {
         type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
       },
       createdAt: {
         type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
       },
       updatedAt: {
         type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
       },
     },
     {
       tableName: 'donacion',
+      timestamps: true,
     },
   );
 
-  donacion.associate = (models) => {
-    donacion.belongsTo(models.Usuario, {
+  Donacion.associate = (models) => {
+    Donacion.belongsTo(models.Usuario, {
       foreignKey: 'donador_id',
+      as: 'donador',
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
     });
-    donacion.belongsTo(models.Animal, {
+    Donacion.belongsTo(models.Animal, {
       foreignKey: 'animal_id',
+      as: 'animal',
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
+    });
+    Donacion.hasMany(models.Evidencia, {
+      foreignKey: 'donacion_id',
+      as: 'evidencias',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
     });
   };
 
-  return donacion;
+  return Donacion;
 };

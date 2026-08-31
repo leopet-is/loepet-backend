@@ -2,7 +2,7 @@
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up (queryInterface, Sequelize) {
+  async up(queryInterface, Sequelize) {
     await queryInterface.createTable('solicitudes_fundacion', {
       id: {
         allowNull: false,
@@ -16,11 +16,11 @@ module.exports = {
         unique: true,
       },
       nombre: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(150),
         allowNull: false,
       },
       direccion: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(200),
         allowNull: false,
       },
       telefono: {
@@ -28,16 +28,16 @@ module.exports = {
         allowNull: false,
       },
       email_contacto: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(150),
         allowNull: false,
         unique: true,
       },
       nombre_contacto: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(100),
         allowNull: false,
       },
       apellido_contacto: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(100),
         allowNull: false,
       },
       cedula_contacto: {
@@ -65,15 +65,17 @@ module.exports = {
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: Sequelize.fn('NOW'),
       },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: Sequelize.fn('NOW'),
       },
     });
   },
 
-  async down (queryInterface, Sequelize) {
+  async down(queryInterface) {
     await queryInterface.dropTable('solicitudes_fundacion');
-  }
+  },
 };

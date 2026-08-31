@@ -10,11 +10,11 @@ module.exports = (sequelize, DataTypes) => {
         unique: true,
       },
       nombre: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(150),
         allowNull: false,
       },
       direccion: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(200),
         allowNull: false,
       },
       telefono: {
@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       email_contacto: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(150),
         allowNull: false,
         unique: true,
         validate: {
@@ -30,11 +30,11 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       nombre_contacto: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(100),
         allowNull: false,
       },
       apellido_contacto: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(100),
         allowNull: false,
       },
       cedula_contacto: {
@@ -65,13 +65,18 @@ module.exports = (sequelize, DataTypes) => {
       },
       createdAt: {
         type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
       },
       updatedAt: {
         type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
       },
     },
     {
       tableName: 'solicitudes_fundacion',
+      timestamps: true,
     },
   );
 

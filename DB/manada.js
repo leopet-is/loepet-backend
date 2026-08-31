@@ -3,63 +3,98 @@ module.exports = (sequelize, DataTypes) => {
     'Manada',
     {
       nombre: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(100),
+        allowNull: false,
       },
       monto: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: false,
       },
       userId: {
         type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'usuario',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       status: {
         type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
       },
       statusSubscription: {
         type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
       },
       productId: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(191),
+        allowNull: true,
       },
       responseProduct: {
         type: DataTypes.JSON,
+        allowNull: true,
       },
       planId: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(191),
+        allowNull: true,
       },
       responsePlan: {
         type: DataTypes.JSON,
+        allowNull: true,
       },
       subscriptionId: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(191),
+        allowNull: true,
       },
       responseSubscription: {
         type: DataTypes.JSON,
+        allowNull: true,
       },
       createdAt: {
         type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
       },
       updatedAt: {
         type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
       },
       galeriamanada: {
         type: DataTypes.JSON,
+        allowNull: true,
       },
     },
     {
       tableName: 'manada',
+      timestamps: true,
     },
   );
+
   Manada.associate = (models) => {
     Manada.belongsTo(models.Usuario, {
       foreignKey: 'userId',
+      as: 'usuario',
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
+    });
+    Manada.hasMany(models.ManadaAnimal, {
+      foreignKey: 'manada_id',
+      as: 'manadaAnimales',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    });
+    Manada.hasMany(models.ComisionManada, {
+      foreignKey: 'manada_id',
+      as: 'comisionesManada',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
     });
   };
+
   return Manada;
 };
-
-// -- ALTER TABLE integradoraDB.manada ADD productId varchar(191) AFTER status;
-// -- ALTER TABLE integradoraDB.manada ADD responseProduct JSON AFTER productId;
-// -- ALTER TABLE integradoraDB.manada ADD planId varchar(191) AFTER responseProduct;
-// -- ALTER TABLE integradoraDB.manada ADD responsePlan JSON AFTER planId;
-// -- ALTER TABLE integradoraDB.manada ADD subscriptionId varchar(191) AFTER responsePlan;
-// -- ALTER TABLE integradoraDB.manada ADD responseSubscription JSON AFTER subscriptionId;

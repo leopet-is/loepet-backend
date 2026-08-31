@@ -2,7 +2,7 @@
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up (queryInterface, Sequelize) {
+  async up(queryInterface, Sequelize) {
     await queryInterface.createTable('denuncia', {
       id: {
         allowNull: false,
@@ -30,6 +30,7 @@ module.exports = {
       fecha: {
         type: Sequelize.DATE,
         allowNull: false,
+        defaultValue: Sequelize.fn('NOW'),
       },
       usuarioId: {
         type: Sequelize.INTEGER,
@@ -38,6 +39,8 @@ module.exports = {
           model: 'usuario',
           key: 'id',
         },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       fundacionId: {
         type: Sequelize.INTEGER,
@@ -46,19 +49,30 @@ module.exports = {
           model: 'fundacion',
           key: 'id',
         },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: Sequelize.fn('NOW'),
       },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: Sequelize.fn('NOW'),
       },
+    });
+
+    await queryInterface.addIndex('denuncia', ['usuarioId'], {
+      name: 'denuncia_usuarioId_idx',
+    });
+    await queryInterface.addIndex('denuncia', ['fundacionId'], {
+      name: 'denuncia_fundacionId_idx',
     });
   },
 
-  async down (queryInterface, Sequelize) {
+  async down(queryInterface) {
     await queryInterface.dropTable('denuncia');
-  }
+  },
 };
