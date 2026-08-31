@@ -37,7 +37,7 @@ app.use('/public', require('./routes/public'));
 app.use('/admin', require('./routes/solicitudesFundacion'));
 
 app.use('/paypal', require('./routes/paypal'));
-app.use('/otros', require('./routes/otros'));
+app.use('/otros', require('./routes/upload'));
 app.use('/test', require('./routes/test'));
 app.use('/denuncias', require('./routes/denunciaRoutes'));
 
