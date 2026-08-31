@@ -53,7 +53,7 @@ router.post(
 router.put(
   '/:animalId',
   passport,
-  validations.createAnimal,
+  validations.updateAnimal,
   AsyncWrapper(animalController.updateAnimal),
 );
 

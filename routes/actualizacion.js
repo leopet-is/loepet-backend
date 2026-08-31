@@ -14,6 +14,7 @@ const router = express.Router();
 router.post(
   '/',
   passport,
+  validations.createActualizacion,
   AsyncWrapper(actualizacionController.createActualizacion),
 );
 
@@ -39,6 +40,7 @@ router.get(
 router.put(
   '/:actualizacionId',
   passport,
+  validations.updateActualizacion,
   AsyncWrapper(actualizacionController.updateActualizacion),
 );
 

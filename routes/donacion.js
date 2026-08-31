@@ -7,6 +7,7 @@ const donacionController = require('../controllers/donacionController');
 
 // Middlewares
 const passport = require('../middlewares/passport');
+const validations = require('../controllers/validations');
 
 const router = express.Router();
 
@@ -18,17 +19,24 @@ router.get(
   AsyncWrapper(donacionController.getDineroDisponible),
 );
 
-router.post('/', passport, AsyncWrapper(donacionController.crearDonacion));
+router.post(
+  '/',
+  passport,
+  validations.crearDonacion,
+  AsyncWrapper(donacionController.crearDonacion),
+);
 
 router.put(
   '/:donacionId/aprobado',
   passport,
+  validations.aprobarDonacion,
   AsyncWrapper(donacionController.aprobarDonacion),
 );
 
 router.put(
   '/:donacionId/pagado',
   passport,
+  validations.pagarDonacion,
   AsyncWrapper(donacionController.pagarDonacion),
 );
 

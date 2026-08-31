@@ -35,35 +35,35 @@ router.get(
 router.post(
   '/',
   passport,
-  validations.createUpdateCuentaBancaria,
+  validations.createCuentaBancaria,
   AsyncWrapper(cuentaController.crearCuentaBancaria),
 );
 
 router.put(
   '/fundacion/:fundacionId',
   passport,
-  validations.createUpdateCuentaBancaria,
+  validations.updateCuentaBancaria,
   AsyncWrapper(cuentaController.updateCuentaBancaria),
 );
 
 router.put(
   '/fundacion/:fundacionId/principal',
   passport,
-  validations.createUpdateCuentaBancaria,
+  validations.updateCuentaBancaria,
   AsyncWrapper(cuentaController.updateCuentaPrincipal),
 );
 
 router.put(
   '/:cuentaId',
   passport,
-  validations.createUpdateCuentaBancaria,
+  validations.updateCuentaBancaria,
   AsyncWrapper(cuentaController.updateCuentaBancariaIDCuenta),
 );
 
 router.delete(
   '/:cuentaId',
   passport,
-  validations.createUpdateCuentaBancaria,
+  validations.updateCuentaBancaria,
   AsyncWrapper(cuentaController.deleteCuenta),
 );
 
