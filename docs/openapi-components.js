@@ -52,7 +52,7 @@ const components = {
         direccion: { type: 'string' },
         email: { type: 'string', format: 'email' },
         role: { type: 'integer', description: '1=Administrador, 2=Administrador de fundacion, 3=Donador' },
-        habilitado: { type: 'boolean' },
+        estado: { type: 'string', description: 'Estado de la cuenta', enum: ['PENDIENTE_ACTIVACION', 'ACTIVO', 'INACTIVO', 'BLOQUEADO'] },
         fundacionId: { type: 'integer' },
         createdAt: { type: 'string', format: 'date-time' },
         updatedAt: { type: 'string', format: 'date-time' },

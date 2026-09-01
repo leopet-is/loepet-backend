@@ -32,7 +32,6 @@ describe('E2E: Manada Management', () => {
       telefono: '0999999999',
       direccion: 'Test Address',
       role: 2, // ROL.ADMIN_FUND
-      habilitado: true,
     });
 
     const foundationProfile = await db.Fundacion.create({
@@ -77,7 +76,6 @@ describe('E2E: Manada Management', () => {
       telefono: '0988888888',
       direccion: 'Donor Address',
       role: 3, // ROL.DONADOR
-      habilitado: true,
     });
 
     // 5. Iniciar Sesión como Donador para obtener token

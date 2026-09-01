@@ -39,7 +39,6 @@ describe('E2E: Evidence Upload Flow', () => {
       telefono: '0999999999',
       direccion: 'Test Address',
       role: 2,
-      habilitado: true,
     });
 
     const foundationProfile = await db.Fundacion.create({
@@ -72,7 +71,6 @@ describe('E2E: Evidence Upload Flow', () => {
       email: 'donor-evidence@test.com',
       password: 'pass',
       role: 3,
-      habilitado: true,
     });
 
     // 4. Crear Donación

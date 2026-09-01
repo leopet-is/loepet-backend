@@ -2,7 +2,7 @@ const _ = require('lodash');
 const jwt = require('jsonwebtoken');
 
 const db = require('../DB/index');
-const { ROL } = require('../constants');
+const { ROL, USUARIO_ESTADO } = require('../constants');
 
 const JWT_SECRET = 'secret';
 
@@ -23,9 +23,15 @@ const authenticateToken = async (req, res, next) => {
       return res.status(404).json({ error: 'No autorizado.' });
     }
 
-    // Check if user is still enabled
-    if (!User.habilitado) {
+    // Cuenta deshabilitada por un administrador (inactiva o bloqueada)
+    if (User.estado === USUARIO_ESTADO.INACTIVO
+      || User.estado === USUARIO_ESTADO.BLOQUEADO) {
       return res.status(401).json({ error: 'Usuario deshabilitado. Acceso denegado.' });
+    }
+
+    // Cuenta aun sin activar (sin contrasena definida)
+    if (User.estado === USUARIO_ESTADO.PENDIENTE_ACTIVACION) {
+      return res.status(401).json({ error: 'La cuenta no ha sido activada. Revisa tu correo electronico.' });
     }
     const data = {
       id: User.id,

@@ -4,10 +4,14 @@ const bcrypt = require('bcrypt');
 
 const { Op } = require('sequelize');
 
+const { USUARIO_ESTADO } = require('../constants');
+
 const db = require('../DB/index');
 
 /**
- * Funcion para que un admin habilite o deshabilite un usuario
+ * Funcion para que un admin habilite o deshabilite un usuario.
+ * El booleano del cuerpo se traduce al estado del ciclo de vida: habilitar pasa
+ * a ACTIVO y deshabilitar a INACTIVO.
  * @param {*} req
  * @param {*} res
  * @return {Object} response
@@ -23,7 +27,7 @@ exports.updateUserStatus = async (req, res) => {
     }
 
     await db.Usuario.update(
-      { habilitado },
+      { estado: habilitado ? USUARIO_ESTADO.ACTIVO : USUARIO_ESTADO.INACTIVO },
       { where: { id: usuarioId } },
     );
 

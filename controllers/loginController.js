@@ -3,7 +3,7 @@ const _ = require('lodash');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const { ROL } = require('../constants');
+const { ROL, USUARIO_ESTADO } = require('../constants');
 
 const db = require('../DB/index');
 
@@ -84,9 +84,15 @@ exports.login = async (req, res) => {
       return res.status(401).send(unAuthorizedResponse);
     }
 
-    // User is disabled
-    if (!User.habilitado) {
+    // User is disabled (inactivo o bloqueado por un administrador)
+    if (User.estado === USUARIO_ESTADO.INACTIVO
+      || User.estado === USUARIO_ESTADO.BLOQUEADO) {
       return res.status(401).send('Usuario deshabilitado.');
+    }
+
+    // Account pending activation (no password set yet)
+    if (User.estado === USUARIO_ESTADO.PENDIENTE_ACTIVACION) {
+      return res.status(401).send('Tu cuenta no ha sido activada. Revisa el enlace enviado a tu correo electronico.');
     }
 
     // Get user password
@@ -95,6 +101,11 @@ exports.login = async (req, res) => {
         id: User.id,
       },
     });
+
+    // Cuenta sin contrasena (aun no activada): no se puede comparar
+    if (!Password.password) {
+      return res.status(401).send(unAuthorizedResponse);
+    }
 
     // Verify password
     if (!bcrypt.compareSync(password, Password.password)) {

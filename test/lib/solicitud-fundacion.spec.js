@@ -55,7 +55,6 @@ describe('Validacion de RUC, cédula y teléfono en solicitudes y fundaciones', 
       role: 1,
       telefono: '0987654321',
       direccion: 'Quito',
-      habilitado: true,
     });
     adminToken = jwt.sign(adminUser.get({ plain: true }), 'secret', { expiresIn: 28800 });
   });
@@ -167,6 +166,48 @@ describe('Validacion de RUC, cédula y teléfono en solicitudes y fundaciones', 
         ));
 
       expect(res.status).toBe(400);
+    });
+
+    it('rechaza el nombre de la fundacion vacio o solo espacios (400)', async () => {
+      const res = await request(app)
+        .post('/public/solicitudes')
+        .send(payloadSolicitud(
+          RUC_SOLICITUD,
+          `${EMAIL_BASE}-nombre-vacio@leopet.test`,
+          { nombre: '   ' },
+        ));
+
+      expect(res.status).toBe(400);
+      expect(res.body.status).toBe('fail');
+      expect(res.body.errors[0].campo).toBe('nombre');
+    });
+
+    it('rechaza el nombre de contacto vacio o solo espacios (400)', async () => {
+      const res = await request(app)
+        .post('/public/solicitudes')
+        .send(payloadSolicitud(
+          RUC_SOLICITUD,
+          `${EMAIL_BASE}-contacto-vacio@leopet.test`,
+          { nombre_contacto: '' },
+        ));
+
+      expect(res.status).toBe(400);
+      expect(res.body.status).toBe('fail');
+      expect(res.body.errors[0].campo).toBe('nombre_contacto');
+    });
+
+    it('rechaza el apellido de contacto vacio o solo espacios (400)', async () => {
+      const res = await request(app)
+        .post('/public/solicitudes')
+        .send(payloadSolicitud(
+          RUC_SOLICITUD,
+          `${EMAIL_BASE}-apellido-vacio@leopet.test`,
+          { apellido_contacto: '   ' },
+        ));
+
+      expect(res.status).toBe(400);
+      expect(res.body.status).toBe('fail');
+      expect(res.body.errors[0].campo).toBe('apellido_contacto');
     });
   });
 
