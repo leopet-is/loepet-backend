@@ -1,3 +1,5 @@
+const { USUARIO_ESTADO } = require('../constants');
+
 module.exports = (sequelize, DataTypes) => {
   const Usuario = sequelize.define(
     'Usuario',
@@ -5,6 +7,7 @@ module.exports = (sequelize, DataTypes) => {
       cedula: {
         type: DataTypes.STRING(10),
         allowNull: false,
+        unique: true,
       },
       nombres: {
         type: DataTypes.STRING(100),
@@ -30,19 +33,32 @@ module.exports = (sequelize, DataTypes) => {
           isEmail: true,
         },
       },
+      /* La contrasena es nula para los usuarios creados al aprobar una
+       * solicitud de fundacion: solo se asigna cuando la fundacion activa su
+       * cuenta con el token recibido por correo. */
       password: {
         type: DataTypes.STRING(255),
-        allowNull: false,
+        allowNull: true,
       },
       role: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      habilitado: {
-        type: DataTypes.BOOLEAN,
+      /* Estado del ciclo de vida de la cuenta. Los registros pre-existentes
+       * permanecen ACTIVO por default (ver migracion). */
+      estado: {
+        type: DataTypes.ENUM(
+          USUARIO_ESTADO.PENDIENTE_ACTIVACION,
+          USUARIO_ESTADO.ACTIVO,
+          USUARIO_ESTADO.INACTIVO,
+          USUARIO_ESTADO.BLOQUEADO,
+        ),
         allowNull: false,
-        defaultValue: true,
+        defaultValue: USUARIO_ESTADO.ACTIVO,
       },
+      /* El token de activacion no vive aqui: se guarda en la tabla
+       * token_activacion (uno por usuario) mientras la cuenta esta en
+       * PENDIENTE_ACTIVACION, y se marca como usado al activar la cuenta. */
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,

@@ -37,6 +37,18 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: true,
       },
+      /* Solicitud que origino esta fundacion (null si se creo manualmente por
+       * un administrador sin pasar por el flujo de solicitudes). */
+      solicitud_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'solicitudes_fundacion',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
+      },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
@@ -55,6 +67,12 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   Fundacion.associate = function associate(models) {
+    Fundacion.belongsTo(models.SolicitudFundacion, {
+      foreignKey: 'solicitud_id',
+      as: 'solicitud',
+      onUpdate: 'CASCADE',
+      onDelete: 'SET NULL',
+    });
     Fundacion.hasMany(models.Animal, {
       foreignKey: 'fundacion_id',
       as: 'animales',

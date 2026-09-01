@@ -25,4 +25,13 @@ module.exports = {
     APROBADA: 'aprobada',
     RECHAZADA: 'rechazada',
   },
+  /* Estados del ciclo de vida de un usuario de fundacion. El usuario se crea
+   * cuando el administrador aprueba la solicitud, pero no puede iniciar sesion
+   * hasta activar su cuenta con el token de activacion recibido por correo. */
+  USUARIO_ESTADO: {
+    PENDIENTE_ACTIVACION: 'PENDIENTE_ACTIVACION',
+    ACTIVO: 'ACTIVO',
+    INACTIVO: 'INACTIVO',
+    BLOQUEADO: 'BLOQUEADO',
+  },
 };
