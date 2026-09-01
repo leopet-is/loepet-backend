@@ -345,6 +345,8 @@ module.exports.createSolicitudFundacion = [
     .withMessage('Es necesario el campo nombre')
     .trim()
     .isString()
+    .notEmpty()
+    .withMessage('El campo nombre no puede estar vacio')
     .isLength({ max: 150 })
     .withMessage('El campo nombre no puede superar 150 caracteres'),
   body('direccion')
@@ -352,6 +354,8 @@ module.exports.createSolicitudFundacion = [
     .withMessage('Es necesario el campo direccion')
     .trim()
     .isString()
+    .notEmpty()
+    .withMessage('El campo direccion no puede estar vacio')
     .isLength({ max: 200 })
     .withMessage('El campo direccion no puede superar 200 caracteres'),
   body('telefono')
@@ -380,6 +384,8 @@ module.exports.createSolicitudFundacion = [
     .withMessage('Es necesario el campo nombre_contacto')
     .trim()
     .isString()
+    .notEmpty()
+    .withMessage('El campo nombre_contacto no puede estar vacio')
     .isLength({ max: 100 })
     .withMessage('El campo nombre_contacto no puede superar 100 caracteres'),
   body('apellido_contacto')
@@ -387,6 +393,8 @@ module.exports.createSolicitudFundacion = [
     .withMessage('Es necesario el campo apellido_contacto')
     .trim()
     .isString()
+    .notEmpty()
+    .withMessage('El campo apellido_contacto no puede estar vacio')
     .isLength({ max: 100 })
     .withMessage('El campo apellido_contacto no puede superar 100 caracteres'),
   validate,
@@ -408,6 +416,8 @@ module.exports.createFundacion = [
     .withMessage('Es necesario el campo nombre')
     .trim()
     .isString()
+    .notEmpty()
+    .withMessage('El campo nombre no puede estar vacio')
     .isLength({ max: 150 })
     .withMessage('El campo nombre no puede superar 150 caracteres'),
   body('direccion')
@@ -415,6 +425,8 @@ module.exports.createFundacion = [
     .withMessage('Es necesario el campo direccion')
     .trim()
     .isString()
+    .notEmpty()
+    .withMessage('El campo direccion no puede estar vacio')
     .isLength({ max: 200 })
     .withMessage('El campo direccion no puede superar 200 caracteres'),
   body('telefono')
@@ -621,5 +633,39 @@ module.exports.updateActualizacion = [
     .withMessage('Es necesario el campo actualizacionId')
     .isInt()
     .withMessage('El campo actualizacionId debe ser un número entero'),
+  validate,
+];
+
+/* Validaciones para la activacion de cuentas de fundacion */
+module.exports.validarTokenActivacion = [
+  query('token')
+    .exists()
+    .withMessage('Es necesario el parametro token')
+    .isString()
+    .withMessage('El token debe ser de tipo String')
+    .trim()
+    .notEmpty()
+    .withMessage('El token no puede estar vacio'),
+  validate,
+];
+
+module.exports.activarCuenta = [
+  body('token')
+    .exists()
+    .withMessage('Es necesario el campo token')
+    .isString()
+    .withMessage('El token debe ser de tipo String')
+    .trim()
+    .notEmpty()
+    .withMessage('El token no puede estar vacio'),
+  body('password')
+    .exists()
+    .withMessage('Es necesario el campo password')
+    .isString()
+    .withMessage('La contrasena debe ser de tipo String')
+    .isLength({ min: 8 })
+    .withMessage('La contrasena debe tener al menos 8 caracteres')
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&._-])[A-Za-z\d@$!%*#?&._-]+$/)
+    .withMessage('La contrasena debe incluir minusculas, mayusculas, un numero y un caracter especial'),
   validate,
 ];

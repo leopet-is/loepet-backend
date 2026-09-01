@@ -1,4 +1,5 @@
 const { Resend } = require('resend');
+const dayjs = require('dayjs');
 require('dotenv').config();
 
 // Drivers de correo:
@@ -45,7 +46,47 @@ const sendMail = async ({
   return { messageId: data.id, driver };
 };
 
+/**
+ * Envia el correo de activacion de cuenta de fundacion con el enlace unico.
+ * @param  {Object}  params
+ * @param  {String}  params.to       correo receptor
+ * @param  {String}  params.nombre   nombre del contacto (para saludar)
+ * @param  {String}  params.url      enlace de activacion con el token
+ * @param  {Date|String} params.expiresAt fecha limite de validez del enlace
+ * @return {Object}  result de sendMail ({ messageId, driver })
+ */
+const sendActivationEmail = async ({
+  to, nombre, url, expiresAt,
+}) => {
+  const activacionUrl = url || process.env.ACTIVATION_URL || 'https://leopet.com/activar-cuenta';
+  const expira = dayjs(expiresAt).format('DD/MM/YYYY HH:mm');
+
+  const subject = 'Activa tu cuenta de fundacion en LEOPET';
+  const text = `Hola ${nombre || 'Fundacion'},
+
+Tu solicitud de fundacion fue aprobada. Para activar tu cuenta y definir tu contrasena, abre el siguiente enlace:
+
+${activacionUrl}
+
+Este enlace expira el ${expira}.
+
+Si no solicitaste este registro, ignora este correo.`;
+  const html = `<p>Hola <strong>${nombre || 'Fundacion'}</strong>,</p>
+<p>Tu solicitud de fundacion fue aprobada. Para activar tu cuenta y definir tu contrasena, haz clic en el siguiente enlace:</p>
+<p><a href="${activacionUrl}">Activar mi cuenta</a></p>
+<p>Este enlace expira el <strong>${expira}</strong>.</p>
+<p>Si no solicitaste este registro, ignora este correo.</p>`;
+
+  return sendMail({
+    to,
+    subject,
+    text,
+    html,
+  });
+};
+
 module.exports = {
   sendMail,
+  sendActivationEmail,
   getDriver,
 };
