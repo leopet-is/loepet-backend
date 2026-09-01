@@ -245,6 +245,7 @@ exports.createFundacion = async (req, res) => {
       aprobado: true,
       comision: comision || 0,
       logo: '/logo.png',
+      solicitud_id: solicitudId || null,
     });
 
     if (solicitudId) {

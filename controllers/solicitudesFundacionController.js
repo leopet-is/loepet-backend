@@ -3,6 +3,7 @@ const { Op } = require('sequelize');
 
 const db = require('../DB/index');
 const { SOLICITUD_FUNDACION_ESTADO } = require('../constants');
+const { crearUsuarioPendiente, enviarCorreoActivacion } = require('./authController');
 
 /**
  * @openapi
@@ -185,6 +186,10 @@ exports.createSolicitudFundacion = async (req, res) => {
 
     const emailNormalizado = _.trim(_.toLower(emailContacto));
     const rucNormalizado = _.trim(String(ruc));
+    const nombreNormalizado = _.trim(String(nombre));
+    const direccionNormalizada = _.trim(String(direccion));
+    const nombreContactoNormalizado = _.trim(String(nombreContacto));
+    const apellidoContactoNormalizado = _.trim(String(apellidoContacto));
 
     // Validar si ya existe una solicitud con el mismo RUC o email de contacto
     const existingSolicitud = await db.SolicitudFundacion.findOne({
@@ -212,12 +217,12 @@ exports.createSolicitudFundacion = async (req, res) => {
 
     const solicitud = await db.SolicitudFundacion.create({
       ruc: rucNormalizado,
-      nombre,
-      direccion,
+      nombre: nombreNormalizado,
+      direccion: direccionNormalizada,
       telefono,
       email_contacto: emailNormalizado,
-      nombre_contacto: nombreContacto,
-      apellido_contacto: apellidoContacto,
+      nombre_contacto: nombreContactoNormalizado,
+      apellido_contacto: apellidoContactoNormalizado,
       cedula_contacto: cedulaContacto,
       comentarios,
       estado: SOLICITUD_FUNDACION_ESTADO.PENDIENTE, // Estado inicial
@@ -303,7 +308,12 @@ exports.getAllSolicitudesFundacion = async (req, res) => {
 };
 
 /**
- * Funcion para aprobar una solicitud de fundacion
+ * Funcion para aprobar una solicitud de fundacion e iniciar la activacion de la
+ * cuenta de la fundacion:
+ *   1. Marca la solicitud como aprobada.
+ *   2. Crea la fundacion con los datos de la solicitud.
+ *   3. Crea el usuario de fundacion en estado PENDIENTE_ACTIVACION.
+ *   4. Genera el token de activacion (24h) y envia el correo con el enlace.
  * @param  {*} req
  * @param  {*} res
  * @return {Object} response
@@ -320,26 +330,103 @@ exports.aprobarSolicitudFundacion = async (req, res) => {
       return res.status(404).send({ error: 'Solicitud no encontrada.' });
     }
 
-    const update = {
-      estado: SOLICITUD_FUNDACION_ESTADO.APROBADA,
-      notas_admin: 'Solicitud aprobada. Pendiente creación de usuario.',
-      ready_for_creation: true,
-      updatedAt: Date.now(),
-    };
+    if (solicitud.estado === SOLICITUD_FUNDACION_ESTADO.APROBADA) {
+      return res.status(409).send({ error: 'La solicitud ya fue aprobada anteriormente.' });
+    }
 
-    await db.SolicitudFundacion.update(update, {
-      where: { id: solicitudId },
+    // Si el RUC ya pertenece a una fundacion registrada, no se puede aprobar.
+    const existingFundacion = await db.Fundacion.findOne({
+      where: { ruc: solicitud.ruc },
     });
+    if (existingFundacion) {
+      return res.status(409).send({
+        error: 'Ya existe una fundacion registrada con el RUC de esta solicitud.',
+      });
+    }
 
-    const updatedSolicitud = await db.SolicitudFundacion.findOne({
-      where: { id: solicitudId },
-    });
+    /* Todo se procesa dentro de una transaccion para que, si falla la creacion
+     * de la fundacion o de la cuenta, la solicitud no quede a medias. El correo
+     * se envia DESPUES del commit. */
+    const transaction = await db.sequelize.transaction();
+    try {
+      const fundacion = await db.Fundacion.create({
+        ruc: solicitud.ruc,
+        nombre: solicitud.nombre,
+        direccion: solicitud.direccion,
+        telefono: solicitud.telefono,
+        aprobado: true,
+        comision: 0,
+        logo: '/logo.png',
+        solicitud_id: solicitud.id,
+      }, { transaction });
 
-    const response = {
-      mensaje: 'Solicitud aprobada exitosamente.',
-      result: updatedSolicitud,
-    };
-    return res.send(response);
+      const { usuario, token, expiresAt } = await crearUsuarioPendiente({
+        cedula: solicitud.cedula_contacto,
+        nombres: solicitud.nombre_contacto,
+        apellidos: solicitud.apellido_contacto,
+        telefono: solicitud.telefono,
+        direccion: solicitud.direccion,
+        email: solicitud.email_contacto,
+      }, transaction);
+
+      await db.AdminFund.create({
+        id: usuario.id,
+        fundacion_id: fundacion.id,
+      }, { transaction });
+
+      await solicitud.update({
+        estado: SOLICITUD_FUNDACION_ESTADO.APROBADA,
+        ready_for_creation: false,
+        notas_admin: 'Solicitud aprobada. Correo de activacion enviado a la fundacion.',
+        updatedAt: new Date(),
+      }, { transaction });
+
+      await transaction.commit();
+
+      /* Correo despues del commit: se envia solo cuando el estado ya quedo
+       * persistido. Un fallo aqui no revierte la aprobacion, solo marca el
+       * aviso para que el administrador pueda reenviar el enlace. */
+      let correoEnviado = true;
+      try {
+        await enviarCorreoActivacion(usuario, { token, expiresAt });
+      } catch (emailError) {
+        correoEnviado = false;
+        console.log('ERROR enviando correo de activacion:', emailError);
+      }
+
+      /* No se expone el password del usuario en la respuesta. El token de
+       * activacion vive en la tabla token_activacion y nunca se devuelve. */
+      const usuarioSeguro = usuario.get({ plain: true });
+      delete usuarioSeguro.password;
+
+      const response = {
+        mensaje: correoEnviado
+          ? 'Solicitud aprobada exitosamente. Se envio el correo de activacion a la fundacion.'
+          : 'Solicitud aprobada exitosamente, pero no se pudo enviar el correo de activacion. Contacta al soporte.',
+        result: {
+          solicitud,
+          fundacion,
+          usuario: usuarioSeguro,
+        },
+      };
+      return res.send(response);
+    } catch (err) {
+      await transaction.rollback();
+      console.log('ERROR', err);
+      if (err.name === 'SequelizeUniqueConstraintError') {
+        return res.status(409).send({
+          error: 'Ya existe un usuario registrado con el correo de contacto de esta solicitud.',
+        });
+      }
+      if (err.name === 'SequelizeValidationError') {
+        const messages = _.map(err.errors, 'message');
+        return res.status(400).send({ error: messages });
+      }
+      return res.status(500).send({
+        message: 'Something bad happened!',
+        error: err.stack,
+      });
+    }
   } catch (error) {
     console.log('ERROR', error);
     const responseError = {
