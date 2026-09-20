@@ -60,7 +60,7 @@ describe('E2E: Evidence Upload Flow', () => {
     // 3. Crear Animal y Donador (Requeridos para la donación)
     const animal = await db.Animal.create({
       nombre: 'Animal Evidence',
-      especie: 'Gato',
+      especie: 'GATO',
       fundacion_id: foundationProfile.id,
       visible: true,
     });

@@ -33,7 +33,8 @@ describe.skip('ActualizacionController - createRating integration', () => {
   let ManadaAnimal;
   let Donacion;
   let Comision;
-  let Rating;
+  let RatingActualizacion;
+  let SuscripcionPadrino;
 
   beforeAll(async () => {
     await db.connect();
@@ -47,7 +48,8 @@ describe.skip('ActualizacionController - createRating integration', () => {
       ManadaAnimal,
       Donacion,
       Comision,
-      Rating,
+      RatingActualizacion,
+      SuscripcionPadrino,
     } = db);
 
     // Crear usuario donador
@@ -88,8 +90,8 @@ describe.skip('ActualizacionController - createRating integration', () => {
     // Crear animal
     animal = await Animal.create({
       nombre: 'Animal Test',
-      status: 'DISPONIBLE',
-      especie: 'Perro',
+      status: 'REQUIERE_PADRINOS',
+      especie: 'PERRO',
       raza: 'Mestizo',
       descripcion: 'Animal de prueba',
       imagen: 'http://example.com/test-animal.jpg',
@@ -110,8 +112,11 @@ describe.skip('ActualizacionController - createRating integration', () => {
     manada = await Manada.create({
       userId: donadorUser.id,
       nombre: 'Manada Test',
-      monto: 100,
       status: true,
+    });
+    await SuscripcionPadrino.create({
+      manadaId: manada.id,
+      montoTotal: 100,
       statusSubscription: true,
     });
 
@@ -138,7 +143,7 @@ describe.skip('ActualizacionController - createRating integration', () => {
     }
     if (actualizacion) {
       // Eliminar ratings antes de la actualización
-      await Rating.destroy({ where: { actualizacion_id: actualizacion.id } });
+      await RatingActualizacion.destroy({ where: { actualizacion_id: actualizacion.id } });
       await ActualizacionAnimal.destroy({ where: { id: actualizacion.id } });
     }
     if (donacion) {
@@ -177,18 +182,18 @@ describe.skip('ActualizacionController - createRating integration', () => {
     const response = await supertest(app)
       .post(`/actualizacion/${actualizacion.id}/ratings`)
       .set('Authorization', `Bearer ${token}`)
-      .send({ valor: ratingValue });
+      .send({ estrellas: ratingValue });
 
     expect(response.status).toBe(200);
     expect(response.body.mensaje).toBe('Rating registrado exitosamente.');
 
     // Verificar que el rating se guardó en la base de datos
-    const ratingGuardado = await Rating.findOne({
+    const ratingGuardado = await RatingActualizacion.findOne({
       where: { actualizacion_id: actualizacion.id },
     });
 
     expect(ratingGuardado).not.toBeNull();
-    expect(ratingGuardado.valor).toBe(ratingValue);
+    expect(ratingGuardado.estrellas).toBe(ratingValue);
   });
 
   it('should return 400 if rating value is invalid', async () => {
@@ -201,11 +206,11 @@ describe.skip('ActualizacionController - createRating integration', () => {
     const response = await supertest(app)
       .post(`/actualizacion/${actualizacion.id}/ratings`)
       .set('Authorization', `Bearer ${token}`)
-      .send({ valor: 6 }); // Valor inválido
+      .send({ estrellas: 6 }); // Valor inválido
 
     expect(response.status).toBe(400);
     expect(response.body.status).toBe('fail');
-    expect(response.body.errors[0].campo).toBe('valor');
+    expect(response.body.errors[0].campo).toBe('estrellas');
     expect(response.body.errors[0].mensaje).toContain('Las estrellas deben ser un número entre 1 y 5.');
   });
 
@@ -219,7 +224,7 @@ describe.skip('ActualizacionController - createRating integration', () => {
     const response = await supertest(app)
       .post('/actualizacion/99999/ratings')
       .set('Authorization', `Bearer ${token}`)
-      .send({ valor: 3 }); // ID no existente
+      .send({ estrellas: 3 }); // ID no existente
 
     // El controlador actual retorna 500 por error de FK, no 404
     expect(response.status).toBe(500);
@@ -245,16 +250,16 @@ describe.skip('ActualizacionController - createRating integration', () => {
     const response = await supertest(app)
       .post(`/actualizacion/${actualizacion2.id}/ratings`)
       .set('Authorization', `Bearer ${token}`)
-      .send({ valor: 3 });
+      .send({ estrellas: 3 });
 
     expect(response.status).toBe(200);
     expect(response.body.mensaje).toBe('Rating registrado exitosamente.');
 
     // Verificar que el rating se guardó
-    const ratingGuardado = await Rating.findOne({
+    const ratingGuardado = await RatingActualizacion.findOne({
       where: { actualizacion_id: actualizacion2.id },
     });
     expect(ratingGuardado).not.toBeNull();
-    expect(ratingGuardado.valor).toBe(3);
+    expect(ratingGuardado.estrellas).toBe(3);
   });
 });

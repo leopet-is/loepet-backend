@@ -139,35 +139,40 @@ exports.verifySubscription = async (req, res) => {
   const status = _.get(subscription, 'status');
   if (_.isEqual(status, 'ACTIVE')) {
     const subscriptionId = _.get(subscription, 'id');
-    const update = {
-      statusSubscription: true,
-      updatedAt: Date.now(),
-    };
-    await db.Manada.update(update, {
+    // Localizar la suscripcion de pago (antes ese estado vivia en manada).
+    const suscripcion = await db.SuscripcionPadrino.findOne({
       where: { subscriptionId },
     });
-    const { rows, count } = await db.ManadaAnimal.findAndCountAll({
-      include: [
-        {
-          model: db.Manada,
-          where: { subscriptionId },
-          required: true,
-        },
-      ],
-      raw: true,
-    });
-
-    await Promise.all(rows.map(async (animal) => {
-      const donacion = {
-        donador_id: _.get(animal, 'Manada.userId'),
-        animal_id: _.get(animal, 'animal_id'),
-        monto: _.toNumber(_.get(animal, 'Manada.monto', 0)) / count,
-        aprobado: false,
-        pagado: false,
+    if (suscripcion) {
+      const update = {
+        statusSubscription: true,
+        updatedAt: Date.now(),
       };
-      await db.Donacion.create(donacion);
-      await changeStatus(_.get(animal, 'animal_id'));
-    }));
+      await suscripcion.update(update);
+      const { manadaId } = suscripcion;
+      const { rows, count } = await db.ManadaAnimal.findAndCountAll({
+        include: [
+          {
+            model: db.Manada,
+            where: { id: manadaId },
+            required: true,
+          },
+        ],
+        raw: true,
+      });
+
+      await Promise.all(rows.map(async (animal) => {
+        const donacion = {
+          donador_id: _.get(animal, 'Manada.userId'),
+          animal_id: _.get(animal, 'animal_id'),
+          monto: suscripcion.montoTotal / count,
+          aprobado: false,
+          pagado: false,
+        };
+        await db.Donacion.create(donacion);
+        await changeStatus(_.get(animal, 'animal_id'), _.get(donacion, 'monto'));
+      }));
+    }
   }
   res.json({ data });
 };
@@ -191,14 +196,14 @@ exports.verifyPaymentFailed = async (req, res) => {
   console.log('EVENT', event);
   if (_.isEqual(event, 'BILLING.SUBSCRIPTION.PAYMENT.FAILED')) {
     const subscriptionId = _.get(subscription, 'id');
+    console.log('subscriptionId', subscriptionId);
     const update = {
       statusSubscription: false,
       updatedAt: Date.now(),
     };
-    console.log('subscriptionId', subscriptionId);
     console.log('update', update);
-
-    await db.Manada.update(update, {
+    // El flag vive ahora en SuscripcionPadrino, no en manada.
+    await db.SuscripcionPadrino.update(update, {
       where: { subscriptionId },
     });
   }
@@ -226,7 +231,7 @@ exports.verifyCancelSubscription = async (req, res) => {
       statusSubscription: false,
       updatedAt: Date.now(),
     };
-    await db.Manada.update(update, {
+    await db.SuscripcionPadrino.update(update, {
       where: { subscriptionId },
     });
   }
@@ -249,7 +254,11 @@ exports.cancelSubscription = async (req, res) => {
     const manada = await db.Manada.findOne({
       where: { id: manadaId },
     });
-    const subscriptionId = _.get(manada, 'subscriptionId');
+    // El subscriptionId vive ahora en la suscripcion de la manada.
+    const suscripcion = await db.SuscripcionPadrino.findOne({
+      where: { manadaId },
+    });
+    const subscriptionId = _.get(suscripcion, 'subscriptionId') || _.get(manada, 'subscriptionId');
     let result = {};
     if (!_.isEmpty(subscriptionId)) {
       request.post(

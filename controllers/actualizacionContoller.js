@@ -185,11 +185,20 @@ exports.getActualizaciones = async (req, res) => {
 
 exports.createRating = async (req, res) => {
   try {
+    const { User } = req;
     const { actualizacionId } = req.params;
-    const { valor } = req.body;
-    await db.Rating.create({
-      valor,
-      actualizacion_id: actualizacionId,
+    const { estrellas, comentario } = req.body;
+    await db.RatingActualizacion.findOrCreate({
+      where: {
+        actualizacionId,
+        userId: _.get(User, 'id'),
+      },
+      defaults: {
+        actualizacionId,
+        userId: _.get(User, 'id'),
+        estrellas,
+        comentario,
+      },
     });
 
     const response = {
@@ -210,14 +219,14 @@ exports.createRating = async (req, res) => {
 exports.loadRating = async (req, res) => {
   try {
     const { actualizacionId } = req.params;
-    const { count, rows } = await db.Rating.findAndCountAll({
+    const { count, rows } = await db.RatingActualizacion.findAndCountAll({
       where: {
-        actualizacion_id: actualizacionId,
+        actualizacionId,
       },
     });
     let promedio = 0;
     rows.forEach((element) => {
-      promedio += parseFloat(element.valor);
+      promedio += parseFloat(element.estrellas);
     });
     console.log(promedio);
     const response = {

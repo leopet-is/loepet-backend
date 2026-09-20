@@ -17,7 +17,28 @@ const config = {
 };
 
 /**
- * Funcion para crear un producto en PayPal, el cual se le asociara la informacion de una manada
+ * Crea (o actualiza) la suscripcion de pago de una manada. Antes estos
+ * metadatos vivian en la tabla manada; ahora se desacoplan en
+ * suscripcion_padrino (1:1 con manada).
+ * @param {Object} data Datos de la manada que se suscribe
+ * @return {Promise<Object>} la fila de SuscripcionPadrino
+ */
+async function obtenerOCrearSuscripcion(data) {
+  const manadaId = _.get(data, 'manadaId', _.get(data, 'id'));
+  const [suscripcion] = await db.SuscripcionPadrino.findOrCreate({
+    where: { manadaId },
+    defaults: {
+      manadaId,
+      montoTotal: _.get(data, 'montoTotal', 0),
+      statusSubscription: false,
+    },
+  });
+  return suscripcion;
+}
+
+/**
+ * Funcion para crear un producto en PayPal, el cual se le asociara la
+ * informacion de una suscripcion de manada.
  * @param  {Object} data
  * @return {Object} response
  */
@@ -36,13 +57,12 @@ exports.createProductManada = async (data) => {
     );
     const responseProduct = _.get(payloadProduct, 'data');
     const productId = _.get(responseProduct, 'id');
-    const update = {
+    const suscripcion = await obtenerOCrearSuscripcion(data);
+    await suscripcion.update({
       productId,
       responseProduct,
+      montoTotal: _.get(data, 'montoTotal', suscripcion.montoTotal),
       updatedAt: Date.now(),
-    };
-    await db.Manada.update(update, {
-      where: { id: _.get(data, 'id') },
     });
   } catch (error) {
     console.log('ERROR', error);
@@ -51,8 +71,8 @@ exports.createProductManada = async (data) => {
 };
 
 /**
- * Funcion para crear una subscripcion en PayPal, el cual se le asociara la informacion de un plan
- * previamente creado en PayPal
+ * Funcion para crear una subscripcion en PayPal, el cual se le asociara la
+ * informacion de un plan previamente creado en PayPal.
  * @param  {Object} data
  * @return {Object} response
  */
@@ -79,13 +99,11 @@ const createSubscription = async (data) => {
     );
     const responseSubscription = _.get(payloadSubscription, 'data');
     const subscriptionId = _.get(responseSubscription, 'id');
-    const update = {
+    const suscripcion = await obtenerOCrearSuscripcion(data);
+    await suscripcion.update({
       subscriptionId,
       responseSubscription,
       updatedAt: Date.now(),
-    };
-    await db.Manada.update(update, {
-      where: { id: _.get(data, 'id') },
     });
     const link = _.first(_.get(responseSubscription, 'links'));
     return _.get(link, 'href');
@@ -96,8 +114,8 @@ const createSubscription = async (data) => {
 };
 
 /**
- * Funcion para crear un plan en PayPal, el cual se le asociara la informacion de un producto
- * previamente creado en PayPal
+ * Funcion para crear un plan en PayPal, el cual se le asociara la informacion
+ * de un producto previamente creado en PayPal.
  * @param  {Object} data
  * @return {Object} response
  */
@@ -118,7 +136,7 @@ exports.createPlanManada = async (data) => {
           total_cycles: 12,
           pricing_scheme: {
             fixed_price: {
-              value: _.toString(_.get(data, 'monto')),
+              value: _.toString(_.get(data, 'montoTotal')),
               currency_code: 'USD',
             },
           },
@@ -139,14 +157,11 @@ exports.createPlanManada = async (data) => {
     const planId = _.get(responsePlan, 'id');
     const newData = data;
     newData.planId = planId;
-    const update = {
+    const suscripcion = await obtenerOCrearSuscripcion(data);
+    await suscripcion.update({
       planId,
       responsePlan,
       updatedAt: Date.now(),
-    };
-
-    await db.Manada.update(update, {
-      where: { id: _.get(data, 'id') },
     });
     const link = await createSubscription(newData);
     return link;

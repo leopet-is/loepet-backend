@@ -1,3 +1,5 @@
+const { STATUS_ANIMAL, ESPECIE_ANIMAL } = require('../constants');
+
 module.exports = (sequelize, DataTypes) => {
   const Animal = sequelize.define(
     'Animal',
@@ -6,18 +8,33 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING(100),
         allowNull: false,
       },
+      /* Estado del animal dentro de la plataforma. El ciclo de vida dejo de
+       * girar en torno a la "adopcion": ahora se enmarca en el apadrinamiento
+       * recurrente, por lo que la recaudacion define si requiere padrinos,
+       * ya esta apadrinado, estan en tratamiento, fallecio o fue retirado. */
       status: {
-        type: DataTypes.ENUM('DISPONIBLE', 'EN_PROCESO', 'ADOPTADO'),
+        type: DataTypes.ENUM(
+          STATUS_ANIMAL.REQUIERE_PADRINOS,
+          STATUS_ANIMAL.APADRINADO,
+          STATUS_ANIMAL.EN_TRATAMIENTO,
+          STATUS_ANIMAL.FALLECIDO,
+          STATUS_ANIMAL.INACTIVO,
+        ),
         allowNull: false,
-        defaultValue: 'DISPONIBLE',
+        defaultValue: STATUS_ANIMAL.REQUIERE_PADRINOS,
       },
       especie: {
-        type: DataTypes.STRING(50),
+        type: DataTypes.ENUM(
+          ESPECIE_ANIMAL.PERRO,
+          ESPECIE_ANIMAL.GATO,
+          ESPECIE_ANIMAL.OTRO,
+        ),
         allowNull: false,
       },
       raza: {
         type: DataTypes.STRING(50),
         allowNull: true,
+        defaultValue: 'Mestizo',
       },
       descripcion: {
         type: DataTypes.TEXT,
@@ -27,19 +44,18 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING(500),
         allowNull: true,
       },
+      /* Galeria de fotos: siempre un arreglo (nunca null) para no romper el
+       * renderizado del frontend. */
       galeria: {
         type: DataTypes.JSON,
-        allowNull: true,
+        allowNull: false,
+        defaultValue: [],
       },
+      /* La clave foranea se define SOLO via la asociacion (ver associate).
+       * Aqui solo se declara como columna sin referencias/integridad local. */
       fundacion_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: {
-          model: 'fundacion',
-          key: 'id',
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
       },
       visible: {
         type: DataTypes.BOOLEAN,
@@ -56,12 +72,28 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: DataTypes.NOW,
       },
-      edad: {
-        type: DataTypes.INTEGER,
+      /* Control financiero del apadrinamiento recurrente: la meta mensual y la
+       * recaudacion en curso determinan el estado del animal (REQUIERE_PADRINOS
+       * si recaudado < meta, APADRINADO si lo cubre al 100%). */
+      monto_meta_mensual: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: false,
+        defaultValue: 0.0,
+      },
+      monto_recaudado_actual: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: false,
+        defaultValue: 0.0,
+      },
+      /* En lugar del entero "edad", se guarda una fecha de nacimiento estimada
+       * para calcular la edad de forma dinamica y precisa. */
+      fecha_nacimiento_estimada: {
+        type: DataTypes.DATEONLY,
         allowNull: true,
       },
+      /* DECIMAL evita la imprecision tipica de FLOAT en valores monetarios. */
       peso: {
-        type: DataTypes.FLOAT,
+        type: DataTypes.DECIMAL(5, 2),
         allowNull: true,
       },
       sexo: {
@@ -103,6 +135,8 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   Animal.associate = function associate(models) {
+    /* La relacion con Fundacion es la unica que define la clave foranea de
+     * fundacion_id (referencias, onUpdate y onDelete viven aqui). */
     Animal.belongsTo(models.Fundacion, {
       foreignKey: 'fundacion_id',
       as: 'fundacion',

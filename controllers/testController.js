@@ -4,7 +4,8 @@ const db = require('../DB/index');
 exports.clearDatabase = async (req, res) => {
   try {
     // Limpiar datos de prueba (orden correcto por foreign keys)
-    await db.Rating.destroy({ where: {}, force: true });
+    await db.RatingActualizacion.destroy({ where: {}, force: true });
+    await db.SuscripcionPadrino.destroy({ where: {}, force: true });
     await db.Comision.destroy({ where: {}, force: true });
     await db.Notificacion.destroy({ where: {}, force: true });
     await db.ActualizacionAnimal.destroy({ where: {}, force: true });

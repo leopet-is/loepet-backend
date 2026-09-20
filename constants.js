@@ -2,9 +2,16 @@ require('dotenv').config();
 
 module.exports = {
   STATUS_ANIMAL: {
-    DISPONIBLE: 'DISPONIBLE',
-    EN_PROCESO: 'EN_PROCESO',
-    ADOPTADO: 'ADOPTADO',
+    REQUIERE_PADRINOS: 'REQUIERE_PADRINOS',
+    APADRINADO: 'APADRINADO',
+    EN_TRATAMIENTO: 'EN_TRATAMIENTO',
+    FALLECIDO: 'FALLECIDO',
+    INACTIVO: 'INACTIVO',
+  },
+  ESPECIE_ANIMAL: {
+    PERRO: 'PERRO',
+    GATO: 'GATO',
+    OTRO: 'OTRO',
   },
   ROL: {
     ADMIN: {

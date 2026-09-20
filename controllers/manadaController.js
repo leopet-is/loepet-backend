@@ -233,18 +233,18 @@ exports.createManada = async (req, res) => {
   const { User } = req;
 
   try {
-    const { nombre, monto, galeriamanada } = req.body;
+    const { nombre, monto } = req.body;
 
     const manada = await db.Manada.create({
       nombre,
-      monto,
       userId: User.id,
       status: 1,
-      galeriamanada,
     });
     const data = {
       id: _.get(manada, 'id'),
+      manadaId: _.get(manada, 'id'),
       nombre,
+      montoTotal: monto || 0,
     };
     await createProductManada(data);
 
@@ -332,6 +332,12 @@ exports.getManadas = async (req, res) => {
       order: [['id', 'DESC']],
       offset: (page - 1) * limit,
       limit,
+      include: [
+        {
+          model: db.SuscripcionPadrino,
+          as: 'suscripcionPadrino',
+        },
+      ],
     };
     const responseBody = await db.Manada.findAndCountAll(query);
     const { count } = responseBody;
@@ -367,9 +373,8 @@ exports.getManadas = async (req, res) => {
       return {
         id: manadaId,
         nombre: _.get(manada, 'nombre'),
-        monto: _.get(manada, 'monto'),
-        galeriamanada: _.get(manada, 'galeriamanada'),
-        statusSubscription: _.get(manada, 'statusSubscription', false),
+        monto: _.get(manada, 'suscripcionPadrino.montoTotal', 0),
+        statusSubscription: _.get(manada, 'suscripcionPadrino.statusSubscription', false),
         apadrinados: animals.count,
         galeria: fotos,
       };
@@ -567,7 +572,7 @@ exports.updateInfoManada = async (req, res) => {
     const { User } = req;
     const { manadaId } = req.params;
     const {
-      nombre, monto, galeriamanada,
+      nombre, monto,
     } = req.body;
     const validationManada = await validateManada(manadaId, User.id);
     const response = {
@@ -576,13 +581,17 @@ exports.updateInfoManada = async (req, res) => {
     if (validationManada) {
       const update = {
         ...(!_.isEmpty(nombre) ? { nombre } : {}),
-        ...(!_.isEmpty(monto) ? { monto } : {}),
-        ...(!_.isEmpty(galeriamanada) ? { galeriamanada } : {}),
         updatedAt: Date.now(),
       };
       await db.Manada.update(update, {
         where: { id: manadaId },
       });
+      if (!_.isEmpty(monto)) {
+        const suscripcion = await db.SuscripcionPadrino.findOne({ where: { manadaId } });
+        if (suscripcion) {
+          await suscripcion.update({ montoTotal: monto, updatedAt: Date.now() });
+        }
+      }
       response.result = 'Informacion actualizada';
     }
     return res.send(response);

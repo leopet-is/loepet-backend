@@ -287,17 +287,24 @@ exports.crearDonacion = async (req, res) => {
           model: db.Usuario,
           required: true,
         },
+        {
+          model: db.SuscripcionPadrino,
+          as: 'suscripcionPadrino',
+        },
       ],
     });
+    const suscripcion = _.get(manada, 'suscripcionPadrino');
 
-    if (_.isEmpty(_.get(manada, 'productId'))) {
+    if (!suscripcion || _.isEmpty(_.get(suscripcion, 'productId'))) {
       throw new Error('ERROR - No existe una un producto asociado a la manada');
     }
     const data = {
       id: _.get(manada, 'id'),
       nombre: _.get(manada, 'nombre'),
-      monto: _.get(manada, 'monto'),
-      productId: _.get(manada, 'productId'),
+      monto: _.get(suscripcion, 'montoTotal'),
+      productId: _.get(suscripcion, 'productId'),
+      planId: _.get(suscripcion, 'planId'),
+      subscriptionId: _.get(suscripcion, 'subscriptionId'),
       nombres: _.get(manada, 'Usuario.nombres'),
       apellidos: _.get(manada, 'Usuario.apellidos'),
       email: _.get(manada, 'Usuario.email'),

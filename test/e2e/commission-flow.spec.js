@@ -116,7 +116,7 @@ describe.skip('E2E: Commission Flow - Money by Stars', () => {
       const animal = await db.Animal.create({
         nombre: 'Perrito E2E',
         edad: 2,
-        especie: 'perro',
+        especie: 'PERRO',
         raza: 'Mestizo',
         descripcion: 'Animal de prueba E2E',
         fundacion_id: fundacionProfile.id,
@@ -301,7 +301,7 @@ describe.skip('E2E: Commission Flow - Money by Stars', () => {
       const animalSinDonacion = await db.Animal.create({
         nombre: 'Animal Sin Donacion',
         edad: 1,
-        especie: 'perro',
+        especie: 'PERRO',
         fundacion_id: fundacion.id,
         estado: 'disponible',
       });
@@ -420,7 +420,7 @@ describe.skip('E2E: Commission Flow - Money by Stars', () => {
         const animalCalc = await db.Animal.create({
           nombre: `Animal ${stars} Stars`,
           edad: 1,
-          especie: 'perro',
+          especie: 'PERRO',
           fundacion_id: fundacion.id,
           estado: 'disponible',
         });

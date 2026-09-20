@@ -74,16 +74,19 @@ describe('E2E: Duplicate Reports Prevention', () => {
     manada = await db.Manada.create({
       userId: donadorUser.id,
       nombre: 'Manada Test',
-      monto: 100,
       status: true,
+    });
+    await db.SuscripcionPadrino.create({
+      manadaId: manada.id,
+      montoTotal: 100,
       statusSubscription: true,
     });
 
     // Crear ANIMALES
     animal1 = await db.Animal.create({
       nombre: 'Perrito 1',
-      status: 'DISPONIBLE',
-      especie: 'Perro',
+      status: 'REQUIERE_PADRINOS',
+      especie: 'PERRO',
       raza: 'Mestizo',
       descripcion: 'Animal de prueba 1',
       imagen: 'http://example.com/image1.jpg',
@@ -93,8 +96,8 @@ describe('E2E: Duplicate Reports Prevention', () => {
 
     animal2 = await db.Animal.create({
       nombre: 'Perrito 2',
-      status: 'DISPONIBLE',
-      especie: 'Perro',
+      status: 'REQUIERE_PADRINOS',
+      especie: 'PERRO',
       raza: 'Mestizo',
       descripcion: 'Animal de prueba 2',
       imagen: 'http://example.com/image2.jpg',

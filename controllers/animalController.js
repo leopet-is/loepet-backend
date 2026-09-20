@@ -261,6 +261,9 @@ exports.createAnimal = async (req, res) => {
       nombre, especie, raza, descripcion, galeria,
       sexo,
       peso,
+      monto_meta_mensual,
+      monto_recaudado_actual,
+      fecha_nacimiento_estimada,
       enfermedades,
       esterilizacion,
       vacunacion,
@@ -274,7 +277,7 @@ exports.createAnimal = async (req, res) => {
     }
     const animal = await db.Animal.create({
       nombre,
-      status: STATUS_ANIMAL.DISPONIBLE,
+      status: STATUS_ANIMAL.REQUIERE_PADRINOS,
       especie,
       raza,
       descripcion,
@@ -284,6 +287,9 @@ exports.createAnimal = async (req, res) => {
       visible: true,
       sexo,
       peso,
+      monto_meta_mensual,
+      monto_recaudado_actual,
+      fecha_nacimiento_estimada,
       enfermedades,
       esterilizacion,
       vacunacion,
@@ -322,8 +328,10 @@ exports.updateAnimal = async (req, res) => {
     const {
       nombre, especie, raza, descripcion, galeria,
       sexo,
-      edad,
+      fecha_nacimiento_estimada,
       peso,
+      monto_meta_mensual,
+      monto_recaudado_actual,
       enfermedades,
       esterilizacion,
       vacunacion,
@@ -343,8 +351,10 @@ exports.updateAnimal = async (req, res) => {
         ...(!_.isEmpty(descripcion) ? { descripcion } : {}),
         ...(!_.isEmpty(galeria) ? { galeria } : {}),
         sexo,
-        edad,
+        fecha_nacimiento_estimada,
         peso,
+        monto_meta_mensual,
+        monto_recaudado_actual,
         enfermedades,
         esterilizacion,
         vacunacion,
@@ -485,7 +495,10 @@ exports.getAllAnimalsApp = async (req, res) => {
       limit,
     };
     if (!_.isEmpty(tipoAnimal) && tipoAnimal !== 'TODOS') {
-      query.where.especie = tipoAnimal;
+      const especieFiltro = _.toUpper(tipoAnimal);
+      query.where.especie = _.includes(['PERRO', 'GATO', 'OTRO'], especieFiltro)
+        ? especieFiltro
+        : 'OTRO';
     }
 
     responseBody = await db.Animal.findAndCountAll(query);

@@ -88,8 +88,8 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
     });
-    ActualizacionAnimal.hasMany(models.Rating, {
-      foreignKey: 'actualizacion_id',
+    ActualizacionAnimal.hasMany(models.RatingActualizacion, {
+      foreignKey: 'actualizacionId',
       as: 'ratings',
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',

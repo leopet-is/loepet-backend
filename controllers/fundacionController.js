@@ -568,6 +568,12 @@ exports.getAnimalPadrinosFundacion = async (req, res) => {
           where: {
             id: manadaId,
           },
+          include: [
+            {
+              model: db.SuscripcionPadrino,
+              as: 'suscripcionPadrino',
+            },
+          ],
         });
         const donadorId = _.get(manada, 'userId');
         const donador = await db.Usuario.findOne({
@@ -651,6 +657,12 @@ exports.getAnimalPadrinosCalificacion = async (req, res) => {
             where: {
               id: manadaId,
             },
+            include: [
+              {
+                model: db.SuscripcionPadrino,
+                as: 'suscripcionPadrino',
+              },
+            ],
           });
           const donadorId = _.get(manada, 'userId');
           const donador = await db.Usuario.findOne({

@@ -19,7 +19,7 @@ exports.parseData = (animal, fundacion, historial = {}) => {
     especie: _.get(animal, 'especie'),
     raza: _.get(animal, 'raza'),
     descripcion: _.get(animal, 'descripcion'),
-    edad: _.get(animal, 'edad'),
+    fecha_nacimiento_estimada: _.get(animal, 'fecha_nacimiento_estimada'),
     sexo: _.get(animal, 'sexo'),
     peso: _.get(animal, 'peso'),
     enfermedades: _.get(animal, 'enfermedades'),
@@ -64,7 +64,7 @@ exports.parseDataActualizacion = (
       imagen: _.get(animal, 'imagen'),
       galeria: _.get(animal, 'galeria'),
       fundacion_id: _.get(animal, 'fundacion_id'),
-      edad: _.get(animal, 'edad'),
+      fecha_nacimiento_estimada: _.get(animal, 'fecha_nacimiento_estimada'),
       sexo: _.get(animal, 'sexo'),
       peso: _.get(animal, 'peso'),
       enfermedades: _.get(animal, 'enfermedades'),
@@ -123,7 +123,7 @@ exports.parseDataNotificacion = (
       imagen: _.get(animal, 'imagen'),
       galeria: _.get(animal, 'galeria'),
       fundacion_id: _.get(animal, 'fundacion_id'),
-      edad: _.get(animal, 'edad'),
+      fecha_nacimiento_estimada: _.get(animal, 'fecha_nacimiento_estimada'),
       peso: _.get(animal, 'peso'),
       sexo: _.get(animal, 'sexo'),
       enfermedades: _.get(animal, 'enfermedades'),
@@ -139,6 +139,7 @@ exports.parseDataNotificacion = (
 };
 
 exports.parseDataPadrinosAnimal = (animal, manada, donador = {}) => {
+  const monto = _.get(manada, 'suscripcionPadrino.montoTotal', _.get(manada, 'monto', 0));
   const data = {
     nombre: _.get(animal, 'nombre'),
     especie: _.get(animal, 'especie'),
@@ -146,15 +147,16 @@ exports.parseDataPadrinosAnimal = (animal, manada, donador = {}) => {
     padrinoNombre: _.get(donador, 'nombres'),
     padrinoApellido: _.get(donador, 'apellidos'),
     manadaNombre: _.get(manada, 'nombre'),
-    monto: _.get(manada, 'monto'),
+    monto,
   };
   return data;
 };
 
 exports.parseDataAnimalComision = (animal, manada, donador, notificacion = {}) => {
   const comision = 15;
-  const montocomision = (_.get(manada, 'monto') * comision) / 100;
-  const subtotal = _.get(manada, 'monto') - ((_.get(manada, 'monto') * comision) / 100);
+  const monto = _.get(manada, 'suscripcionPadrino.montoTotal', _.get(manada, 'monto', 0));
+  const montocomision = (_.toNumber(monto) * comision) / 100;
+  const subtotal = _.toNumber(monto) - ((_.toNumber(monto) * comision) / 100);
   let calificacion = _.get(notificacion, 'calificacion');
   calificacion = calificacion == null ? 0 : calificacion;
   let total;
@@ -176,7 +178,7 @@ exports.parseDataAnimalComision = (animal, manada, donador, notificacion = {}) =
     padrinoNombre: _.get(donador, 'nombres'),
     padrinoApellido: _.get(donador, 'apellidos'),
     manadaNombre: _.get(manada, 'nombre'),
-    monto: _.get(manada, 'monto'),
+    monto,
     montocomision,
     subtotal,
     calificacion,
@@ -421,21 +423,34 @@ exports.validateFundacion = async (ruc) => {
 };
 
 /**
- * Funcion para actualizar el estado de una animal cuando es apadrinado,
- * el estado se cambia de "DISPONIBLE" a "EN_PROCESO"
+ * Funcion para actualizar la recaudacion mensual de un animal cuando recibe un
+ * aporte de apadrinamiento. Si la recaudacion acumulada alcanza la meta
+ * mensual, el estado cambia a "APADRINADO".
  * @param  {Int} animalId
+ * @param  {Number} montoDonacion
  */
-exports.changeStatus = async (animalId) => {
+exports.changeStatus = async (animalId, montoDonacion = 0) => {
   try {
     const animal = await db.Animal.findOne({ where: { id: animalId } });
-    if (_.isEqual(animal.status, STATUS_ANIMAL.DISPONIBLE)) {
-      const update = {
-        status: STATUS_ANIMAL.EN_PROCESO,
-      };
-      await db.Animal.update(update, {
-        where: { id: animalId },
-      });
+    if (!animal) return;
+
+    const recaudado = _.toNumber(animal.monto_recaudado_actual) + _.toNumber(montoDonacion);
+    const meta = _.toNumber(animal.monto_meta_mensual);
+
+    const update = {
+      monto_recaudado_actual: recaudado,
+      updatedAt: Date.now(),
+    };
+    // Animales fuera del programa de apadrinamiento no se marcan como cubiertos.
+    if (!_.includes(['FALLECIDO', 'INACTIVO'], animal.status)) {
+      update.status = recaudado >= meta && meta > 0
+        ? STATUS_ANIMAL.APADRINADO
+        : STATUS_ANIMAL.REQUIERE_PADRINOS;
     }
+
+    await db.Animal.update(update, {
+      where: { id: animalId },
+    });
   } catch (error) {
     throw new Error(error);
   }

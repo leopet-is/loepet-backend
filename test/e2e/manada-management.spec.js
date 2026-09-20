@@ -54,7 +54,7 @@ describe('E2E: Manada Management', () => {
     // 3. Crear Animal
     const animal = await db.Animal.create({
       nombre: 'Animal Manada',
-      especie: 'Perro',
+      especie: 'PERRO',
       raza: 'Mestizo',
       edad: 2,
       peso: 10,
@@ -141,10 +141,14 @@ describe('E2E: Manada Management', () => {
   });
 
   it('3. Manada should verify subscription status logic', async () => {
-    // Verificamos que al crearla, el estado de suscripción por defecto es false (0)
-    // ya que no hemos completado el flujo de pago real de PayPal.
-    const manada = await db.Manada.findByPk(manadaId);
-    expect(manada.statusSubscription).toBeFalsy(); // 0 o false
+    // Verificamos que al crearla, la suscripcion de apadrinamiento queda
+    // registrada con estado inactivo (false), ya que no hemos completado el
+    // flujo de pago real de PayPal.
+    const suscripcion = await db.SuscripcionPadrino.findOne({
+      where: { manadaId },
+    });
+    expect(suscripcion).not.toBeNull();
+    expect(suscripcion.statusSubscription).toBeFalsy(); // false
 
     // Nota: Probar la activación real requeriría mockear la respuesta de PayPal
     // o llamar al webhook, lo cual es un test más avanzado de integración con terceros.

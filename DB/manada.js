@@ -6,10 +6,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING(100),
         allowNull: false,
       },
-      monto: {
-        type: DataTypes.DECIMAL(10, 2),
-        allowNull: false,
-      },
       userId: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -25,35 +21,6 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: true,
       },
-      statusSubscription: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
-      productId: {
-        type: DataTypes.STRING(191),
-        allowNull: true,
-      },
-      responseProduct: {
-        type: DataTypes.JSON,
-        allowNull: true,
-      },
-      planId: {
-        type: DataTypes.STRING(191),
-        allowNull: true,
-      },
-      responsePlan: {
-        type: DataTypes.JSON,
-        allowNull: true,
-      },
-      subscriptionId: {
-        type: DataTypes.STRING(191),
-        allowNull: true,
-      },
-      responseSubscription: {
-        type: DataTypes.JSON,
-        allowNull: true,
-      },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
@@ -63,10 +30,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: DataTypes.NOW,
-      },
-      galeriamanada: {
-        type: DataTypes.JSON,
-        allowNull: true,
       },
     },
     {
@@ -81,6 +44,13 @@ module.exports = (sequelize, DataTypes) => {
       as: 'usuario',
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
+    });
+    /* Cada manada tiene a lo sumo una suscripcion de apadrinamiento activa. */
+    Manada.hasOne(models.SuscripcionPadrino, {
+      foreignKey: 'manadaId',
+      as: 'suscripcionPadrino',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
     });
     Manada.hasMany(models.ManadaAnimal, {
       foreignKey: 'manada_id',

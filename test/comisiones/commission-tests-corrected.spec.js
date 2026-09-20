@@ -28,7 +28,8 @@ describe('Commission System - Corrected Tests', () => {
   let ManadaAnimal;
   let Donacion;
   let Comision;
-  let Rating;
+  let RatingActualizacion;
+  let SuscripcionPadrino;
 
   beforeAll(async () => {
     await db.connect();
@@ -41,7 +42,8 @@ describe('Commission System - Corrected Tests', () => {
       ManadaAnimal,
       Donacion,
       Comision,
-      Rating,
+      RatingActualizacion,
+      SuscripcionPadrino,
     } = db);
 
     // Crear usuario donador
@@ -82,8 +84,8 @@ describe('Commission System - Corrected Tests', () => {
     // Crear animal
     animal = await Animal.create({
       nombre: 'Comision Test Animal',
-      status: 'DISPONIBLE',
-      especie: 'Perro',
+      status: 'REQUIERE_PADRINOS',
+      especie: 'PERRO',
       raza: 'Mestizo',
       descripcion: 'Animal de prueba',
       imagen: 'http://example.com/test-animal.jpg',
@@ -104,8 +106,13 @@ describe('Commission System - Corrected Tests', () => {
     manada = await Manada.create({
       userId: donadorUser.id,
       nombre: 'Comision Test Manada',
-      monto: 100,
       status: true,
+    });
+
+    // Crear suscripcion de apadrinamiento de la manada
+    await SuscripcionPadrino.create({
+      manadaId: manada.id,
+      montoTotal: 100,
       statusSubscription: true,
     });
 
@@ -131,7 +138,7 @@ describe('Commission System - Corrected Tests', () => {
       await Comision.destroy({ where: { fundacion_id: actualizacion.fundacion_id } });
     }
     if (actualizacion) {
-      await Rating.destroy({ where: { actualizacion_id: actualizacion.id } });
+      await RatingActualizacion.destroy({ where: { actualizacionId: actualizacion.id } });
       await ActualizacionAnimal.destroy({ where: { id: actualizacion.id } });
     }
     if (donacion) {
@@ -171,7 +178,7 @@ describe('Commission System - Corrected Tests', () => {
       const response = await supertest(app)
         .post(`/actualizacion/${actualizacion.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: 1 });
+        .send({ estrellas: 1 });
 
       expect(response.status).toBe(200);
       expect(response.body.mensaje).toContain('Rating registrado');
@@ -181,8 +188,8 @@ describe('Commission System - Corrected Tests', () => {
       // Create new setup for this test
       const animal2 = await Animal.create({
         nombre: 'ECT Test Animal 2',
-        status: 'DISPONIBLE',
-        especie: 'Gato',
+        status: 'REQUIERE_PADRINOS',
+        especie: 'GATO',
         raza: 'Mestizo',
         descripcion: 'Animal de prueba 2',
         imagen: 'http://example.com/test-animal2.jpg',
@@ -214,13 +221,13 @@ describe('Commission System - Corrected Tests', () => {
       const response = await supertest(app)
         .post(`/actualizacion/${actualizacion2.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: 3 });
+        .send({ estrellas: 3 });
 
       expect(response.status).toBe(200);
       expect(response.body.mensaje).toContain('Rating registrado');
 
       // Cleanup
-      await Rating.destroy({ where: { actualizacion_id: actualizacion2.id } });
+      await RatingActualizacion.destroy({ where: { actualizacionId: actualizacion2.id } });
       await ActualizacionAnimal.destroy({ where: { id: actualizacion2.id } });
       await Donacion.destroy({ where: { animal_id: animal2.id } });
       await Animal.destroy({ where: { id: animal2.id } });
@@ -229,8 +236,8 @@ describe('Commission System - Corrected Tests', () => {
     it('ECT-WN-3: Valid rating (5) → 200 created successfully', async () => {
       const animal3 = await Animal.create({
         nombre: 'ECT Test Animal 3',
-        status: 'DISPONIBLE',
-        especie: 'Pajaro',
+        status: 'REQUIERE_PADRINOS',
+        especie: 'OTRO',
         raza: 'Mestizo',
         descripcion: 'Animal de prueba 3',
         imagen: 'http://example.com/test-animal3.jpg',
@@ -262,13 +269,13 @@ describe('Commission System - Corrected Tests', () => {
       const response = await supertest(app)
         .post(`/actualizacion/${actualizacion3.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: 5 });
+        .send({ estrellas: 5 });
 
       expect(response.status).toBe(200);
       expect(response.body.mensaje).toContain('Rating registrado');
 
       // Cleanup
-      await Rating.destroy({ where: { actualizacion_id: actualizacion3.id } });
+      await RatingActualizacion.destroy({ where: { actualizacionId: actualizacion3.id } });
       await ActualizacionAnimal.destroy({ where: { id: actualizacion3.id } });
       await Donacion.destroy({ where: { animal_id: animal3.id } });
       await Animal.destroy({ where: { id: animal3.id } });
@@ -283,7 +290,7 @@ describe('Commission System - Corrected Tests', () => {
       const response = await supertest(app)
         .post(`/actualizacion/${actualizacion.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: 0 });
+        .send({ estrellas: 0 });
 
       expect(response.status).toBe(400);
       expect(response.body.status).toBe('fail');
@@ -299,7 +306,7 @@ describe('Commission System - Corrected Tests', () => {
       const response = await supertest(app)
         .post(`/actualizacion/${actualizacion.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: 6 });
+        .send({ estrellas: 6 });
 
       expect(response.status).toBe(400);
       expect(response.body.status).toBe('fail');
@@ -315,7 +322,7 @@ describe('Commission System - Corrected Tests', () => {
       const response = await supertest(app)
         .post(`/actualizacion/${actualizacion.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: '5' });
+        .send({ estrellas: '5' });
 
       // String might be coerced to number by validation - accept either 200 or 400/422
       expect([200, 400, 422]).toContain(response.status);
@@ -330,7 +337,7 @@ describe('Commission System - Corrected Tests', () => {
       const response = await supertest(app)
         .post(`/actualizacion/${actualizacion.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: null });
+        .send({ estrellas: null });
 
       expect(response.status).toBe(400);
     });
@@ -349,7 +356,7 @@ describe('Commission System - Corrected Tests', () => {
       const response = await supertest(app)
         .post(`/actualizacion/${actualizacion.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: 1 });
+        .send({ estrellas: 1 });
 
       expect(response.status).toBe(200);
       expect(response.body.mensaje).toBeDefined();
@@ -358,8 +365,8 @@ describe('Commission System - Corrected Tests', () => {
     it('BVA-N-5: Maximum valid boundary (5) → 200', async () => {
       const animal4 = await Animal.create({
         nombre: 'BVA Test Animal',
-        status: 'DISPONIBLE',
-        especie: 'Reptil',
+        status: 'REQUIERE_PADRINOS',
+        especie: 'OTRO',
         raza: 'Mestizo',
         descripcion: 'Animal de prueba 4',
         imagen: 'http://example.com/test-animal4.jpg',
@@ -391,13 +398,13 @@ describe('Commission System - Corrected Tests', () => {
       const response = await supertest(app)
         .post(`/actualizacion/${actualizacion4.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: 5 });
+        .send({ estrellas: 5 });
 
       expect(response.status).toBe(200);
       expect(response.body.mensaje).toBeDefined();
 
       // Cleanup
-      await Rating.destroy({ where: { actualizacion_id: actualizacion4.id } });
+      await RatingActualizacion.destroy({ where: { actualizacionId: actualizacion4.id } });
       await ActualizacionAnimal.destroy({ where: { id: actualizacion4.id } });
       await Donacion.destroy({ where: { animal_id: animal4.id } });
       await Animal.destroy({ where: { id: animal4.id } });
@@ -412,7 +419,7 @@ describe('Commission System - Corrected Tests', () => {
       const response = await supertest(app)
         .post(`/actualizacion/${actualizacion.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: 0 });
+        .send({ estrellas: 0 });
 
       expect(response.status).toBe(400);
     });
@@ -426,7 +433,7 @@ describe('Commission System - Corrected Tests', () => {
       const response = await supertest(app)
         .post(`/actualizacion/${actualizacion.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: 6 });
+        .send({ estrellas: 6 });
 
       expect(response.status).toBe(400);
     });
@@ -445,7 +452,7 @@ describe('Commission System - Corrected Tests', () => {
       const response = await supertest(app)
         .post(`/actualizacion/${actualizacion.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: 3 });
+        .send({ estrellas: 3 });
 
       expect(response.status).toBe(200);
       expect(response.body.mensaje).toBeDefined();
@@ -460,7 +467,7 @@ describe('Commission System - Corrected Tests', () => {
       const response = await supertest(app)
         .post(`/actualizacion/${actualizacion.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: 0 });
+        .send({ estrellas: 0 });
 
       expect(response.status).toBe(400);
     });
@@ -474,7 +481,7 @@ describe('Commission System - Corrected Tests', () => {
       const response = await supertest(app)
         .post('/actualizacion/99999/ratings')
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: 3 });
+        .send({ estrellas: 3 });
 
       // DB constraint fails, returns 500
       expect(response.status).toBe(500);
@@ -489,7 +496,7 @@ describe('Commission System - Corrected Tests', () => {
       const response = await supertest(app)
         .post(`/actualizacion/${actualizacion.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: 1 });
+        .send({ estrellas: 1 });
 
       expect(response.status).toBe(200);
       expect(response.body.mensaje).toContain('registrado');
@@ -498,8 +505,8 @@ describe('Commission System - Corrected Tests', () => {
     it('DT-CALC-5: 5 stars → Valid rating accepted', async () => {
       const animal5 = await Animal.create({
         nombre: 'DTT Test Animal',
-        status: 'DISPONIBLE',
-        especie: 'Pez',
+        status: 'REQUIERE_PADRINOS',
+        especie: 'OTRO',
         raza: 'Mestizo',
         descripcion: 'Animal de prueba 5',
         imagen: 'http://example.com/test-animal5.jpg',
@@ -531,13 +538,13 @@ describe('Commission System - Corrected Tests', () => {
       const response = await supertest(app)
         .post(`/actualizacion/${actualizacion5.id}/ratings`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ valor: 5 });
+        .send({ estrellas: 5 });
 
       expect(response.status).toBe(200);
       expect(response.body.mensaje).toContain('registrado');
 
       // Cleanup
-      await Rating.destroy({ where: { actualizacion_id: actualizacion5.id } });
+      await RatingActualizacion.destroy({ where: { actualizacionId: actualizacion5.id } });
       await ActualizacionAnimal.destroy({ where: { id: actualizacion5.id } });
       await Donacion.destroy({ where: { animal_id: animal5.id } });
       await Animal.destroy({ where: { id: animal5.id } });

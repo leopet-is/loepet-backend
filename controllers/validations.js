@@ -68,11 +68,8 @@ module.exports.createAnimal = [
   body('especie')
     .exists()
     .withMessage('El campo especie es obligatorio')
-    .isString()
-    .withMessage('El campo especie debe ser de tipo String')
-    .trim()
-    .isLength({ max: 50 })
-    .withMessage('El campo especie no puede superar 50 caracteres'),
+    .isIn(['PERRO', 'GATO', 'OTRO'])
+    .withMessage('El campo especie debe ser uno de: PERRO, GATO, OTRO'),
   body('sexo')
     .exists()
     .withMessage('El campo sexo es obligatorio')
@@ -91,18 +88,35 @@ module.exports.createAnimal = [
     .withMessage('El campo descripcion debe ser de tipo String'),
   body('status')
     .optional()
-    .isIn(['DISPONIBLE', 'EN_PROCESO', 'ADOPTADO'])
-    .withMessage('El campo status debe ser uno de: DISPONIBLE, EN_PROCESO, ADOPTADO'),
+    .isIn([
+      'REQUIERE_PADRINOS',
+      'APADRINADO',
+      'EN_TRATAMIENTO',
+      'FALLECIDO',
+      'INACTIVO',
+    ])
+    .withMessage(
+      'El campo status debe ser uno de: REQUIERE_PADRINOS, APADRINADO, EN_TRATAMIENTO, FALLECIDO, INACTIVO',
+    ),
   body('peso')
     .optional()
-    .isFloat({ min: 0 })
-    .withMessage('El campo peso debe ser un número (kg) mayor o igual a 0')
+    .isDecimal({ decimal_digits: '0,2' })
+    .withMessage('El campo peso debe ser un número decimal (kg) con hasta 2 decimales y mayor o igual a 0')
     .toFloat(),
-  body('edad')
+  body('monto_meta_mensual')
     .optional()
-    .isInt({ min: 0 })
-    .withMessage('El campo edad debe ser un número entero mayor o igual a 0')
-    .toInt(),
+    .isDecimal({ decimal_digits: '0,2' })
+    .withMessage('El campo monto_meta_mensual debe ser un decimal con hasta 2 decimales y mayor o igual a 0')
+    .toFloat(),
+  body('monto_recaudado_actual')
+    .optional()
+    .isDecimal({ decimal_digits: '0,2' })
+    .withMessage('El campo monto_recaudado_actual debe ser un decimal con hasta 2 decimales y mayor o igual a 0')
+    .toFloat(),
+  body('fecha_nacimiento_estimada')
+    .optional()
+    .isISO8601({ strict: true })
+    .withMessage('El campo fecha_nacimiento_estimada debe ser una fecha valida (YYYY-MM-DD)'),
   body('fecha_rescate')
     .optional()
     .isISO8601({ strict: true })
@@ -138,11 +152,8 @@ module.exports.updateAnimal = [
     .withMessage('El campo nombre no puede superar 100 caracteres'),
   body('especie')
     .optional()
-    .isString()
-    .withMessage('El campo especie debe ser de tipo String')
-    .trim()
-    .isLength({ max: 50 })
-    .withMessage('El campo especie no puede superar 50 caracteres'),
+    .isIn(['PERRO', 'GATO', 'OTRO'])
+    .withMessage('El campo especie debe ser uno de: PERRO, GATO, OTRO'),
   body('sexo')
     .optional()
     .isIn(['MACHO', 'HEMBRA'])
@@ -160,18 +171,35 @@ module.exports.updateAnimal = [
     .withMessage('El campo descripcion debe ser de tipo String'),
   body('status')
     .optional()
-    .isIn(['DISPONIBLE', 'EN_PROCESO', 'ADOPTADO'])
-    .withMessage('El campo status debe ser uno de: DISPONIBLE, EN_PROCESO, ADOPTADO'),
+    .isIn([
+      'REQUIERE_PADRINOS',
+      'APADRINADO',
+      'EN_TRATAMIENTO',
+      'FALLECIDO',
+      'INACTIVO',
+    ])
+    .withMessage(
+      'El campo status debe ser uno de: REQUIERE_PADRINOS, APADRINADO, EN_TRATAMIENTO, FALLECIDO, INACTIVO',
+    ),
   body('peso')
     .optional()
-    .isFloat({ min: 0 })
-    .withMessage('El campo peso debe ser un número (kg) mayor o igual a 0')
+    .isDecimal({ decimal_digits: '0,2' })
+    .withMessage('El campo peso debe ser un número decimal (kg) con hasta 2 decimales y mayor o igual a 0')
     .toFloat(),
-  body('edad')
+  body('monto_meta_mensual')
     .optional()
-    .isInt({ min: 0 })
-    .withMessage('El campo edad debe ser un número entero mayor o igual a 0')
-    .toInt(),
+    .isDecimal({ decimal_digits: '0,2' })
+    .withMessage('El campo monto_meta_mensual debe ser un decimal con hasta 2 decimales y mayor o igual a 0')
+    .toFloat(),
+  body('monto_recaudado_actual')
+    .optional()
+    .isDecimal({ decimal_digits: '0,2' })
+    .withMessage('El campo monto_recaudado_actual debe ser un decimal con hasta 2 decimales y mayor o igual a 0')
+    .toFloat(),
+  body('fecha_nacimiento_estimada')
+    .optional()
+    .isISO8601({ strict: true })
+    .withMessage('El campo fecha_nacimiento_estimada debe ser una fecha valida (YYYY-MM-DD)'),
   body('fecha_rescate')
     .optional()
     .isISO8601({ strict: true })
@@ -491,11 +519,15 @@ module.exports.updateInfoFundacion = [
 
 /* Validaciones para Rating */
 module.exports.createRating = [
-  body('valor')
+  body('estrellas')
     .exists()
-    .withMessage('El campo valor es requerido')
-    .isFloat({ min: 1, max: 5 })
-    .withMessage('La calificacion debe ser un número entre 1 y 5.'),
+    .withMessage('El campo estrellas es requerido')
+    .isInt({ min: 1, max: 5 })
+    .withMessage('La calificacion debe ser un número entero entre 1 y 5.'),
+  body('comentario')
+    .optional()
+    .isString()
+    .withMessage('El campo comentario debe ser una cadena de texto'),
   param('actualizacionId')
     .exists()
     .withMessage('Es necesario el campo actualizacionId')
