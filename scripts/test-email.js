@@ -1,13 +1,14 @@
 require('dotenv').config();
 
-const { sendMail, getDriver } = require('../services/emailService');
+const { sendMail, getRecipient, getDriver } = require('../services/emailService');
 
 (async () => {
   try {
     const driver = getDriver();
-    const to = process.env.MAIL_TO || 'dev@test.com';
+    const configuredTo = process.env.MAIL_TO || 'dev@test.com';
+    const to = getRecipient(configuredTo, driver);
     const result = await sendMail({
-      to,
+      to: configuredTo,
       subject: 'Prueba de correo LEOPET',
       text: 'Este es un correo de prueba enviado desde desarrollo.',
       html: '<h1>Hola</h1><p>Este es un correo de prueba de LEOPET.</p>',

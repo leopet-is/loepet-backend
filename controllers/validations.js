@@ -239,6 +239,79 @@ module.exports.login = [
   validate,
 ];
 
+module.exports.register = [
+  body('cedula')
+    .exists()
+    .withMessage('El campo cedula es obligatorio')
+    .isString()
+    .withMessage('El campo cedula debe ser de tipo String')
+    .trim()
+    .custom((value) => esCedulaValida(value))
+    .withMessage('La cedula no es una cedula ecuatoriana valida'),
+  body('nombres')
+    .exists()
+    .withMessage('El campo nombres es obligatorio')
+    .isString()
+    .withMessage('El campo nombres debe ser de tipo String')
+    .trim()
+    .notEmpty()
+    .withMessage('El campo nombres no puede estar vacio')
+    .isLength({ max: 100 })
+    .withMessage('El campo nombres no puede superar 100 caracteres'),
+  body('apellidos')
+    .exists()
+    .withMessage('El campo apellidos es obligatorio')
+    .isString()
+    .withMessage('El campo apellidos debe ser de tipo String')
+    .trim()
+    .notEmpty()
+    .withMessage('El campo apellidos no puede estar vacio')
+    .isLength({ max: 100 })
+    .withMessage('El campo apellidos no puede superar 100 caracteres'),
+  body('telefono')
+    .exists()
+    .withMessage('El campo telefono es obligatorio')
+    .isString()
+    .withMessage('El campo telefono debe ser de tipo String')
+    .trim()
+    .custom((value) => esTelefonoEcuador(value))
+    .withMessage('El telefono debe ser un numero de Ecuador valido (movil 09XXXXXXXX o fijo 0[2-7]XXXXXXX)'),
+  body('email')
+    .exists()
+    .withMessage('El campo email es obligatorio')
+    .isEmail()
+    .withMessage('El email debe ser un correo electronico valido')
+    .normalizeEmail(),
+  body('direccion')
+    .optional()
+    .isString()
+    .withMessage('El campo direccion debe ser de tipo String')
+    .trim()
+    .isLength({ max: 200 })
+    .withMessage('El campo direccion no puede superar 200 caracteres'),
+  body('password')
+    .exists()
+    .withMessage('El campo password es obligatorio')
+    .isString()
+    .withMessage('El campo password debe ser de tipo String')
+    .isLength({ min: 8 })
+    .withMessage('La contrasena debe tener al menos 8 caracteres')
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&._-])[A-Za-z\d@$!%*#?&._-]+$/)
+    .withMessage('La contrasena debe incluir minusculas, mayusculas, un numero y un caracter especial'),
+  body('role')
+    .exists()
+    .withMessage('El campo role es obligatorio')
+    .isInt({ min: 2, max: 3 })
+    .withMessage('El role debe ser 2 (fundacion) o 3 (donador)'),
+  body('fundacionId')
+    .if((value, { req }) => Number(req.body.role) === 2)
+    .exists()
+    .withMessage('El campo fundacionId es obligatorio para un administrador de fundacion')
+    .isInt()
+    .withMessage('El campo fundacionId debe ser un numero entero'),
+  validate,
+];
+
 /* Validaciones para crear una cuenta bancaria (POST): se exigen los campos
  * que el modelo define como obligatorios (allowNull: false). */
 module.exports.createCuentaBancaria = [

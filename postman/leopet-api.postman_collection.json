@@ -1,0 +1,138 @@
+{
+  "info": {
+    "_postman_id": "leopet-api",
+    "name": "Leopet API - Smoke Tests",
+    "description": "Coleccion para probar los endpoints de Leopet. Ejecutar primero el login del rol deseado; cada login guarda su token en una variable de entorno.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "variable": [{ "key": "baseUrl", "value": "http://localhost:8181" }],
+  "item": [
+    {
+      "name": "00 - Health y autenticacion",
+      "item": [
+        {
+          "name": "Health",
+          "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/health" }
+        },
+        {
+          "name": "Login donador",
+          "event": [{ "listen": "test", "script": { "exec": ["const body = pm.response.json();", "pm.environment.set('token', body.token || body.result.token);"], "type": "text/javascript" } }],
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"email\": \"donador@gmail.com\",\n  \"password\": \"Leopet2025!\"\n}" }, "url": "{{baseUrl}}/auth/login" }
+        },
+        {
+          "name": "Login administrador",
+          "event": [{ "listen": "test", "script": { "exec": ["const body = pm.response.json();", "pm.environment.set('adminToken', body.token || body.result.token);"], "type": "text/javascript" } }],
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@gmail.com\",\n  \"password\": \"Leopet2025!\"\n}" }, "url": "{{baseUrl}}/auth/login" }
+        },
+        {
+          "name": "Login administrador fundacion",
+          "event": [{ "listen": "test", "script": { "exec": ["const body = pm.response.json();", "pm.environment.set('fundacionToken', body.token || body.result.token);"], "type": "text/javascript" } }],
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"email\": \"colitafeliz@gmail.com\",\n  \"password\": \"Leopet2025!\"\n}" }, "url": "{{baseUrl}}/auth/login" }
+        },
+        {
+          "name": "Registro donador (genera datos nuevos)",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"cedula\": \"0912345678\",\n  \"nombres\": \"Usuario\",\n  \"apellidos\": \"Postman\",\n  \"telefono\": \"0991234567\",\n  \"email\": \"postman{{$timestamp}}@example.com\",\n  \"password\": \"Postman2026!\",\n  \"role\": 3\n}" }, "url": "{{baseUrl}}/auth/register" }
+        },
+        {
+          "name": "Solicitud publica de fundacion",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"ruc\": \"0998887776001\",\n  \"nombre\": \"Fundacion Postman\",\n  \"direccion\": \"Guayaquil\",\n  \"telefono\": \"0998887776\",\n  \"email_contacto\": \"postman@example.com\",\n  \"cedula_contacto\": \"0912345678\",\n  \"nombre_contacto\": \"Ana\",\n  \"apellido_contacto\": \"Prueba\",\n  \"comentarios\": \"Solicitud creada desde Postman\"\n}" }, "url": "{{baseUrl}}/public/solicitudes" }
+        }
+      ]
+    },
+    {
+      "name": "01 - Animales",
+      "item": [
+        { "name": "Listar animales", "request": { "method": "GET", "url": "{{baseUrl}}/animal?especie=PERRO" } },
+        { "name": "Listar animales app", "request": { "method": "GET", "url": "{{baseUrl}}/animal/app" } },
+        { "name": "Animales por fundacion", "request": { "method": "GET", "url": "{{baseUrl}}/animal/app/fundacion/{{fundacionId}}" } },
+        { "name": "Listar especies", "request": { "method": "GET", "url": "{{baseUrl}}/animal/especies" } },
+        { "name": "Buscar animal", "request": { "method": "GET", "url": "{{baseUrl}}/animal/search?q=Balto" } },
+        { "name": "Obtener animal", "request": { "method": "GET", "url": "{{baseUrl}}/animal/{{animalId}}" } },
+        { "name": "Crear animal", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Animal Postman\",\n  \"especie\": \"PERRO\",\n  \"sexo\": \"MACHO\",\n  \"raza\": \"Mestizo\",\n  \"descripcion\": \"Animal creado para pruebas\",\n  \"peso\": 12.5,\n  \"esterilizacion\": false,\n  \"vacunacion\": true,\n  \"desparasitacion\": true\n}" }, "url": "{{baseUrl}}/animal" } },
+        { "name": "Actualizar animal", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"descripcion\": \"Actualizado desde Postman\",\n  \"peso\": 13\n}" }, "url": "{{baseUrl}}/animal/{{animalId}}" } },
+        { "name": "Eliminar animal", "request": { "method": "DELETE", "url": "{{baseUrl}}/animal/{{animalId}}" } }
+      ]
+    },
+    {
+      "name": "02 - Fundaciones y cuentas",
+      "item": [
+        { "name": "Listar fundaciones (publico)", "request": { "auth": { "type": "noauth" }, "method": "GET", "url": "{{baseUrl}}/fundacion" } },
+        { "name": "Animales de fundaciones (publico)", "request": { "auth": { "type": "noauth" }, "method": "GET", "url": "{{baseUrl}}/fundacion/animales" } },
+        { "name": "Padrinos de fundacion", "request": { "method": "GET", "url": "{{baseUrl}}/fundacion/padrinos/{{fundacionId}}" } },
+        { "name": "Calificacion de padrinos", "request": { "method": "GET", "url": "{{baseUrl}}/fundacion/padrinos/calificacion/{{fundacionId}}" } },
+        { "name": "Crear fundacion", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"ruc\": \"0998887776001\",\n  \"nombre\": \"Fundacion Postman\",\n  \"direccion\": \"Guayaquil\",\n  \"telefono\": \"0998887776\",\n  \"descripcion\": \"Fundacion de prueba\"\n}" }, "url": "{{baseUrl}}/fundacion" } },
+        { "name": "Actualizar fundacion", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Colita Feliz Actualizada\",\n  \"direccion\": \"Urdesa\",\n  \"telefono\": \"0911111111\"\n}" }, "url": "{{baseUrl}}/fundacion/{{fundacionId}}" } },
+        { "name": "Cuenta bancaria principal", "request": { "method": "GET", "url": "{{baseUrl}}/cuenta/fundacion/{{fundacionId}}/principal" } },
+        { "name": "Todas las cuentas bancarias", "request": { "method": "GET", "url": "{{baseUrl}}/cuenta/fundacion/{{fundacionId}}/all" } },
+        { "name": "Crear cuenta bancaria", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"banco\": \"PICHINCHA\",\n  \"numero\": \"4040404040\",\n  \"tipo\": \"AHORROS\",\n  \"nombre\": \"CUENTA POSTMAN\",\n  \"fundacionId\": 1\n}" }, "url": "{{baseUrl}}/cuenta" } },
+        { "name": "Eliminar cuenta bancaria", "request": { "method": "DELETE", "url": "{{baseUrl}}/cuenta/{{cuentaId}}" } }
+      ]
+    },
+    {
+      "name": "03 - Manadas y donaciones",
+      "item": [
+        { "name": "Listar manadas", "request": { "method": "GET", "url": "{{baseUrl}}/manada?page=1&limit=10" } },
+        { "name": "Buscar manadas", "request": { "method": "GET", "url": "{{baseUrl}}/manada/search?q=Alfa" } },
+        { "name": "Crear manada", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Manada Postman\"\n}" }, "url": "{{baseUrl}}/manada" } },
+        { "name": "Animales de manada", "request": { "method": "GET", "url": "{{baseUrl}}/manada/{{manadaId}}/animals" } },
+        { "name": "Agregar animales a manada", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"animalId\": [14]\n}" }, "url": "{{baseUrl}}/manada/{{manadaId}}/animals" } },
+        { "name": "Actualizar manada", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Alfa actualizada\"\n}" }, "url": "{{baseUrl}}/manada/{{manadaId}}" } },
+        { "name": "Eliminar animal de manada", "request": { "method": "DELETE", "url": "{{baseUrl}}/manada/{{manadaId}}/animals/14" } },
+        { "name": "Donaciones de fundacion", "request": { "method": "GET", "url": "{{baseUrl}}/donacion?page=1&limit=10" } },
+        { "name": "Dinero disponible", "request": { "method": "GET", "url": "{{baseUrl}}/donacion/disponible" } },
+        { "name": "Crear donacion", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"manadaId\": 1,\n  \"monto\": 10\n}" }, "url": "{{baseUrl}}/donacion" } },
+        { "name": "Aprobar donacion", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"aprobado\": true\n}" }, "url": "{{baseUrl}}/donacion/{{donacionId}}/aprobado" } },
+        { "name": "Marcar donacion pagada", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"status\": \"success\"\n}" }, "url": "{{baseUrl}}/donacion/{{donacionId}}/pagado" } }
+      ]
+    },
+    {
+      "name": "04 - Actualizaciones, favoritos y notificaciones",
+      "item": [
+        { "name": "Listar actualizaciones", "request": { "method": "GET", "url": "{{baseUrl}}/actualizacion" } },
+        { "name": "Crear actualizacion", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"animal_id\": 6,\n  \"fecha\": \"2026-09-22\",\n  \"descripcion\": \"Control veterinario Postman\",\n  \"estado_salud\": \"Muy bien\"\n}" }, "url": "{{baseUrl}}/actualizacion" } },
+        { "name": "Ratings de actualizacion", "request": { "method": "GET", "url": "{{baseUrl}}/actualizacion/{{actualizacionId}}/ratings" } },
+        { "name": "Crear rating", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"estrellas\": 5,\n  \"comentario\": \"Excelente\"\n}" }, "url": "{{baseUrl}}/actualizacion/{{actualizacionId}}/ratings" } },
+        { "name": "Notificaciones", "request": { "method": "GET", "url": "{{baseUrl}}/notificacion" } },
+        { "name": "Actualizar notificacion", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"leido\": true\n}" }, "url": "{{baseUrl}}/notificacion/{{notificacionId}}" } },
+        { "name": "Agregar favorito", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"fundacionId\": 1\n}" }, "url": "{{baseUrl}}/favorito" } },
+        { "name": "Listar favoritos", "request": { "method": "GET", "url": "{{baseUrl}}/favorito" } },
+        { "name": "Verificar favorito", "request": { "method": "GET", "url": "{{baseUrl}}/favorito/{{fundacionId}}" } },
+        { "name": "Eliminar favorito", "request": { "method": "DELETE", "url": "{{baseUrl}}/favorito/{{fundacionId}}" } }
+      ]
+    },
+    {
+      "name": "05 - Usuarios, admin y reportes",
+      "item": [
+        { "name": "Listar usuarios", "request": { "method": "GET", "url": "{{baseUrl}}/usuario" } },
+        { "name": "Actualizar usuario", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nombres\": \"Johanna Actualizada\",\n  \"direccion\": \"Guayaquil\"\n}" }, "url": "{{baseUrl}}/usuario/1" } },
+        { "name": "Cambiar password", "request": { "method": "PATCH", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"passwordActual\": \"Leopet2025!\",\n  \"passwordNueva\": \"Leopet2026!\"\n}" }, "url": "{{baseUrl}}/usuario/1/password" } },
+        { "name": "Solicitudes de fundacion", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": "{{baseUrl}}/admin/solicitudes" } },
+        { "name": "Solicitud por id", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": "{{baseUrl}}/admin/solicitudes/{{solicitudId}}" } },
+        { "name": "Solicitudes listas para crear", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": "{{baseUrl}}/admin/solicitudes/ready-for-creation" } },
+        { "name": "Reporte transferencias", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": "{{baseUrl}}/reportes/transferencias" } },
+        { "name": "Reporte denuncias agrupadas", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": "{{baseUrl}}/denuncias/agrupadas" } },
+        { "name": "Crear notificacion admin", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"fundacionId\": 1,\n  \"mensaje\": \"Notificacion de prueba\"\n}" }, "url": "{{baseUrl}}/notificacion/admin" } },
+        { "name": "Notificaciones de fundacion", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{fundacionToken}}" }], "url": "{{baseUrl}}/notificacion/fundacion" } },
+        { "name": "Comisiones por fundacion", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{fundacionToken}}" }], "url": "{{baseUrl}}/comision/fundacion" } }
+      ]
+    },
+    {
+      "name": "06 - Evidencias, denuncias, PayPal y archivos",
+      "item": [
+        { "name": "Crear evidencia", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"donacionId\": 1,\n  \"descripcion\": \"Evidencia de prueba\",\n  \"url\": \"https://example.com/evidencia.jpg\"\n}" }, "url": "{{baseUrl}}/evidencia" } },
+        { "name": "Crear denuncia", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "multipart/form-data" }], "body": { "mode": "formdata", "formdata": [{ "key": "fundacionId", "value": "1", "type": "text" }, { "key": "motivo", "value": "Motivo de prueba desde Postman", "type": "text" }, { "key": "archivos", "type": "file", "src": "" }] }, "url": "{{baseUrl}}/denuncias" } },
+        { "name": "Rechazar denuncia", "request": { "method": "PUT", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"motivo_rechazo\": \"Rechazada en prueba\"\n}" }, "url": "{{baseUrl}}/denuncias/{{denunciaId}}" } },
+        { "name": "Subir archivo", "request": { "method": "POST", "body": { "mode": "formdata", "formdata": [{ "key": "file", "type": "file", "src": "" }] }, "url": "{{baseUrl}}/otros/uploadFile" } },
+        { "name": "Borrar archivo", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"fileName\": \"archivo-de-prueba.jpg\"\n}" }, "url": "{{baseUrl}}/otros/deleteFile" } },
+        { "name": "Crear comision", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"fundacionId\": 1,\n  \"monto\": 10\n}" }, "url": "{{baseUrl}}/comision" } },
+        { "name": "Webhook PayPal suscripcion", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"event_type\": \"BILLING.SUBSCRIPTION.ACTIVATED\",\n  \"resource\": {\n    \"id\": \"I-PRUEBA\",\n    \"status\": \"ACTIVE\"\n  }\n}" }, "url": "{{baseUrl}}/paypal/verify/subscription" } },
+        { "name": "PayPal crear producto", "request": { "method": "POST", "url": "{{baseUrl}}/paypal/create/product" } },
+        { "name": "PayPal cancelar suscripcion", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"subscriptionId\": \"I-PRUEBA\"\n}" }, "url": "{{baseUrl}}/paypal/cancel" } }
+      ]
+    }
+  ]
+}

@@ -105,11 +105,12 @@ Los datos de ejemplo pueden cargarse con `npm run db:migrate` y luego opcionalme
 
 | Rol | Email | Contraseña |
 |---|---|---|
-| Administrador | `admin@gmail.com` | `admin` |
-| Donador | `sofiacastro@gmail.com` | `sofiacastro123` |
-| Fundación (Colita Feliz) | `colitafeliz@gmail.com` | `colitafeliz123` |
-| Fundación (Huellitas) | `refugiohuellitas@gmail.com` | (ver documentación) |
-| Fundación (Leopet) | `leopet@gmail.com` | (ver documentación) |
+| Administrador | `admin@gmail.com` | `Leopet2025!` |
+| Donador | `donador@gmail.com` | `Leopet2025!` |
+| Donador | `sofiacastro@gmail.com` | `Leopet2025!` |
+| Fundación (Colita Feliz) | `colitafeliz@gmail.com` | `Leopet2025!` |
+| Fundación (Huellitas) | `refugiohuellitas@gmail.com` | `Leopet2025!` |
+| Fundación (Leopet) | `leopet@gmail.com` | `Leopet2025!` |
 
 ---
 
@@ -120,7 +121,7 @@ Los datos de ejemplo pueden cargarse con `npm run db:migrate` y luego opcionalme
 ```bash
 curl -X POST http://localhost:8181/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"admin@gmail.com","password":"admin"}'
+  -d '{"email":"admin@gmail.com","password":"Leopet2025!"}'
 ```
 
 Guardar el `token` del JSON de respuesta.

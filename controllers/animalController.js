@@ -25,8 +25,6 @@ const db = require('../DB/index');
  * /animal:
  *   get:
  *     tags: [Animales]
- *     security:
- *       - bearerAuth: []
  *     summary: Obtiene todos los animales con paginacion
  *     description: Si se envia el parametro `manada` se listan los animales de esa manada (debe pertenecer al usuario). Soporta filtros por especie y busqueda por nombre.
  *     parameters:

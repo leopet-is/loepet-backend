@@ -4,6 +4,7 @@ const { Op } = require('sequelize');
 const db = require('../DB/index');
 const { SOLICITUD_FUNDACION_ESTADO } = require('../constants');
 const { crearUsuarioPendiente, enviarCorreoActivacion } = require('./authController');
+const { sendRejectionEmail } = require('../services/emailService');
 
 /**
  * @openapi
@@ -474,8 +475,22 @@ exports.rechazarSolicitudFundacion = async (req, res) => {
       where: { id: solicitudId },
     });
 
+    let correoEnviado = true;
+    try {
+      await sendRejectionEmail({
+        to: updatedSolicitud.email_contacto,
+        nombre: `${updatedSolicitud.nombre_contacto} ${updatedSolicitud.apellido_contacto}`,
+        motivo: notasAdmin,
+      });
+    } catch (emailError) {
+      correoEnviado = false;
+      console.log('ERROR enviando correo de rechazo:', emailError);
+    }
+
     const response = {
-      mensaje: 'Solicitud rechazada exitosamente.',
+      mensaje: correoEnviado
+        ? 'Solicitud rechazada exitosamente. Se envio el correo de rechazo.'
+        : 'Solicitud rechazada exitosamente, pero no se pudo enviar el correo de rechazo.',
       result: updatedSolicitud,
     };
     return res.send(response);

@@ -6,7 +6,6 @@ const { Op } = require('sequelize');
 
 const {
   getCuentaBancaria,
-  validateAdminFund,
   validateFundacion,
   validateSuperAdmin,
   parseDataPadrinosAnimal,
@@ -53,8 +52,6 @@ const db = require('../DB/index');
  *         description: Error interno del servidor
  *   get:
  *     tags: [Fundaciones]
- *     security:
- *       - bearerAuth: []
  *     summary: Obtiene las fundaciones con paginacion
  *     parameters:
  *       - in: query
@@ -80,8 +77,6 @@ const db = require('../DB/index');
  * /fundacion/animales:
  *   get:
  *     tags: [Fundaciones]
- *     security:
- *       - bearerAuth: []
  *     summary: Obtiene los animales de las fundaciones aprobadas con paginacion
  *     parameters:
  *       - in: query
@@ -497,22 +492,19 @@ exports.getFundaciones = async (req, res) => {
  * @return {Object} response
  */
 exports.getAnimalFundaciones = async (req, res) => {
-  console.log('--- CONTROLLER GET_ANIMAL_FUNDACIONES ALCANZADO ---');
   try {
-    const { User } = req;
     const { q } = req.query;
     const limit = parseInt(req.query.limit || '1', 10);
     const page = parseInt(req.query.page || '1', 10);
-
-    if (!(await validateAdminFund(User.id))) {
-      return res
-        .status(401)
-        .send({ error: 'No esta autorizado para realizar esta operacion!' });
-    }
+    const fundacionesAprobadas = await db.Fundacion.findAll({
+      where: { aprobado: true },
+      attributes: ['id'],
+      raw: true,
+    });
 
     const query = {
       where: {
-        fundacion_id: User.fundacionId,
+        fundacion_id: { [Op.in]: fundacionesAprobadas.map((fundacion) => fundacion.id) },
         ...(!_.isEmpty(q) ? { nombre: { [Op.regexp]: q } } : {}),
         visible: true,
       },

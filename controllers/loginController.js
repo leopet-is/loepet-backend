@@ -180,15 +180,21 @@ exports.register = async (req, res) => {
 
     const unAuthorizedResponse = 'Ya existe un usuario registrado con ese correo.';
 
+    const normalizedEmail = email.trim().toLowerCase();
     let User = await Usuario.findOne({
       where: {
-        email,
+        email: normalizedEmail,
       },
     });
 
     // Usuario existe
     if (User) {
-      return res.status(401).send(unAuthorizedResponse);
+      return res.status(409).send(unAuthorizedResponse);
+    }
+
+    const existingCedula = await Usuario.findOne({ where: { cedula } });
+    if (existingCedula) {
+      return res.status(409).send('Ya existe un usuario registrado con esa cedula.');
     }
 
     const saltRounds = 10;
@@ -201,7 +207,7 @@ exports.register = async (req, res) => {
       nombres,
       apellidos,
       telefono,
-      email,
+      email: normalizedEmail,
       direccion,
       role,
       password: hash,
@@ -246,6 +252,15 @@ exports.register = async (req, res) => {
       tokenType: 'Bearer',
     });
   } catch (error) {
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      const field = error.fields && error.fields.email ? 'correo' : 'cedula';
+      return res.status(409).send(`Ya existe un usuario registrado con ese ${field}.`);
+    }
+    if (error.name === 'SequelizeValidationError') {
+      return res.status(400).send({
+        error: error.errors.map((validationError) => validationError.message),
+      });
+    }
     console.log('ERROR', error);
     const responseError = {
       message: 'Something bad happened!',

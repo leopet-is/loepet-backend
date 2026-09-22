@@ -13,7 +13,6 @@ const router = express.Router();
 
 router.get(
   '/',
-  passport,
   validations.allAnimals,
   AsyncWrapper(animalController.getAllAnimals),
 );

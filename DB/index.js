@@ -7,6 +7,24 @@ require('dotenv').config();
 const basename = path.basename(__filename);
 const db = {};
 
+// Guard de seguridad (TEST).
+//
+// Los tests E2E crean datos (usuarios, fundaciones, manadas, comisiones...) y
+// NO los borran (por restricciones de FK). Si corren contra la BD remota de
+// Supabase, la contaminan. Este guard aborta SIEMPRE que el codigo se ejecute
+// bajo un runner de tests (jest) y la BD no sea local.
+if (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID) {
+  const testUrl = process.env.DATABASE_URL || '';
+  const esLocal = /localhost|127\.0\.0\.1/.test(testUrl);
+  if (!esLocal) {
+    throw new Error(
+      '[SEGURIDAD TEST] Los tests deben ejecutarse contra una BD local. '
+      + `DATABASE_URL=${testUrl} apunta a una BD remota. `
+      + 'Configura: DATABASE_URL=postgresql://leopet:leopet@localhost:5432/leopet_dev y DB_SSL=false.',
+    );
+  }
+}
+
 // Forzar SSL en produccion (Supabase/Render) o cuando DB_SSL=true.
 // Si DB_SSL se define explicitamente (true/false) esa decision manda
 // (p. ej. local: NODE_ENV=production + DB_SSL=false para Postgres local sin TLS).

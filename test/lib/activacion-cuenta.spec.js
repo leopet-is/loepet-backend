@@ -27,7 +27,7 @@ describe('Flujo de activacion de cuenta de fundacion', () => {
     direccion: 'Quito, Ecuador',
     telefono: '0987654321',
     email_contacto: EMAIL,
-    cedula_contacto: '1710034065',
+    cedula_contacto: '1710034017',
     nombre_contacto: 'Ana',
     apellido_contacto: 'Gutierrez',
     ...overrides,
@@ -163,6 +163,24 @@ describe('Flujo de activacion de cuenta de fundacion', () => {
         .send({ token: tokenActivacion, password: 'corta' });
 
       expect(res.status).toBe(400);
+    });
+
+    it('rechaza activar la cuenta con un token expirado (410)', async () => {
+      await db.TokenActivacion.update(
+        { expires_at: dayjs().subtract(1, 'hour').toDate() },
+        { where: { usuario_id: usuarioId } },
+      );
+
+      const res = await request(app)
+        .post('/auth/activar-cuenta')
+        .send({ token: tokenActivacion, password: WITH_PASSWORD });
+
+      expect(res.status).toBe(410);
+
+      await db.TokenActivacion.update(
+        { expires_at: dayjs().add(24, 'hour').toDate() },
+        { where: { usuario_id: usuarioId } },
+      );
     });
 
     it('activa la cuenta con contrasena valida (200)', async () => {

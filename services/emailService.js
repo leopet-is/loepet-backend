@@ -13,6 +13,16 @@ const getFrom = () => process.env.RESEND_FROM
   || process.env.MAIL_FROM
   || 'LEOPET <no-reply@leopet.app>';
 
+// Resend en modo de prueba usa el dominio resend.dev y solo permite enviar al
+// correo asociado a la cuenta. Con un dominio propio se conserva el destinatario real.
+const isResendTestSender = () => getFrom().toLowerCase().includes('@resend.dev');
+
+const getRecipient = (to, driver) => (
+  driver === 'resend' && isResendTestSender() && process.env.RESEND_TO
+    ? process.env.RESEND_TO
+    : to
+);
+
 let resendClient;
 
 const getResendClient = () => {
@@ -26,9 +36,10 @@ const sendMail = async ({
   to, subject, text, html,
 }) => {
   const driver = getDriver();
+  const recipient = getRecipient(to, driver);
   const mail = {
     from: getFrom(),
-    to,
+    to: recipient,
     subject,
     text,
     html: html || text,
@@ -85,8 +96,40 @@ Si no solicitaste este registro, ignora este correo.`;
   });
 };
 
+/**
+ * Envia el correo de rechazo de una solicitud de fundacion.
+ * @param  {Object}  params
+ * @param  {String}  params.to       correo receptor
+ * @param  {String}  params.nombre   nombre del contacto (para saludar)
+ * @param  {String}  params.motivo   motivo informado por el administrador
+ * @return {Object}  result de sendMail ({ messageId, driver })
+ */
+const sendRejectionEmail = async ({ to, nombre, motivo }) => {
+  const subject = 'Actualizacion de tu solicitud de fundacion en LEOPET';
+  const text = `Hola ${nombre || 'Fundacion'},
+
+Tu solicitud de fundacion no fue aprobada en esta ocasion.
+
+Motivo: ${motivo}
+
+Si necesitas mas informacion, contacta al equipo de LEOPET.`;
+  const html = `<p>Hola <strong>${nombre || 'Fundacion'}</strong>,</p>
+<p>Tu solicitud de fundacion no fue aprobada en esta ocasion.</p>
+<p><strong>Motivo:</strong> ${motivo}</p>
+<p>Si necesitas mas informacion, contacta al equipo de LEOPET.</p>`;
+
+  return sendMail({
+    to,
+    subject,
+    text,
+    html,
+  });
+};
+
 module.exports = {
   sendMail,
   sendActivationEmail,
+  sendRejectionEmail,
+  getRecipient,
   getDriver,
 };

@@ -28,11 +28,11 @@ async function seed() {
 
     // ---- USUARIOS ----
     const users = await db.Usuario.bulkCreate([
-      { id: 1, cedula: '0909090909', nombres: 'Johanna', apellidos: 'Lopez', telefono: '0909090909', email: 'donador@gmail.com', password: pw, role: 3, createdAt: OLD, updatedAt: OLD },
+      { id: 1, cedula: '0909090901', nombres: 'Johanna', apellidos: 'Lopez', telefono: '0909090909', email: 'donador@gmail.com', password: pw, role: 3, createdAt: OLD, updatedAt: OLD },
       { id: 2, cedula: '0808080808', nombres: 'Alexandra', apellidos: 'Ramos', telefono: '0808080808', email: 'admin@gmail.com', password: pw, role: 1, createdAt: OLD, updatedAt: OLD },
-      { id: 3, cedula: '0909090909', nombres: 'Cecilia', apellidos: 'Castillo', telefono: '0909090909', direccion: 'Florida', email: 'colitafeliz@gmail.com', password: pw, role: 2, createdAt: OLD, updatedAt: new Date('2022-03-16T06:07:15') },
-      { id: 4, cedula: '0909090909', nombres: 'Ricardo', apellidos: 'Silva', telefono: '0909090909', direccion: 'Ceibos', email: 'refugiohuellitas@gmail.com', password: pw, role: 2, createdAt: new Date('2022-03-16T06:25:51'), updatedAt: new Date('2022-03-16T06:25:51') },
-      { id: 5, cedula: '0808080808', nombres: 'Cristian', apellidos: 'Pincay', telefono: '0909090909', direccion: 'Sauces', email: 'leopet@gmail.com', password: pw, role: 2, createdAt: new Date('2022-03-16T06:34:00'), updatedAt: new Date('2022-03-16T06:34:00') },
+      { id: 3, cedula: '0909090903', nombres: 'Cecilia', apellidos: 'Castillo', telefono: '0909090903', direccion: 'Florida', email: 'colitafeliz@gmail.com', password: pw, role: 2, createdAt: OLD, updatedAt: new Date('2022-03-16T06:07:15') },
+      { id: 4, cedula: '0909090904', nombres: 'Ricardo', apellidos: 'Silva', telefono: '0909090904', direccion: 'Ceibos', email: 'refugiohuellitas@gmail.com', password: pw, role: 2, createdAt: new Date('2022-03-16T06:25:51'), updatedAt: new Date('2022-03-16T06:25:51') },
+      { id: 5, cedula: '0808080805', nombres: 'Cristian', apellidos: 'Pincay', telefono: '0909090905', direccion: 'Sauces', email: 'leopet@gmail.com', password: pw, role: 2, createdAt: new Date('2022-03-16T06:34:00'), updatedAt: new Date('2022-03-16T06:34:00') },
       { id: 6, cedula: '0000000000', nombres: 'Johanna Lopez', apellidos: 'NN', telefono: 'NN', direccion: 'NN', email: 'johannalopez@gmail.com', password: pw, role: 3, createdAt: new Date('2022-03-23T20:03:03'), updatedAt: new Date('2022-03-23T20:03:03') },
       { id: 8, cedula: '0909010203', nombres: 'Alex', apellidos: 'Vera', telefono: '0101020105', email: 'alex@gmail.com', password: pw, role: 3, createdAt: new Date('2022-08-21T04:09:36'), updatedAt: new Date('2022-08-21T04:09:36') },
       { id: 9, cedula: '0909090102', nombres: 'Sofia', apellidos: 'Castro', telefono: '0909090807', email: 'sofiacastro@gmail.com', password: pw, role: 3, createdAt: new Date('2022-08-21T13:41:47'), updatedAt: new Date('2022-08-21T13:41:47') },
@@ -121,7 +121,7 @@ async function seed() {
       { manada_id: 28, animal_id: 15, createdAt: new Date('2022-08-21T13:44:20'), updatedAt: new Date('2022-08-21T13:44:20') },
       { manada_id: 28, animal_id: 12, createdAt: new Date('2022-08-21T13:44:28'), updatedAt: new Date('2022-08-21T13:44:28') },
       { manada_id: 28, animal_id: 3, createdAt: new Date('2022-08-21T13:44:40'), updatedAt: new Date('2022-08-21T13:44:40') },
-      { manada_id: 10, animal_id: 17, createdAt: new Date('2022-08-23T21:58:00'), updatedAt: new Date('2022-08-23T21:58:00') },
+      { manada_id: 10, animal_id: 14, createdAt: new Date('2022-08-23T21:58:00'), updatedAt: new Date('2022-08-23T21:58:00') },
     ]);
     console.log('  21 manada_animal');
 

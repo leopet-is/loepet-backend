@@ -13,11 +13,10 @@ const router = express.Router();
 
 router.post('/', passport, validations.createFundacion, AsyncWrapper(fundacionController.createFundacion));
 
-router.get('/', passport, AsyncWrapper(fundacionController.getFundaciones));
+router.get('/', AsyncWrapper(fundacionController.getFundaciones));
 
 router.get(
   '/animales',
-  passport,
   AsyncWrapper(fundacionController.getAnimalFundaciones),
 );
 

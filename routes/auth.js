@@ -12,7 +12,7 @@ const validations = require('../controllers/validations');
 const router = express.Router();
 
 router.post('/login', validations.login, AsyncWrapper(loginController.login));
-router.post('/register', AsyncWrapper(loginController.register));
+router.post('/register', validations.register, AsyncWrapper(loginController.register));
 
 // Activacion de cuentas de fundacion (publico)
 router.get(

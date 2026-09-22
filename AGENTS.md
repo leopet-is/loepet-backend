@@ -12,6 +12,11 @@ npm start                  # http://localhost:8181
 npm run start:test         # test env (uses NODE_ENV=test)
 ```
 
+> Local dev (`npm start`) points at the **Supabase remote DB** (the `DATABASE_URL`
+> in `.env`). The Docker `postgres` is used for tests/migrations only (see below),
+> and the `leopet-app` container on 8181 may serve an **older build** (rebuild with
+> `docker compose up -d --build app`).
+
 ## Commands
 
 | Command | What it does |
@@ -51,6 +56,14 @@ docker compose up -d --build         # all services
 - `leopet-postgres` on port 5432 (`leopet_dev`/`leopet`/`leopet`)
 - App healthcheck: `GET /api/health`
 - API docs: `http://localhost:8181/api-docs` (Scalar/OpenAPI)
+
+## Env notes
+
+`.env` (gitignored) points `DATABASE_URL` at **Supabase** and sets `DB_SSL=true`
+(Supabase requires SSL). Because `NODE_ENV=development`, SSL only happens when
+`DB_SSL` is set explicitly. Test/local-postgres runs override both vars (see above).
+The Supabase project used to be paused; when that happens connections fail with
+`XX000 tenant/user postgres.<ref> not found` until it is resumed in the dashboard.
 
 ## Non-Obvious Facts
 
@@ -120,8 +133,16 @@ Pre-existing lint errors exist in `controllers/uploadController.js` (not blockin
 
 ## Seeding
 
-`scripts/seed-v2.js` bulk-creates users with password `Leopet2025!` (different from
-README credentials). Seed RUCs use invalid checksums (they bypass model validation).
+`scripts/seed-v2.js` bulk-creates users with password `Leopet2025!` (same as README,
+which documents it). Seed RUCs use invalid checksums (they bypass model validation).
+
+### Tests are safe from the remote DB (hard guard)
+`DB/index.js` throws immediately when running under Jest (`NODE_ENV=test` or
+`JEST_WORKER_ID`) if `DATABASE_URL` is NOT local (localhost/127.0.0.1). The npm
+scripts `test`, `test:watch` and `test:unit` already inject the local URL via
+`cross-env`, so even if `.env` points at Supabase the suite cannot touch it.
+Anything that imports `DB` inside Jest aborts fast — never point tests at the
+remote DB.
 
 Do NOT add Sequelize `validate` to `fundacion.ruc` or `solicitudes_fundacion.ruc` --
 it would break the seed script and historical rows.
@@ -130,5 +151,5 @@ it would break the seed script and historical rows.
 
 - Remote: `origin/master`
 - Branch: `master`
-- Push has been deferred by user decision (multiple commits ahead of origin)
+- Push is synced with origin (no pending commits) as of `6a02cb7` (apadrinamiento refactor)
 - `.gitlab-ci.yml` runs on merge_requests, main, and develop
