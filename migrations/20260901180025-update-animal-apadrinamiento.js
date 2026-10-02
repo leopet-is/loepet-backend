@@ -65,6 +65,14 @@ module.exports = {
     //    - ADOPTADO -> INACTIVO (retirado del programa; el dato historico se
     //                  conserva aunque el ciclo de adopcion ya no aplica).
     // -----------------------------------------------------------------
+
+    await seq.query(`ALTER TABLE "animal" ALTER COLUMN "status" DROP DEFAULT;`);
+
+    await seq.query(`
+      ALTER TABLE "animal" ALTER COLUMN "status" TYPE VARCHAR(50)
+      USING ("status"::text);
+    `);
+
     await seq.query(`
       UPDATE animal SET status = 'INACTIVO'
       WHERE status = 'ADOPTADO';
@@ -78,13 +86,14 @@ module.exports = {
     // -----------------------------------------------------------------
     // 4. Convertir status a ENUM de 5 valores (idempotente).
     // -----------------------------------------------------------------
-    if (!(await typeExists(seq, 'enum_animal_status'))) {
-      await seq.query(`
-        CREATE TYPE "enum_animal_status" AS ENUM (
-          'REQUIERE_PADRINOS', 'APADRINADO', 'EN_TRATAMIENTO', 'FALLECIDO', 'INACTIVO'
-        );
-      `);
-    }
+    await seq.query(`DROP TYPE IF EXISTS "enum_animal_status";`);
+
+    await seq.query(`
+      CREATE TYPE "enum_animal_status" AS ENUM (
+        'REQUIERE_PADRINOS', 'APADRINADO', 'EN_TRATAMIENTO', 'FALLECIDO', 'INACTIVO'
+      );
+    `);
+
     await seq.query(`
       ALTER TABLE "animal" ALTER COLUMN "status" TYPE "enum_animal_status"
       USING ("status"::text::"enum_animal_status");
