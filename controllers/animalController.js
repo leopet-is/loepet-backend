@@ -4,9 +4,10 @@ const { Op } = require('sequelize');
 
 const { STATUS_ANIMAL } = require('../constants');
 const {
+  getAnimalView,
   getFundacionInfo,
   getHistorialAnimal,
-  parseData,
+  serializeAnimal,
   validateAdminFund,
   validateUpdateAnimal,
 } = require('./helpers');
@@ -84,9 +85,7 @@ const db = require('../DB/index');
  * /animal/app:
  *   get:
  *     tags: [Animales]
- *     security:
- *       - bearerAuth: []
- *     summary: Obtiene los animales visibles para la aplicacion movil con paginacion
+ *     summary: Alias compatible de GET /animal con paginacion y vista por rol
  *     parameters:
  *       - in: query
  *         name: tipoAnimal
@@ -111,9 +110,7 @@ const db = require('../DB/index');
  * /animal/app/fundacion/{fundacionId}:
  *   get:
  *     tags: [Animales]
- *     security:
- *       - bearerAuth: []
- *     summary: Obtiene los animales visibles de una fundacion con paginacion
+ *     summary: Alias compatible de GET /animal filtrado por fundacion y vista por rol
  *     parameters:
  *       - in: path
  *         name: fundacionId
@@ -231,7 +228,7 @@ const db = require('../DB/index');
  *     tags: [Animales]
  *     security:
  *       - bearerAuth: []
- *     summary: Elimina un animal (borrado logico, rol administrador de fundacion)
+ *     summary: Elimina un animal (rol administrador de fundacion)
  *     parameters:
  *       - in: path
  *         name: animalId
@@ -335,42 +332,41 @@ exports.updateAnimal = async (req, res) => {
       vacunacion,
       desparasitacion,
     } = req.body;
-    const response = {
-      result: [],
-    };
-    if (
-      (await validateAdminFund(User.id))
-      && (await validateUpdateAnimal(User.fundacionId, animalId))
-    ) {
-      const update = {
-        ...(!_.isEmpty(nombre) ? { nombre } : {}),
-        ...(!_.isEmpty(especie) ? { especie } : {}),
-        ...(!_.isEmpty(raza) ? { raza } : {}),
-        ...(!_.isEmpty(descripcion) ? { descripcion } : {}),
-        ...(!_.isEmpty(galeria) ? { galeria } : {}),
-        sexo,
-        fecha_nacimiento_estimada,
-        peso,
-        monto_meta_mensual,
-        monto_recaudado_actual,
-        enfermedades,
-        esterilizacion,
-        vacunacion,
-        desparasitacion,
-        updatedAt: Date.now(),
-      };
-      const animal = await db.Animal.update(update, {
-        where: { id: animalId, fundacion_id: User.fundacionId },
-      });
-
-      // Obtener el animal actualizado para notificaciones
-      const animalActualizado = await db.Animal.findByPk(animalId);
-      crearNotificacionesAlerta(animalActualizado);
-
-      response.mensaje = 'Informacion del animal actualizada.';
-      response.result = animal;
+    if (!(await validateAdminFund(User.id))) {
+      return res.status(401).send({ error: 'No esta autorizado para realizar esta operacion!' });
     }
-    return res.send(response);
+    if (!(await validateUpdateAnimal(User.fundacionId, animalId))) {
+      return res.status(404).send({ error: 'Animal no encontrado en la fundacion' });
+    }
+
+    const update = {
+      ...(!_.isEmpty(nombre) ? { nombre } : {}),
+      ...(!_.isEmpty(especie) ? { especie } : {}),
+      ...(!_.isEmpty(raza) ? { raza } : {}),
+      ...(!_.isEmpty(descripcion) ? { descripcion } : {}),
+      ...(!_.isEmpty(galeria) ? { galeria } : {}),
+      ...(_.isUndefined(sexo) ? {} : { sexo }),
+      ...(_.isUndefined(fecha_nacimiento_estimada) ? {} : { fecha_nacimiento_estimada }),
+      ...(_.isUndefined(peso) ? {} : { peso }),
+      ...(_.isUndefined(monto_meta_mensual) ? {} : { monto_meta_mensual }),
+      ...(_.isUndefined(monto_recaudado_actual) ? {} : { monto_recaudado_actual }),
+      ...(_.isUndefined(enfermedades) ? {} : { enfermedades }),
+      ...(_.isUndefined(esterilizacion) ? {} : { esterilizacion }),
+      ...(_.isUndefined(vacunacion) ? {} : { vacunacion }),
+      ...(_.isUndefined(desparasitacion) ? {} : { desparasitacion }),
+      updatedAt: Date.now(),
+    };
+    await db.Animal.update(update, {
+      where: { id: animalId, fundacion_id: User.fundacionId },
+    });
+
+    const animalActualizado = await db.Animal.findByPk(animalId);
+    crearNotificacionesAlerta(animalActualizado);
+
+    return res.send({
+      mensaje: 'Informacion del animal actualizada.',
+      result: animalActualizado,
+    });
   } catch (error) {
     console.log('ERROR', error);
     const responseError = {
@@ -391,19 +387,62 @@ exports.updateAnimal = async (req, res) => {
 exports.getAllAnimals = async (req, res) => {
   try {
     const { User } = req;
-    const { especie } = req.query;
+    const especie = req.query.especie || req.query.tipoAnimal;
     const manadaId = req.query.manada ? parseInt(req.query.manada, 10) : null;
+    const fundacionId = req.params.fundacionId || req.query.fundacionId;
     const { q } = req.query;
     const page = parseInt(req.query.page || '1', 10);
     const limit = parseInt(req.query.limit || '1', 10);
-    let total;
-    let query = {};
-    let responseBody;
+    const view = getAnimalView(User);
+    let total = 0;
     let result = [];
-    if (!manadaId) {
-      query = {
+
+    if (manadaId) {
+      if (!User) return res.status(401).send({ error: 'Token no proporcionado' });
+      const responseManada = await db.Manada.findOne({
         where: {
-          ...(!_.isEmpty(especie) ? { especie } : {}),
+          id: manadaId,
+        },
+      });
+      if (!responseManada || !_.isEqual(responseManada.userId, User.id)) {
+        return res.send({
+          limit, page, totalPages: 0, total: 0, result,
+        });
+      }
+      const relations = await db.ManadaAnimal.findAndCountAll({
+        where: {
+          manada_id: manadaId,
+        },
+        offset: (page - 1) * limit,
+        limit,
+      });
+      total = relations.count;
+      result = await Promise.all(relations.rows.map(async (relation) => {
+        const animal = await db.Animal.findOne({
+          where: { id: relation.animal_id, visible: true },
+        });
+        if (!animal) return null;
+        const fundacion = await getFundacionInfo(animal.fundacion_id);
+        const historial = await getHistorialAnimal(User.id, animal.id);
+        return serializeAnimal(animal, fundacion, historial || {}, view);
+      }));
+      result = result.filter(Boolean);
+    } else {
+      const approvedFoundations = await db.Fundacion.findAll({
+        where: {
+          aprobado: true,
+          ...(fundacionId ? { id: fundacionId } : {}),
+        },
+        attributes: ['id'],
+        raw: true,
+      });
+      const normalizedSpecies = _.toUpper(especie);
+      const query = {
+        where: {
+          fundacion_id: { [Op.in]: approvedFoundations.map((foundation) => foundation.id) },
+          ...(!_.isEmpty(normalizedSpecies) && normalizedSpecies !== 'TODOS'
+            ? { especie: _.includes(['PERRO', 'GATO', 'OTRO'], normalizedSpecies) ? normalizedSpecies : 'OTRO' }
+            : {}),
           ...(!_.isEmpty(q) ? { nombre: { [Op.regexp]: q } } : {}),
           visible: true,
         },
@@ -411,103 +450,14 @@ exports.getAllAnimals = async (req, res) => {
         offset: (page - 1) * limit,
         limit,
       };
-      responseBody = await db.Animal.findAndCountAll(query);
-      const { rows, count } = responseBody;
-      total = count;
-      result = await Promise.all(rows.map(async (animals) => {
-        const fundacionId = _.get(animals, 'fundacion_id');
-        const fundacion = await getFundacionInfo(fundacionId);
-        return parseData(animals, fundacion);
+      const responseBody = await db.Animal.findAndCountAll(query);
+      total = responseBody.count;
+      result = await Promise.all(responseBody.rows.map(async (animal) => {
+        const fundacion = await getFundacionInfo(animal.fundacion_id);
+        return serializeAnimal(animal, fundacion, {}, view);
       }));
-    } else {
-      query = {
-        where: {
-          id: manadaId,
-        },
-      };
-      const responseManada = await db.Manada.findOne(query);
-      if (
-        !_.isEmpty(responseManada)
-        && _.isEqual(responseManada.userId, User.id)
-      ) {
-        query = {
-          where: {
-            manada_id: manadaId,
-          },
-        };
-        responseBody = await db.ManadaAnimal.findAndCountAll(query);
-        const { rows, count } = responseBody;
-        total = count;
-        result = await Promise.all(rows.map(async (animal) => {
-          const animals = await db.Animal.findOne({
-            where: {
-              id: animal.animal_id,
-            },
-          });
-          const fundacionId = _.get(animals, 'fundacion_id');
-
-          const fundacion = await getFundacionInfo(fundacionId);
-          let historial = await getHistorialAnimal(User.id, animals.id);
-          if (_.isNull(historial)) {
-            historial = {};
-          }
-          return parseData(animals, fundacion, historial);
-        }));
-      } else {
-        total = 0;
-      }
-    }
-    const totalPages = Math.ceil(total / limit);
-    const response = {
-      limit,
-      page,
-      totalPages,
-      total,
-      result,
-    };
-    return res.send(response);
-  } catch (error) {
-    console.log('ERROR', error);
-    const responseError = {
-      message: 'Something bad happened!',
-      error: error.stack,
-    };
-    return res.status(500).send(JSON.stringify(responseError));
-  }
-};
-
-exports.getAllAnimalsApp = async (req, res) => {
-  try {
-    const { tipoAnimal } = req.query;
-    const page = parseInt(req.query.page || '1', 10);
-    const limit = parseInt(req.query.limit || '1', 10);
-    let total;
-    let query = {};
-    let responseBody;
-    query = {
-      where: {
-        visible: true,
-      },
-      order: [['id', 'DESC']],
-      offset: (page - 1) * limit,
-      limit,
-    };
-    if (!_.isEmpty(tipoAnimal) && tipoAnimal !== 'TODOS') {
-      const especieFiltro = _.toUpper(tipoAnimal);
-      query.where.especie = _.includes(['PERRO', 'GATO', 'OTRO'], especieFiltro)
-        ? especieFiltro
-        : 'OTRO';
     }
 
-    responseBody = await db.Animal.findAndCountAll(query);
-    const { rows, count } = responseBody;
-    total = count;
-    const result = await Promise.all(rows.map(async (animals) => {
-      const fundacionId = _.get(animals, 'fundacion_id');
-      const fundacion = await getFundacionInfo(fundacionId);
-      return parseData(animals, fundacion);
-    }));
-
     const totalPages = Math.ceil(total / limit);
     const response = {
       limit,
@@ -516,7 +466,6 @@ exports.getAllAnimalsApp = async (req, res) => {
       total,
       result,
     };
-
     return res.send(response);
   } catch (error) {
     console.log('ERROR', error);
@@ -528,52 +477,8 @@ exports.getAllAnimalsApp = async (req, res) => {
   }
 };
 
-exports.getAllAnimalsFundacionApp = async (req, res) => {
-  try {
-    const { fundacionId } = req.params;
-    const page = parseInt(req.query.page || '1', 10);
-    const limit = parseInt(req.query.limit || '1', 10);
-    let total;
-    let query = {};
-    let responseBody;
-    query = {
-      where: {
-        fundacion_id: fundacionId,
-        visible: true,
-      },
-      order: [['id', 'DESC']],
-      offset: (page - 1) * limit,
-      limit,
-    };
-
-    responseBody = await db.Animal.findAndCountAll(query);
-    const { rows, count } = responseBody;
-    total = count;
-    const result = await Promise.all(rows.map(async (animals) => {
-      const animalFundacionId = _.get(animals, 'fundacion_id');
-      const fundacion = await getFundacionInfo(animalFundacionId);
-      return parseData(animals, fundacion);
-    }));
-
-    const totalPages = Math.ceil(total / limit);
-    const response = {
-      limit,
-      page,
-      totalPages,
-      total,
-      result,
-    };
-
-    return res.send(response);
-  } catch (error) {
-    console.log('ERROR', error);
-    const responseError = {
-      message: 'Something bad happened!',
-      error: error.stack,
-    };
-    return res.status(500).send(JSON.stringify(responseError));
-  }
-};
+exports.getAllAnimalsApp = exports.getAllAnimals;
+exports.getAllAnimalsFundacionApp = exports.getAllAnimals;
 
 /**
  * Funcion para obtener todas las especies de los animales registrados en la BD
@@ -613,6 +518,7 @@ exports.getEspecies = async (req, res) => {
 exports.getAnimal = async (req, res) => {
   try {
     const { animalId } = req.params;
+    const view = getAnimalView(req.User);
     let result = [];
     const response = {
       result,
@@ -625,7 +531,8 @@ exports.getAnimal = async (req, res) => {
     if (_.isEmpty(responseBody)) {
       return res.send(response);
     }
-    result = responseBody;
+    const fundacion = await getFundacionInfo(responseBody.fundacion_id);
+    result = serializeAnimal(responseBody, fundacion, {}, view);
     response.result = result;
     return res.send(response);
   } catch (error) {
@@ -647,6 +554,7 @@ exports.getAnimal = async (req, res) => {
 exports.searchAnimal = async (req, res) => {
   try {
     const { q } = req.query;
+    const view = getAnimalView(req.User);
     let result = [];
     const response = {
       result,
@@ -658,7 +566,10 @@ exports.searchAnimal = async (req, res) => {
     if (_.isEmpty(responseBody)) {
       return res.send(response);
     }
-    result = responseBody;
+    result = await Promise.all(responseBody.map(async (animal) => {
+      const fundacion = await getFundacionInfo(animal.fundacion_id);
+      return serializeAnimal(animal, fundacion, {}, view);
+    }));
     response.result = result;
     return res.send(response);
   } catch (error) {
@@ -689,23 +600,16 @@ exports.deleteAnimal = async (req, res) => {
         .send({ error: 'No esta autorizado para realizar esta operacion!' });
     }
 
-    let mensaje = 'Animal eliminado exitosamente';
     const animal = await db.Animal.findOne({
-      where: { id: animalId, visible: true },
-    });
-    if (_.isEmpty(animal)) {
-      mensaje = 'Animal no encontrado';
-    }
-
-    const update = {
-      visible: false,
-      updatedAt: Date.now(),
-    };
-    await db.Animal.update(update, {
       where: { id: animalId, fundacion_id: User.fundacionId },
     });
+    if (_.isEmpty(animal)) {
+      return res.status(404).send({ error: 'Animal no encontrado' });
+    }
+
+    await db.Animal.destroy({ where: { id: animalId, fundacion_id: User.fundacionId } });
     const response = {
-      mensaje,
+      mensaje: 'Animal eliminado exitosamente',
       result: animal,
     };
     return res.send(response);

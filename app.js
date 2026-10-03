@@ -27,7 +27,6 @@ app.use('/manada', require('./routes/manada'));
 app.use('/usuario', require('./routes/usuario'));
 app.use('/donacion', require('./routes/donacion'));
 app.use('/reportes', require('./routes/report'));
-app.use('/evidencia', require('./routes/evidencia'));
 app.use('/cuenta', require('./routes/cuenta'));
 app.use('/actualizacion', require('./routes/actualizacion'));
 app.use('/notificacion', require('./routes/notificacion'));

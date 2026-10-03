@@ -7,13 +7,12 @@ const fundacionController = require('../controllers/fundacionController');
 
 // Middlewares
 const passport = require('../middlewares/passport');
+const optionalPassport = require('../middlewares/optionalPassport');
 const validations = require('../controllers/validations');
 
 const router = express.Router();
 
-router.post('/', passport, validations.createFundacion, AsyncWrapper(fundacionController.createFundacion));
-
-router.get('/', AsyncWrapper(fundacionController.getFundaciones));
+router.get('/', optionalPassport, AsyncWrapper(fundacionController.getFundaciones));
 
 router.get(
   '/animales',

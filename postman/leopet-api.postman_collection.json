@@ -64,7 +64,6 @@
         { "name": "Animales de fundaciones (publico)", "request": { "auth": { "type": "noauth" }, "method": "GET", "url": "{{baseUrl}}/fundacion/animales" } },
         { "name": "Padrinos de fundacion", "request": { "method": "GET", "url": "{{baseUrl}}/fundacion/padrinos/{{fundacionId}}" } },
         { "name": "Calificacion de padrinos", "request": { "method": "GET", "url": "{{baseUrl}}/fundacion/padrinos/calificacion/{{fundacionId}}" } },
-        { "name": "Crear fundacion", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"ruc\": \"0998887776001\",\n  \"nombre\": \"Fundacion Postman\",\n  \"direccion\": \"Guayaquil\",\n  \"telefono\": \"0998887776\",\n  \"descripcion\": \"Fundacion de prueba\"\n}" }, "url": "{{baseUrl}}/fundacion" } },
         { "name": "Actualizar fundacion", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Colita Feliz Actualizada\",\n  \"direccion\": \"Urdesa\",\n  \"telefono\": \"0911111111\"\n}" }, "url": "{{baseUrl}}/fundacion/{{fundacionId}}" } },
         { "name": "Cuenta bancaria principal", "request": { "method": "GET", "url": "{{baseUrl}}/cuenta/fundacion/{{fundacionId}}/principal" } },
         { "name": "Todas las cuentas bancarias", "request": { "method": "GET", "url": "{{baseUrl}}/cuenta/fundacion/{{fundacionId}}/all" } },

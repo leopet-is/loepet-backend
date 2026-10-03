@@ -12,6 +12,21 @@ const { STATUS_ANIMAL, ROL } = require('../constants');
  * @return {Object} response
  */
 exports.parseData = (animal, fundacion, historial = {}) => {
+  return exports.serializeAnimal(animal, fundacion, historial, 'full');
+};
+
+/**
+ * Determina la vista segun el rol del usuario
+ * @param  {Object} user
+ * @return {String} 'admin' | 'fundacion' | 'public'
+ */
+exports.getAnimalView = (user) => {
+  if (user?.role === ROL.ADMIN.ROL_ID) return 'admin';
+  if (user?.role === ROL.ADMIN_FUND.ROL_ID) return 'fundacion';
+  return 'public';
+};
+
+exports.serializeAnimal = (animal, fundacion, historial = {}, view = 'public') => {
   const data = {
     id: _.get(animal, 'id'),
     nombre: _.get(animal, 'nombre'),
@@ -19,23 +34,36 @@ exports.parseData = (animal, fundacion, historial = {}) => {
     especie: _.get(animal, 'especie'),
     raza: _.get(animal, 'raza'),
     descripcion: _.get(animal, 'descripcion'),
-    fecha_nacimiento_estimada: _.get(animal, 'fecha_nacimiento_estimada'),
-    sexo: _.get(animal, 'sexo'),
-    peso: _.get(animal, 'peso'),
-    enfermedades: _.get(animal, 'enfermedades'),
-    esterilizacion: _.get(animal, 'esterilizacion'),
-    vacunacion: _.get(animal, 'vacunacion'),
-    desparasitacion: _.get(animal, 'desparasitacion'),
-    fecha_rescate: _.get(animal, 'fecha_rescate'),
-    fecha_registro: _.get(animal, 'fecha_registro'),
     imagen: _.get(animal, 'imagen'),
     galeria: _.get(animal, 'galeria'),
     fundacion_id: _.get(animal, 'fundacion_id'),
     fundacion: _.get(fundacion, 'nombre'),
-    ...(!_.isEmpty(historial) ? { historial } : {}),
-    createdAt: _.get(animal, 'createdAt'),
-    updatedAt: _.get(animal, 'updatedAt'),
   };
+
+  if (view === 'fundacion' || view === 'admin' || view === 'full') {
+    Object.assign(data, {
+      fecha_nacimiento_estimada: _.get(animal, 'fecha_nacimiento_estimada'),
+      sexo: _.get(animal, 'sexo'),
+      peso: _.get(animal, 'peso'),
+      enfermedades: _.get(animal, 'enfermedades'),
+      esterilizacion: _.get(animal, 'esterilizacion'),
+      vacunacion: _.get(animal, 'vacunacion'),
+      desparasitacion: _.get(animal, 'desparasitacion'),
+      fecha_rescate: _.get(animal, 'fecha_rescate'),
+      fecha_registro: _.get(animal, 'fecha_registro'),
+    });
+  }
+
+  if (view === 'admin' || view === 'full') {
+    Object.assign(data, {
+      monto_meta_mensual: _.get(animal, 'monto_meta_mensual'),
+      monto_recaudado_actual: _.get(animal, 'monto_recaudado_actual'),
+      createdAt: _.get(animal, 'createdAt'),
+      updatedAt: _.get(animal, 'updatedAt'),
+    });
+  }
+
+  if (!_.isEmpty(historial)) data.historial = historial;
   return data;
 };
 
@@ -49,7 +77,7 @@ exports.parseDataActualizacion = (
     fecha: _.get(actualizacion, 'fecha'),
     descripcion: _.get(actualizacion, 'descripcion'),
     estado_salud: _.get(actualizacion, 'estado_salud'),
-    image: _.get(actualizacion, 'image'),
+    image: _.get(actualizacion, 'imagen'),
     calificacion: _.get(actualizacion, 'calificacion'),
     fundacion_id: _.get(actualizacion, 'fundacion_id'),
     fundacion: _.get(fundacion, 'nombre'),
@@ -108,7 +136,7 @@ exports.parseDataNotificacion = (
       fecha: _.get(actualizacion, 'fecha'),
       descripcion: _.get(actualizacion, 'descripcion'),
       estado_salud: _.get(actualizacion, 'estado_salud'),
-      image: _.get(actualizacion, 'image'),
+      image: _.get(actualizacion, 'imagen'),
       fundacion_id: _.get(actualizacion, 'fundacion_id'),
       fundacion: _.get(fundacion, 'nombre'),
       galeria: _.get(actualizacion, 'galeria'),
@@ -336,37 +364,25 @@ exports.getCuentaBancaria = async (fundacionId) => {
 };
 
 /**
- * Funcion para obtener el historial de donaciones de una animal en especifico
+ * Funcion para obtener el historial de actualizaciones de un animal en especifico
  * @param  {Int} donadorId
  * @param  {Int} animalId
  * @return {Object} response
  */
 exports.getHistorialAnimal = async (donadorId, animalId) => {
   try {
-    const historial = await db.Donacion.findAll({
+    const historial = await db.ActualizacionAnimal.findAll({
       where: {
-        donador_id: donadorId,
         animal_id: animalId,
+        visible: true,
       },
       order: [['id', 'DESC']],
       limit: 10,
-      raw: true,
     });
-    if (_.isNull(historial)) {
+    if (_.isEmpty(historial)) {
       return [];
     }
-    const evidencias = await Promise.all(historial.map(async (evidencia) => {
-      const evidenciaAnimal = await db.Evidencia.findOne({
-        where: {
-          donacion_id: evidencia.id,
-        },
-      });
-      return {
-        ...evidencia,
-        evidencia: !_.isEmpty(evidenciaAnimal) ? evidenciaAnimal : {},
-      };
-    }));
-    return evidencias;
+    return historial;
   } catch (error) {
     console.log('ERROR', error);
     const responseError = {
@@ -457,19 +473,18 @@ exports.changeStatus = async (animalId, montoDonacion = 0) => {
 };
 
 /**
- * Funcion para obtener las evidencias relacionadas a una donacion
- * @param  {int} donacionId
- * @return {Object} response
+ * Funcion para obtener las actualizaciones visibles de un animal
+ * @param  {int} animalId
+ * @return {Array} response
  */
-exports.getEvidencia = async (donacionId) => {
+exports.getActualizacionesAnimal = async (animalId) => {
   try {
-    let evidencia = await db.Evidencia.findOne({
-      where: { donacion_id: donacionId },
+    const actualizaciones = await db.ActualizacionAnimal.findAll({
+      where: { animal_id: animalId, visible: true },
+      order: [['id', 'DESC']],
+      limit: 10,
     });
-    if (_.isEmpty(evidencia)) {
-      evidencia = {};
-    }
-    return evidencia;
+    return actualizaciones;
   } catch (error) {
     throw new Error(error);
   }

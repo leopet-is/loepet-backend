@@ -111,6 +111,7 @@ module.exports = (sequelize, DataTypes) => {
       fecha_registro: {
         type: DataTypes.DATEONLY,
         allowNull: true,
+        defaultValue: DataTypes.NOW,
       },
       esterilizacion: {
         type: DataTypes.BOOLEAN,

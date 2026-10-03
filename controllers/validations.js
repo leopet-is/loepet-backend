@@ -501,56 +501,6 @@ module.exports.createSolicitudFundacion = [
   validate,
 ];
 
-/* Validaciones para crear una fundacion (rol administrador de plataforma) */
-module.exports.createFundacion = [
-  body('ruc')
-    .exists()
-    .withMessage('Es necesario el campo ruc')
-    .trim()
-    .isString()
-    .matches(/^\d{13}$/)
-    .withMessage('El ruc debe tener exactamente 13 digitos numericos')
-    .custom((value) => esRucValido(value))
-    .withMessage('El ruc no es un RUC ecuatoriano valido'),
-  body('nombre')
-    .exists()
-    .withMessage('Es necesario el campo nombre')
-    .trim()
-    .isString()
-    .notEmpty()
-    .withMessage('El campo nombre no puede estar vacio')
-    .isLength({ max: 150 })
-    .withMessage('El campo nombre no puede superar 150 caracteres'),
-  body('direccion')
-    .exists()
-    .withMessage('Es necesario el campo direccion')
-    .trim()
-    .isString()
-    .notEmpty()
-    .withMessage('El campo direccion no puede estar vacio')
-    .isLength({ max: 200 })
-    .withMessage('El campo direccion no puede superar 200 caracteres'),
-  body('telefono')
-    .optional()
-    .trim()
-    .isString()
-    .custom((value) => esTelefonoEcuador(value))
-    .withMessage('El telefono debe ser un numero de Ecuador valido (movil 09XXXXXXXX o fijo 0[2-7]XXXXXXX)'),
-  body('comision')
-    .optional()
-    .isFloat({ min: 0, max: 100 })
-    .withMessage('El campo comision debe ser un porcentaje entre 0 y 100'),
-  body('user_id')
-    .optional()
-    .isInt()
-    .withMessage('El campo user_id debe ser un numero entero'),
-  body('id')
-    .optional()
-    .isInt()
-    .withMessage('El campo id (solicitud) debe ser un numero entero'),
-  validate,
-];
-
 /* Validaciones para actualizar la informacion de una fundacion */
 module.exports.updateInfoFundacion = [
   body('ruc')
@@ -609,6 +559,74 @@ module.exports.createRating = [
   validate,
 ];
 
+/* Validaciones para Manadas */
+module.exports.createManada = [
+  body('nombre')
+    .exists()
+    .withMessage('Es necesario el campo nombre')
+    .isString()
+    .withMessage('El campo nombre debe ser de tipo String')
+    .trim()
+    .notEmpty()
+    .withMessage('El campo nombre no puede estar vacio'),
+  body('monto')
+    .optional()
+    .isInt()
+    .withMessage('El campo monto debe ser un numero entero'),
+  validate,
+];
+
+module.exports.manadaParam = [
+  param('manadaId')
+    .exists()
+    .withMessage('Es necesario el campo manadaId')
+    .isInt()
+    .withMessage('El campo manadaId debe ser un numero entero'),
+  validate,
+];
+
+module.exports.addAnimalsManada = [
+  param('manadaId')
+    .exists()
+    .withMessage('Es necesario el campo manadaId')
+    .isInt()
+    .withMessage('El campo manadaId debe ser un numero entero'),
+  body('animalId')
+    .exists()
+    .withMessage('Es necesario el campo animalId')
+    .isArray()
+    .withMessage('El campo animalId debe ser un arreglo de ids'),
+  body('animalId.*')
+    .isInt()
+    .withMessage('Cada animalId debe ser un numero entero'),
+  validate,
+];
+
+module.exports.animalManadaParam = [
+  param('manadaId')
+    .exists()
+    .withMessage('Es necesario el campo manadaId')
+    .isInt()
+    .withMessage('El campo manadaId debe ser un numero entero'),
+  param('animalId')
+    .exists()
+    .withMessage('Es necesario el campo animalId')
+    .isInt()
+    .withMessage('El campo animalId debe ser un numero entero'),
+  validate,
+];
+
+module.exports.searchManada = [
+  query('q')
+    .optional()
+    .isString()
+    .withMessage('El campo q debe ser de tipo String')
+    .trim()
+    .notEmpty()
+    .withMessage('El campo q no puede estar vacio'),
+  validate,
+];
+
 /* Validaciones para Donaciones */
 module.exports.crearDonacion = [
   body('manadaId')
@@ -656,38 +674,7 @@ module.exports.pagarDonacion = [
   validate,
 ];
 
-/* Validaciones para Evidencias */
-module.exports.crearEvidencia = [
-  body('donacion')
-    .exists()
-    .withMessage('Es necesario el campo donacion')
-    .isInt()
-    .withMessage('El campo donacion debe ser un numero entero'),
-  body('descripcion')
-    .optional()
-    .isString()
-    .withMessage('El campo descripcion debe ser de tipo String'),
-  validate,
-];
-
-module.exports.updateEvidencia = [
-  body('descripcion')
-    .optional()
-    .isString()
-    .withMessage('El campo descripcion debe ser de tipo String'),
-  body('galeria')
-    .optional()
-    .isObject()
-    .withMessage('El campo galeria debe ser un objeto'),
-  param('evidenciaId')
-    .exists()
-    .withMessage('Es necesario el campo evidenciaId')
-    .isInt()
-    .withMessage('El campo evidenciaId debe ser un numero entero'),
-  validate,
-];
-
-/* Validaciones para Actualizaciones de Animal */
+/* Validaciones para Actualizaciones de animales */
 module.exports.createActualizacion = [
   body('animal_id')
     .exists()
@@ -700,16 +687,28 @@ module.exports.createActualizacion = [
     .isInt()
     .withMessage('El campo fundacion_id debe ser un numero entero'),
   body('descripcion')
-    .optional()
+    .exists()
+    .withMessage('Es necesario el campo descripcion')
     .isString()
     .withMessage('El campo descripcion debe ser de tipo String'),
   body('estado_salud')
-    .optional()
+    .exists()
+    .withMessage('Es necesario el campo estado_salud')
     .isString()
     .withMessage('El campo estado_salud debe ser de tipo String')
     .trim()
+    .notEmpty()
+    .withMessage('El campo estado_salud no puede estar vacio')
     .isLength({ max: 50 })
     .withMessage('El campo estado_salud no puede superar 50 caracteres'),
+  body('imagen')
+    .exists()
+    .withMessage('Es necesario el campo imagen')
+    .isString()
+    .withMessage('El campo imagen debe ser de tipo String')
+    .trim()
+    .notEmpty()
+    .withMessage('El campo imagen no puede estar vacio'),
   body('fecha')
     .optional()
     .isISO8601()
@@ -729,6 +728,10 @@ module.exports.updateActualizacion = [
     .trim()
     .isLength({ max: 50 })
     .withMessage('El campo estado_salud no puede superar 50 caracteres'),
+  body('imagen')
+    .optional()
+    .isString()
+    .withMessage('El campo imagen debe ser de tipo String'),
   body('galeria')
     .optional()
     .isObject()
@@ -772,5 +775,25 @@ module.exports.activarCuenta = [
     .withMessage('La contrasena debe tener al menos 8 caracteres')
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&._-])[A-Za-z\d@$!%*#?&._-]+$/)
     .withMessage('La contrasena debe incluir minusculas, mayusculas, un numero y un caracter especial'),
+  validate,
+];
+
+/* Validacion para agregar una fundacion a favoritos (fundacionId en el body) */
+module.exports.agregarFavorito = [
+  body('fundacionId')
+    .exists()
+    .withMessage('Es necesario el campo fundacionId')
+    .isInt()
+    .withMessage('El campo fundacionId debe ser un número entero'),
+  validate,
+];
+
+/* Validacion para endpoints de favoritos que reciben fundacionId en la URL */
+module.exports.favoritoUrl = [
+  param('fundacionId')
+    .exists()
+    .withMessage('Es necesario el parametro fundacionId')
+    .isInt()
+    .withMessage('El parametro fundacionId debe ser un número entero'),
   validate,
 ];

@@ -52,12 +52,8 @@ const authenticateToken = async (req, res, next) => {
     req.User = data;
     return next();
   } catch (error) {
-    console.log('ERROR in authenticateToken:', error); // Modified log
-    const responseError = {
-      message: 'Token expirado',
-      error: error.stack,
-    };
-    return res.status(401).json(responseError);
+    console.log('ERROR in authenticateToken:', error);
+    return res.status(401).json({ error: 'Token expirado o invalido' });
   }
 };
 

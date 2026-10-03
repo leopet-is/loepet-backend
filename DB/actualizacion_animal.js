@@ -29,15 +29,15 @@ module.exports = (sequelize, DataTypes) => {
       },
       descripcion: {
         type: DataTypes.TEXT,
-        allowNull: true,
+        allowNull: false,
       },
       estado_salud: {
         type: DataTypes.STRING(50),
-        allowNull: true,
+        allowNull: false,
       },
       imagen: {
         type: DataTypes.STRING(500),
-        allowNull: true,
+        allowNull: false,
       },
       calificacion: {
         type: DataTypes.INTEGER,

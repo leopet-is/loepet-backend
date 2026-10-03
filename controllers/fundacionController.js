@@ -1,13 +1,11 @@
 /* eslint-disable no-await-in-loop, no-console */
 
 const _ = require('lodash');
-const bcrypt = require('bcrypt');
 const { Op } = require('sequelize');
 
 const {
+  getAnimalView,
   getCuentaBancaria,
-  validateFundacion,
-  validateSuperAdmin,
   parseDataPadrinosAnimal,
   parseDataAnimalComision,
 } = require('./helpers');
@@ -20,36 +18,6 @@ const db = require('../DB/index');
  *   - name: Fundaciones
  *
  * /fundacion:
- *   post:
- *     tags: [Fundaciones]
- *     security:
- *       - bearerAuth: []
- *     summary: Crea una fundacion (rol administrador de plataforma)
- *     description: Tambien se puede utilizar para aprobar/crear la fundacion ligada a una solicitud enviando `id` (solicitud) y `user_id`.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/FundacionRequest'
- *     responses:
- *       '200':
- *         description: Fundacion creada exitosamente
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 mensaje: { type: string }
- *                 result: { $ref: '#/components/schemas/Fundacion' }
- *       '400':
- *         description: Error de validacion de los datos de entrada (formato de RUC/cedula/telefono o digito verificador incorrecto)
- *       '401':
- *         description: No autorizado para realizar la operacion
- *       '409':
- *         description: Ya existe una fundacion o solicitud registrada con ese RUC
- *       '500':
- *         description: Error interno del servidor
  *   get:
  *     tags: [Fundaciones]
  *     summary: Obtiene las fundaciones con paginacion
@@ -193,170 +161,6 @@ const db = require('../DB/index');
  */
 
 /**
- * Funcion para crear una fundacion por parte del administrador de la plataforma en la BD
- * @param  {*} req
- * @param  {*} res
- * @return {Object} response
- */
-exports.createFundacion = async (req, res) => {
-  try {
-    const { User } = req;
-    const {
-      ruc, nombre, direccion, telefono, comision, user_id: userId, id: solicitudId,
-    } = req.body;
-
-    if (!(await validateSuperAdmin(User.id))) {
-      return res
-        .status(401)
-        .send({ error: 'No esta autorizado para realizar esta operacion!' });
-    }
-
-    const rucNormalizado = _.trim(String(ruc));
-
-    if (await validateFundacion(rucNormalizado)) {
-      return res.status(409).send({
-        error: 'Ya se encuentra registrada una fundacion con ese RUC',
-      });
-    }
-
-    // Si no se esta creando desde una solicitud aprobada, el RUC no debe
-    // coincidir con una solicitud existente (aun no aprobada).
-    if (!solicitudId) {
-      const existingSolicitud = await db.SolicitudFundacion.findOne({
-        where: { ruc: rucNormalizado },
-      });
-      if (existingSolicitud) {
-        return res.status(409).send({
-          error: 'Ya existe una solicitud de fundacion registrada con ese RUC',
-        });
-      }
-    }
-
-    const fundacion = await db.Fundacion.create({
-      ruc: rucNormalizado,
-      nombre,
-      direccion,
-      telefono,
-      aprobado: true,
-      comision: comision || 0,
-      logo: '/logo.png',
-      solicitud_id: solicitudId || null,
-    });
-
-    if (solicitudId) {
-      const solicitud = await db.SolicitudFundacion.findByPk(solicitudId);
-      if (solicitud) {
-        const {
-          email_contacto: emailContacto,
-          nombre_contacto: nombreContacto,
-          apellido_contacto: apellidoContacto,
-          telefono: telContacto,
-          direccion: dirContacto,
-          cedula_contacto: cedulaContacto,
-        } = solicitud;
-        const tempPassword = Math.random().toString(36).slice(-8);
-        const saltRounds = 10;
-        const salt = bcrypt.genSaltSync(saltRounds);
-        const hash = bcrypt.hashSync(tempPassword, salt);
-
-        const newUser = await db.Usuario.create({
-          cedula: cedulaContacto,
-          nombres: nombreContacto,
-          apellidos: apellidoContacto,
-          email: emailContacto,
-          telefono: telContacto,
-          direccion: dirContacto,
-          password: hash,
-          role: 2, // ADMIN_FUND
-        });
-
-        await db.AdminFund.create({
-          id: newUser.id,
-          fundacion_id: fundacion.id,
-        });
-
-        await db.SolicitudFundacion.update(
-          {
-            ready_for_creation: false,
-            notas_admin: `Solicitud aprobada. Usuario creado con contraseña temporal: ${tempPassword}`,
-          },
-          { where: { id: solicitudId } },
-        );
-      }
-    } else if (userId) {
-      const existingAdminFund = await db.AdminFund.findByPk(userId);
-      if (existingAdminFund) {
-        await existingAdminFund.update({
-          fundacion_id: fundacion.id,
-        });
-      } else {
-        await db.AdminFund.create({
-          id: userId,
-          fundacion_id: fundacion.id,
-        });
-      }
-    }
-
-    const response = {
-      mensaje: 'Fundacion registrada exitosamente.',
-      result: fundacion,
-    };
-    return res.send(response);
-  } catch (error) {
-    if (error.name === 'SequelizeUniqueConstraintError') {
-      return res.status(409).send({
-        error: 'Ya se encuentra registrada una fundacion con ese RUC',
-      });
-    }
-    console.log('ERROR', error);
-    const responseError = {
-      message: 'Something bad happened!',
-      error: error.stack,
-    };
-    return res.status(500).send(JSON.stringify(responseError));
-  }
-};
-
-/**
- * CONSIDERAR BORRAR ESTA FUNCION, YA QUE NO SE USA
- * Funcion para enviar una fundacion por desde el Landing Page de la plataforma en la BD
- * @param  {*} req
- * @param  {*} res
- * @return {Object} response
- */
-exports.registerFundacion = async (req, res) => {
-  try {
-    const {
-      ruc, nombre, direccion, telefono, comision,
-    } = req.body;
-    if (await validateFundacion(ruc)) {
-      return res.status(400).send({
-        error: 'La Fundación ya ha registrado una solicitud',
-      });
-    }
-    const fundacion = await db.Fundacion.create({
-      ruc,
-      nombre,
-      direccion,
-      telefono,
-      aprobado: false,
-      comision,
-    });
-    const response = {
-      mensaje: 'La solicitud de registro ha sido enviada.',
-      result: fundacion,
-    };
-    return res.send(response);
-  } catch (error) {
-    console.log('ERROR', error);
-    const responseError = {
-      message: 'Something bad happened!',
-      error: error.stack,
-    };
-    return res.status(500).send(JSON.stringify(responseError));
-  }
-};
-/**
  * Funcion para actualizar la informacion de una fundacion por parte del administrador
  * de la plataforma
  * @param  {*} req
@@ -450,7 +254,19 @@ exports.getFundaciones = async (req, res) => {
 
     const fundaciones = await db.Fundacion.findAndCountAll(query);
     const { count, rows } = fundaciones;
+    const esAdministrador = getAnimalView(req.User) === 'admin';
     const result = await Promise.all(rows.map(async (fundacion) => {
+      if (!esAdministrador) {
+        return {
+          id: fundacion.id,
+          nombre: fundacion.nombre,
+          direccion: fundacion.direccion,
+          telefono: fundacion.telefono,
+          logo: fundacion.logo,
+          descripcion: fundacion.descripcion,
+        };
+      }
+
       const adminFun = await db.AdminFund.findOne({
         where: { fundacion_id: fundacion.id },
       });
