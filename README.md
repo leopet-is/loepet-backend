@@ -9,7 +9,7 @@ Backend del proyecto de Materia Integradora — Grupo #3
 - **Runtime:** Node.js 20+
 - **Framework:** Express
 - **ORM:** Sequelize
-- **BD:** PostgreSQL (Supabase en producción / local en Docker para desarrollo)
+- **BD:** PostgreSQL (Supabase en producción y proyecto Supabase separado para tests)
 - **Auth:** JWT (jsonwebtoken)
 - **PayPal:** API de suscripciones (con mock automático en desarrollo)
 - **Storage:** Local (desarrollo) / Supabase Storage (producción)
@@ -23,8 +23,8 @@ Backend del proyecto de Materia Integradora — Grupo #3
 |---|---|
 | Node.js | >= 20 |
 | npm | >= 10 |
-| Docker | 24+ (solo para BD) |
-| Docker Compose | plugin incluido |
+| Docker | 24+ (para ejecutar la app en Render o Postgres local opcional) |
+| Docker Compose | plugin incluido (opcional para desarrollo local) |
 
 ---
 
@@ -46,15 +46,17 @@ El `.env` no está en el repo (está en `.gitignore`). Copiar el ejemplo como ba
 cp .env.example .env
 ```
 
-Con la configuración de desarrollo local (ya viene por defecto en `.env.example`): la BD apunta a `postgresql://leopet:leopet@localhost:5432/leopet_dev`, `DB_SSL=false`, `STORAGE_PROVIDER=local` y el correo en modo `console` (sin `RESEND_API_KEY` solo se imprime en los logs).
+El desarrollo local y los tests usan una sola `DATABASE_URL`, que debe apuntar al proyecto Supabase de pruebas descartable. Configura `DB_SSL=true`. No pongas la URL de producción en tu `.env`: algunos tests recrean tablas y borran sus datos.
 
-> **Importante:** en desarrollo la BD es un Postgres local; la de Supabase no se toca.
+> **Importante:** `npm test` y `npm run test:unit` usan `DATABASE_URL`; no es necesario levantar Docker para ejecutar tests.
 
-### 3. Levantar Postgres con Docker
+### 3. Base de datos local opcional
 
 ```bash
 docker compose up -d postgres
 ```
+
+Si prefieres no usar Supabase para desarrollo local, puedes levantar un Postgres local y establecer `DB_SSL=false`:
 
 Esto crea:
 - `leopet-postgres`: PostgreSQL 16 con la base `leopet_dev` (usuario/contraseña `leopet`).
@@ -169,7 +171,14 @@ npm run test:unit
 
 # Tests completos con cobertura
 npm test
+
+# Aplicar las migraciones a la BD definida en DATABASE_URL
+npm run db:migrate:test
 ```
+
+Las pruebas E2E pueden recrear tablas y borrar datos. Usa para `DATABASE_URL` un proyecto de pruebas aislado y descartable, nunca producción.
+
+GitHub Actions usa el secreto `DATABASE_URL`, que debe contener la conexión al proyecto de pruebas aislado; configúralo en Settings → Secrets and variables → Actions. El workflow aplica las migraciones y ejecuta la suite allí. Render configura su propio `DATABASE_URL` con la conexión de producción.
 
 ---
 
@@ -202,8 +211,8 @@ Variables principales (`cp .env.example .env` para desarrollo; en producción se
 | Variable | Obligatoria | Descripción |
 |---|---|---|
 | `PORT` | Sí | Puerto del servidor |
-| `DATABASE_URL` | Sí | Cadena de conexión PostgreSQL (ej. Supabase o local `...@localhost:5432/leopet_dev`) |
-| `DB_SSL` | No | `true` obliga SSL (producción/Supabase). En dev local dejar `false` o vacío |
+| `DATABASE_URL` | Sí | Única cadena de PostgreSQL; usa el proyecto de pruebas localmente/en CI y producción solo en Render |
+| `DB_SSL` | No | `true` para Supabase; `false` para Postgres local sin TLS |
 | `STORAGE_PROVIDER` | No | `local` (desarrollo) o `supabase` (producción) |
 | `SUPABASE_URL` | En prod | URL del proyecto Supabase |
 | `SUPABASE_KEY` | En prod | Anon o service-role key de Supabase |
@@ -212,7 +221,7 @@ Variables principales (`cp .env.example .env` para desarrollo; en producción se
 | `RESEND_API_KEY` | No (usa `console` si falta) | API key de Resend (desarrollo: omitir → solo imprime) |
 | `RESEND_FROM` | No | Remitente por defecto (debe usar dominio verificado en Resend) |
 | `MAIL_TO` | No | Destinatario de `npm run email:test` (default `dev@test.com`) |
-| `JWT_SECRET` | No (default: `secret`) | Clave para firmar tokens |
+| `JWT_SECRET` | Sí en producción | Secreto largo y aleatorio para firmar tokens (en desarrollo usa `secret` por defecto) |
 | `PAYPAL_CLIENT` | No (usa mock si falta) | Client ID de PayPal |
 | `PAYPAL_SECRET` | No (usa mock si falta) | Secret de PayPal |
 | `PAYPAL_URI` | No | URL API de PayPal (dev: sandbox) |
@@ -220,9 +229,13 @@ Variables principales (`cp .env.example .env` para desarrollo; en producción se
 
 ---
 
+## Despliegue en Render
+
+El archivo `render.yaml` configura el servicio web usando el `Dockerfile` y el health check `/api/health`. Configura en Render `DATABASE_URL`, `JWT_SECRET`, `SUPABASE_URL` y `SUPABASE_KEY`; `STORAGE_PROVIDER=supabase` y `DB_SSL=true` están declaradas en el Blueprint. Antes del primer despliegue, aplica migraciones a la BD de producción con `npm run db:migrate` usando su `DATABASE_URL`. No ejecutes `db:migrate:test` en producción.
+
 ## Notas sobre Docker
 
 El repositorio incluye dos archivos Docker con propósitos distintos:
 
-- **`Dockerfile`**: Empaqueta el backend Node.js para deploy (Render/VPS). No incluye BD ni correo.
-- **`docker-compose.yml`**: Entorno local — levanta **PostgreSQL 16** (dev) y, opcionalmente, la propia app (`docker compose up app`). La BD y credenciales reales de producción viven fuera del Dockerfile (Supabase + variables del proveedor).
+- **`Dockerfile`**: Empaqueta el backend Node.js para Render. No incluye BD ni correo.
+- **`docker-compose.yml`**: Opción local — levanta PostgreSQL 16 para desarrollo y, opcionalmente, la app. No es necesario si `DATABASE_URL` apunta a la Supabase de pruebas.

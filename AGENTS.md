@@ -124,25 +124,24 @@ also ignored by ESLint (matches `lib/` pattern).
 
 Pre-existing lint errors exist in `controllers/uploadController.js` (not blocking CI).
 
-## CI (.gitlab-ci.yml)
+## CI (.github/workflows/ci.yml)
 
-- **lint stage:** `npm ci --legacy-peer-deps && npm run lint`
-- **test stage:** Postgres service, runs `npm run test`, artifacts `coverage/`
-- Test stage has `allow_failure: true`
-- CI does NOT run migrations -- they must exist and be compatible
+- GitHub Actions runs lint and tests on pushes and pull requests.
+- Tests require the GitHub Actions secret `DATABASE_URL` set to an isolated, disposable Supabase project.
+- The workflow applies `npm run db:migrate:test` before running `npm test`.
+- Do not add a production database URL or password to workflow files.
 
 ## Seeding
 
 `scripts/seed-v2.js` bulk-creates users with password `Leopet2025!` (same as README,
 which documents it). Seed RUCs use invalid checksums (they bypass model validation).
 
-### Tests are safe from the remote DB (hard guard)
-`DB/index.js` throws immediately when running under Jest (`NODE_ENV=test` or
-`JEST_WORKER_ID`) if `DATABASE_URL` is NOT local (localhost/127.0.0.1). The npm
-scripts `test`, `test:watch` and `test:unit` already inject the local URL via
-`cross-env`, so even if `.env` points at Supabase the suite cannot touch it.
-Anything that imports `DB` inside Jest aborts fast — never point tests at the
-remote DB.
+### Tests use an isolated remote DB
+Under Jest (`NODE_ENV=test` or `JEST_WORKER_ID`), `DB/index.js` uses `DATABASE_URL`.
+Set it only to the disposable test project for local tests and CI: integration tests
+create and remove records, and some E2E tests recreate application tables. Set
+`DB_SSL=true` for Supabase. The test project must have migrations applied
+(`npm run db:migrate:test`).
 
 Do NOT add Sequelize `validate` to `fundacion.ruc` or `solicitudes_fundacion.ruc` --
 it would break the seed script and historical rows.
@@ -152,4 +151,4 @@ it would break the seed script and historical rows.
 - Remote: `origin/master`
 - Branch: `master`
 - Push is synced with origin (no pending commits) as of `6a02cb7` (apadrinamiento refactor)
-- `.gitlab-ci.yml` runs on merge_requests, main, and develop
+- `.github/workflows/ci.yml` runs on pushes and pull requests
