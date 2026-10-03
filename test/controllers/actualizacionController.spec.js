@@ -103,6 +103,7 @@ describe.skip('ActualizacionController - createRating integration', () => {
     actualizacion = await ActualizacionAnimal.create({
       descripcion: 'Actualizacion de prueba',
       estado_salud: 'Bueno',
+      imagen: 'http://example.com/test-actualizacion.jpg',
       animal_id: animal.id,
       fundacion_id: fundacion.id,
       fecha: new Date(),
@@ -236,6 +237,7 @@ describe.skip('ActualizacionController - createRating integration', () => {
     const actualizacion2 = await ActualizacionAnimal.create({
       descripcion: 'Segunda actualización',
       estado_salud: 'Excelente',
+      imagen: 'http://example.com/test-actualizacion.jpg',
       animal_id: animal.id,
       fundacion_id: actualizacion.fundacion_id,
       fecha: new Date(),

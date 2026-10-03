@@ -7,9 +7,10 @@ const fs = require('fs');
 const app = require('../../app');
 const db = require('../../DB/index');
 
-describe('E2E: Evidence Upload Flow', () => {
+describe('E2E: Actualizacion Upload Flow', () => {
   let foundationToken;
-  let donacionId;
+  let animalId;
+  let foundationProfileId;
   let uploadedImageUrl;
 
   // Datos de prueba
@@ -32,6 +33,7 @@ describe('E2E: Evidence Upload Flow', () => {
 
     // 2. Crear Fundación
     const foundationUser = await db.Usuario.create({
+      cedula: '1111111111',
       nombres: 'Fundacion Evidence',
       apellidos: 'Test',
       email: FOUNDATION_EMAIL,
@@ -42,6 +44,7 @@ describe('E2E: Evidence Upload Flow', () => {
     });
 
     const foundationProfile = await db.Fundacion.create({
+      ruc: '0998885552001',
       nombre: 'Fundación Evidence',
       descripcion: 'Prueba de evidencia',
       telefono: '0999999999',
@@ -50,6 +53,7 @@ describe('E2E: Evidence Upload Flow', () => {
       logo: 'default.jpg',
       usuario_id: foundationUser.id,
     });
+    foundationProfileId = foundationProfile.id;
 
     // Crear AdminFund
     await db.AdminFund.create({
@@ -57,38 +61,41 @@ describe('E2E: Evidence Upload Flow', () => {
       fundacion_id: foundationProfile.id,
     });
 
-    // 3. Crear Animal y Donador (Requeridos para la donación)
+    // 3. Crear Animal y Donador
     const animal = await db.Animal.create({
       nombre: 'Animal Evidence',
       especie: 'GATO',
+      sexo: 'HEMBRA',
       fundacion_id: foundationProfile.id,
       visible: true,
     });
+    animalId = animal.id;
 
     const donorUser = await db.Usuario.create({
+      cedula: '2222222222',
       nombres: 'Donor Evidence',
       apellidos: 'Test',
       email: 'donor-evidence@test.com',
       password: 'pass',
+      telefono: '0998888888',
       role: 3,
     });
 
-    // 4. Crear Donación
-    const donacion = await db.Donacion.create({
+    // 4. Donación del animal (para el historial del animal y del donador)
+    await db.Donacion.create({
       donador_id: donorUser.id,
       animal_id: animal.id,
       monto: 50,
       aprobado: true,
       pagado: true,
     });
-    donacionId = donacion.id;
 
     // 5. Login Fundación
     const res = await request(app)
       .post('/auth/login')
       .send({ email: FOUNDATION_EMAIL, password: PASSWORD });
     foundationToken = res.body.result.token;
-  });
+  }, 120000);
 
   afterAll(async () => {
     await db.sequelize.close();
@@ -132,26 +139,30 @@ describe('E2E: Evidence Upload Flow', () => {
     expect(uploadedImageUrl).toMatch(/^http:\/\/localhost/);
   });
 
-  it('2. Should create evidence record with the uploaded image', async () => {
-    expect(donacionId).toBeDefined();
+  it('2. Should create actualizacion record with the uploaded image', async () => {
+    expect(animalId).toBeDefined();
     expect(uploadedImageUrl).toBeDefined();
 
     const payload = {
-      donacion: donacionId,
+      animal_id: animalId,
+      fundacion_id: foundationProfileId,
       descripcion: 'Evidencia de prueba E2E',
+      estado_salud: 'BUENO',
+      imagen: uploadedImageUrl,
       galeria: {
         fotos: [uploadedImageUrl],
       },
     };
 
     const res = await request(app)
-      .post('/evidencia')
+      .post('/actualizacion')
       .set('Authorization', `Bearer ${foundationToken}`)
       .send(payload);
 
     expect(res.statusCode).toBe(200);
-    expect(res.body.mensaje).toBe('Historia creado exitosamente.');
-    expect(res.body.result.donacion_id).toBe(donacionId);
+    expect(res.body.mensaje).toBe('Actualizacion registrada exitosamente.');
+    expect(res.body.result.animal_id).toBe(animalId);
+    expect(res.body.result.fundacion_id).toBe(foundationProfileId);
 
     // Verificar que se guardó el JSON de galería
     expect(res.body.result.galeria).toEqual(payload.galeria);
