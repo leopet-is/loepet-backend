@@ -6,7 +6,7 @@ Backend del proyecto de Materia Integradora — Grupo #3
 
 ## Stack
 
-- **Runtime:** Node.js 20+
+- **Runtime:** Node.js 22+
 - **Framework:** Express
 - **ORM:** Sequelize
 - **BD:** PostgreSQL (Supabase en producción y proyecto Supabase separado para tests)

@@ -4,7 +4,7 @@
   "description": "backend_proyecto_materia_integradora",
   "main": "server.js",
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.0.0"
   },
   "scripts": {
     "test": "cross-env NODE_ENV=test JWT_SECRET=secret STORAGE_PROVIDER=local jest --coverage",
@@ -70,6 +70,6 @@
     "supertest": "^6.3.3"
   },
   "volta": {
-    "node": "20.19.6"
+    "node": "22.20.0"
   }
 }
