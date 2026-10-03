@@ -67,7 +67,7 @@ module.exports = {
     // -----------------------------------------------------------------
     await seq.query(`
       UPDATE animal SET status = 'INACTIVO'
-      WHERE status = 'ADOPTADO';
+      WHERE status::text = 'ADOPTADO';
     `);
     await seq.query(`
       UPDATE animal SET status = 'REQUIERE_PADRINOS'

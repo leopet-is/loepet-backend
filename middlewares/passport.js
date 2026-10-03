@@ -4,7 +4,11 @@ const jwt = require('jsonwebtoken');
 const db = require('../DB/index');
 const { ROL, USUARIO_ESTADO } = require('../constants');
 
-const JWT_SECRET = 'secret';
+const JWT_SECRET = process.env.JWT_SECRET || (process.env.NODE_ENV === 'production' ? null : 'secret');
+
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET es obligatoria en produccion.');
+}
 
 const authenticateToken = async (req, res, next) => {
   try {

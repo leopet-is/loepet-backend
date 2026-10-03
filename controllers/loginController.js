@@ -7,6 +7,12 @@ const { ROL, USUARIO_ESTADO } = require('../constants');
 
 const db = require('../DB/index');
 
+const jwtSecret = process.env.JWT_SECRET || (process.env.NODE_ENV === 'production' ? null : 'secret');
+
+if (!jwtSecret) {
+  throw new Error('JWT_SECRET es obligatoria en produccion.');
+}
+
 const { Usuario, AdminFund } = db;
 
 /**
@@ -115,7 +121,7 @@ exports.login = async (req, res) => {
     // Make JWT
     const expiresIn = 28800;
     const user = User.get({ plain: true });
-    const token = jwt.sign(user, 'secret', {
+    const token = jwt.sign(user, jwtSecret, {
       expiresIn,
     });
 

@@ -22,11 +22,17 @@ const db = require('./DB');
 const { PORT } = process.env;
 
 (async () => {
-  await db.connect();
-  app.listen(PORT, () => {
-    // eslint-disable-next-line no-console
-    console.log(`Server listening on port ${PORT}`);
-    // eslint-disable-next-line no-console
-    console.log('Server is running OK');
-  });
+  try {
+    await db.connect();
+    const port = PORT || 8181;
+    app.listen(port, () => {
+      // eslint-disable-next-line no-console
+      console.log(`Server listening on port ${port}`);
+      // eslint-disable-next-line no-console
+      console.log('Server is running OK');
+    });
+  } catch (error) {
+    console.error('Server startup failed:', error.message);
+    process.exit(1);
+  }
 })();

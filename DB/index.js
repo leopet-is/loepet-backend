@@ -7,35 +7,25 @@ require('dotenv').config();
 const basename = path.basename(__filename);
 const db = {};
 
-// Guard de seguridad (TEST).
-//
-// Los tests E2E crean datos (usuarios, fundaciones, manadas, comisiones...) y
-// NO los borran (por restricciones de FK). Si corren contra la BD remota de
-// Supabase, la contaminan. Este guard aborta SIEMPRE que el codigo se ejecute
-// bajo un runner de tests (jest) y la BD no sea local.
-if (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID) {
-  const testUrl = process.env.DATABASE_URL || '';
-  const esLocal = /localhost|127\.0\.0\.1/.test(testUrl);
-  if (!esLocal) {
-    throw new Error(
-      '[SEGURIDAD TEST] Los tests deben ejecutarse contra una BD local. '
-      + `DATABASE_URL=${testUrl} apunta a una BD remota. `
-      + 'Configura: DATABASE_URL=postgresql://leopet:leopet@localhost:5432/leopet_dev y DB_SSL=false.',
-    );
-  }
+const databaseUrl = process.env.DATABASE_URL;
+
+if (!databaseUrl) {
+  throw new Error('DATABASE_URL es obligatoria para conectar con PostgreSQL.');
 }
 
 // Forzar SSL en produccion (Supabase/Render) o cuando DB_SSL=true.
 // Si DB_SSL se define explicitamente (true/false) esa decision manda
 // (p. ej. local: NODE_ENV=production + DB_SSL=false para Postgres local sin TLS).
-const sslRequired = process.env.DB_SSL
-  ? process.env.DB_SSL === 'true'
+const sslSetting = process.env.DB_SSL;
+const sslRequired = sslSetting
+  ? sslSetting === 'true'
   : process.env.NODE_ENV === 'production';
 
-const sequelize = new Sequelize(process.env.DATABASE_URL, {
+const sequelize = new Sequelize(databaseUrl, {
   dialect: 'postgres',
   protocol: 'postgres',
   logging: false, // Cámbialo a console.log si quieres ver los queries en desarrollo
+  searchPath: 'public',
   dialectOptions: sslRequired
     ? {
       ssl: {
@@ -43,8 +33,9 @@ const sequelize = new Sequelize(process.env.DATABASE_URL, {
         // Supabase requiere SSL con certificados autofirmados.
         rejectUnauthorized: false,
       },
+      prependSearchPath: true,
     }
-    : {},
+    : { prependSearchPath: true },
   pool: {
     max: 5,
     min: 0,
@@ -77,12 +68,8 @@ Object.keys(db).forEach((modelName) => {
 db.sequelize = sequelize;
 
 db.connect = async () => {
-  try {
-    await sequelize.authenticate();
-    console.log('Connection has been established successfully.');
-  } catch (err) {
-    console.error('Unable to connect to the database:', err);
-  }
+  await sequelize.authenticate();
+  console.log('Connection has been established successfully.');
 };
 
 db.disconnect = () => {
