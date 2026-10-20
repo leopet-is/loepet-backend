@@ -19,11 +19,20 @@ const db = require('../DB/index');
 exports.updateUserStatus = async (req, res) => {
   try {
     const { usuarioId } = req.params;
-    const { habilitado,estado } = req.body;
+    const { habilitado, estado } = req.body;
 
     // Un admin no se puede deshabilitar a sí mismo
     if (req.User.id === parseInt(usuarioId, 10)) {
       return res.status(400).send({ error: 'No puedes deshabilitar tu propia cuenta.' });
+    }
+
+    // No se permite modificar el estado de cuentas administradoras
+    const targetUser = await db.Usuario.findOne({ where: { id: usuarioId } });
+    if (!targetUser) {
+      return res.status(404).send({ error: 'Usuario no encontrado.' });
+    }
+    if (targetUser.role === 1) {
+      return res.status(403).send({ error: 'No se permite modificar el estado de cuentas administradoras.' });
     }
 
     let nuevoEstado;
@@ -193,8 +202,10 @@ exports.getAllUsers = async (req, res) => {
       ];
     }
 
-    if (role) {
+    if (role && parseInt(role, 10) !== 1) {
       where.role = role;
+    } else {
+      where.role = { [Op.ne]: 1 };
     }
 
     const adminCount = await db.Usuario.count({ where: { role: 1 } });
