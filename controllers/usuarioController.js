@@ -19,22 +19,31 @@ const db = require('../DB/index');
 exports.updateUserStatus = async (req, res) => {
   try {
     const { usuarioId } = req.params;
-    const { habilitado } = req.body;
+    const { habilitado,estado } = req.body;
 
     // Un admin no se puede deshabilitar a sí mismo
     if (req.User.id === parseInt(usuarioId, 10)) {
       return res.status(400).send({ error: 'No puedes deshabilitar tu propia cuenta.' });
     }
 
+    let nuevoEstado;
+    if (estado && Object.values(USUARIO_ESTADO).includes(estado)) {
+      nuevoEstado = estado;
+    } else if (typeof habilitado === 'boolean') {
+      nuevoEstado = habilitado ? USUARIO_ESTADO.ACTIVO : USUARIO_ESTADO.INACTIVO;
+    } else {
+      return res.status(400).send({ error: 'Debes proporcionar un estado válido o habilitado.' });
+    }
+
     await db.Usuario.update(
-      { estado: habilitado ? USUARIO_ESTADO.ACTIVO : USUARIO_ESTADO.INACTIVO },
+      { estado: nuevoEstado },
       { where: { id: usuarioId } },
     );
 
-    const response = {
+    return res.send({
       message: 'Estado del usuario actualizado correctamente.',
-    };
-    return res.send(response);
+      estado: nuevoEstado,
+    });
   } catch (error) {
     console.log('ERROR', error);
     const responseError = {
