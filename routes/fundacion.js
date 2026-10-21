@@ -29,6 +29,13 @@ router.get(
   AsyncWrapper(fundacionController.getAnimalPadrinosCalificacion),
 );
 
+router.get(
+  '/:fundacionId',
+  optionalPassport,
+  validations.fundacionParam,
+  AsyncWrapper(fundacionController.getFundacionById),
+);
+
 router.put(
   '/:fundacionId',
   passport,

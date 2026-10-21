@@ -114,6 +114,28 @@ const db = require('../DB/index');
  *         description: Error interno del servidor
  *
  * /fundacion/{fundacionId}:
+ *   get:
+ *     tags: [Fundaciones]
+ *     summary: Obtiene la informacion de una fundacion por ID
+ *     parameters:
+ *       - in: path
+ *         name: fundacionId
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       '200':
+ *         description: Informacion de la fundacion
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 result:
+ *                   type: object
+ *       '404':
+ *         description: Fundacion no encontrada
+ *       '500':
+ *         description: Error interno del servidor
  *   put:
  *     tags: [Fundaciones]
  *     security:
@@ -536,6 +558,80 @@ exports.deleteFundacion = async (req, res) => {
       result: fundacion,
     };
     return res.send(response);
+  } catch (error) {
+    console.log('ERROR', error);
+    const responseError = {
+      message: 'Something bad happened!',
+      error: error.stack,
+    };
+    return res.status(500).send(JSON.stringify(responseError));
+  }
+};
+
+/**
+ * Funcion para obtener la informacion de una fundacion por su ID
+ * @param  {*} req
+ * @param  {*} res
+ * @return {Object} response
+ */
+exports.getFundacionById = async (req, res) => {
+  try {
+    const { fundacionId } = req.params;
+    const esAdministrador = getAnimalView(req.User) === 'admin';
+
+    const fundacion = await db.Fundacion.findOne({
+      where: { id: fundacionId },
+      raw: true,
+    });
+
+    if (!fundacion) {
+      return res.status(404).send({ error: 'Fundacion no encontrada.' });
+    }
+
+    if (!esAdministrador && !fundacion.aprobado) {
+      return res.status(404).send({ error: 'Fundacion no encontrada.' });
+    }
+
+    const cantidadMascotasCuidado = await db.Animal.count({
+      where: {
+        fundacion_id: fundacionId,
+        visible: true,
+      },
+    });
+
+    let result = {
+      id: fundacion.id,
+      nombre: fundacion.nombre,
+      ruc: fundacion.ruc,
+      direccion: fundacion.direccion,
+      telefono: fundacion.telefono,
+      logo: fundacion.logo,
+      descripcion: fundacion.descripcion,
+      aprobado: fundacion.aprobado,
+      cantidadMascotasCuidado,
+      createdAt: fundacion.createdAt,
+      updatedAt: fundacion.updatedAt,
+    };
+
+    if (esAdministrador) {
+      const adminFun = await db.AdminFund.findOne({
+        where: { fundacion_id: fundacion.id },
+      });
+      const cuentaBancaria = await getCuentaBancaria(fundacion.id);
+      let user = {};
+      if (!_.isEmpty(adminFun)) {
+        const admin = await db.Usuario.findOne({ where: { id: adminFun.id } });
+        user = !_.isEmpty(admin) ? admin : {};
+      }
+      result = {
+        ...fundacion,
+        cantidadMascotasCuidado,
+        cuentaBancaria,
+        user,
+      };
+    }
+
+    return res.send({ result });
   } catch (error) {
     console.log('ERROR', error);
     const responseError = {

@@ -38,12 +38,12 @@ exports.serializeAnimal = (animal, fundacion, historial = {}, view = 'public') =
     galeria: _.get(animal, 'galeria'),
     fundacion_id: _.get(animal, 'fundacion_id'),
     fundacion: _.get(fundacion, 'nombre'),
+    sexo: _.get(animal, 'sexo'),
+    fecha_nacimiento_estimada: _.get(animal, 'fecha_nacimiento_estimada'),
   };
 
   if (view === 'fundacion' || view === 'admin' || view === 'full') {
     Object.assign(data, {
-      fecha_nacimiento_estimada: _.get(animal, 'fecha_nacimiento_estimada'),
-      sexo: _.get(animal, 'sexo'),
       peso: _.get(animal, 'peso'),
       enfermedades: _.get(animal, 'enfermedades'),
       esterilizacion: _.get(animal, 'esterilizacion'),
