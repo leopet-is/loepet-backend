@@ -265,8 +265,10 @@ exports.getFundaciones = async (req, res) => {
     const { q } = req.query;
     const limit = parseInt(req.query.limit || '1', 10);
     const page = parseInt(req.query.page || '1', 10);
+    const esAdministrador = getAnimalView(req.User) === 'admin';
     const query = {
       where: {
+        ...(!esAdministrador ? { aprobado: true } : {}),
         ...(!_.isEmpty(q) ? { nombre: { [Op.regexp]: q } } : {}),
       },
       offset: (page - 1) * limit,
@@ -276,8 +278,11 @@ exports.getFundaciones = async (req, res) => {
 
     const fundaciones = await db.Fundacion.findAndCountAll(query);
     const { count, rows } = fundaciones;
-    const esAdministrador = getAnimalView(req.User) === 'admin';
     const result = await Promise.all(rows.map(async (fundacion) => {
+      const cantidadMascotasCuidado = await db.Animal.count({
+        where: { fundacion_id: fundacion.id, visible: true },
+      });
+
       if (!esAdministrador) {
         return {
           id: fundacion.id,
@@ -286,6 +291,8 @@ exports.getFundaciones = async (req, res) => {
           telefono: fundacion.telefono,
           logo: fundacion.logo,
           descripcion: fundacion.descripcion,
+          aprobado: fundacion.aprobado,
+          cantidadMascotasCuidado,
         };
       }
 
@@ -300,6 +307,7 @@ exports.getFundaciones = async (req, res) => {
       }
       return {
         ...fundacion,
+        cantidadMascotasCuidado,
         cuentaBancaria,
         user,
       };
