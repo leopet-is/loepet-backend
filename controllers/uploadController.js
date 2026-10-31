@@ -1,5 +1,4 @@
 const fs = require('fs');
-const path = require('path');
 const storage = require('../services/storage');
 
 exports.uploadFile = async (req, res) => {
@@ -12,13 +11,12 @@ exports.uploadFile = async (req, res) => {
       });
     }
 
-    const fotos = [];
-    for (const file of files) {
+    const fotos = await Promise.all(files.map(async (file) => {
       const { path: filePath, originalname: fileName } = file;
       const location = await storage.updateFile(fileName, filePath);
-      fotos.push(location);
       fs.unlinkSync(filePath);
-    }
+      return location;
+    }));
 
     return res.status(200).send({
       message: 'Imagen subida exitosamente',

@@ -11,9 +11,7 @@ const { STATUS_ANIMAL, ROL } = require('../constants');
  * @param  {Object} historial
  * @return {Object} response
  */
-exports.parseData = (animal, fundacion, historial = {}) => {
-  return exports.serializeAnimal(animal, fundacion, historial, 'full');
-};
+exports.parseData = (animal, fundacion, historial = {}) => exports.serializeAnimal(animal, fundacion, historial, 'full');
 
 /**
  * Determina la vista segun el rol del usuario

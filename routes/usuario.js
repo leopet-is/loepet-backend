@@ -8,12 +8,12 @@ const usuarioController = require('../controllers/usuarioController');
 // Middlewares
 const passport = require('../middlewares/passport');
 
-const adminOnly = (req,res,next) => {
-  if(req.User.role !== 1){
-    return res.status(403).json({message: 'No tienes permiso para realizar esta accion'});
+const adminOnly = (req, res, next) => {
+  if (req.User.role !== 1) {
+    return res.status(403).json({ message: 'No tienes permiso para realizar esta accion' });
   }
-  next();
-}
+  return next();
+};
 
 const router = express.Router();
 

@@ -89,7 +89,7 @@ module.exports = {
     // -----------------------------------------------------------------
     // 4. Convertir status a ENUM de 5 valores (idempotente).
     // -----------------------------------------------------------------
-    await seq.query(`DROP TYPE IF EXISTS "enum_animal_status";`);
+    await seq.query('DROP TYPE IF EXISTS "enum_animal_status";');
 
     await seq.query(`
       CREATE TYPE "enum_animal_status" AS ENUM (
