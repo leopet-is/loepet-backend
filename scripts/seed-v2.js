@@ -7,6 +7,26 @@ const PASSWORD = 'Leopet2025!';
 const NOW = new Date();
 const OLD = new Date('2022-03-02T19:39:10');
 
+async function resetSequences(tables) {
+  for (const table of tables) {
+    try {
+      const [sequenceResult] = await db.sequelize.query(
+        'SELECT pg_get_serial_sequence(?, \'id\') AS sequence',
+        { replacements: [table] },
+      );
+      const sequence = sequenceResult[0]?.sequence;
+      if (!sequence) continue;
+
+      await db.sequelize.query(
+        `SELECT setval(?, COALESCE(MAX(id), 1), COUNT(*) > 0) FROM "${table}"`,
+        { replacements: [sequence] },
+      );
+    } catch (error) {
+      if (!error.message.includes('column "id" does not exist')) throw error;
+    }
+  }
+}
+
 async function seed() {
   try {
     await db.connect();
@@ -140,6 +160,7 @@ async function seed() {
     // ---- ACTUALIZACION ANIMAL ----
     const update = await db.ActualizacionAnimal.create({
       id: 15, animal_id: 6, fundacion_id: 3, fecha: new Date('2022-08-23'), descripcion: 'Veterinario y comida', estado_salud: 'Muy Bien', visible: true, createdAt: new Date('2022-08-23'), updatedAt: new Date('2022-08-23'),
+      imagen: 'https://leopet.sfo3.digitaloceanspaces.com/20220823_223710_457Aprende_Veterinaria_y_etologi__a.jpg',
       galeria: { fotos: ['https://leopet.sfo3.digitaloceanspaces.com/20220823_223710_457Aprende_Veterinaria_y_etologi__a.jpg', 'https://leopet.sfo3.digitaloceanspaces.com/20220823_223725_28576a22a_0eff54c94e97404196b01f45b77e3145_mv2.jpg'] },
     });
     console.log('  1 actualizacion_animal');
@@ -172,6 +193,8 @@ async function seed() {
       { ruc: '0997778889001', nombre: 'Ángeles Peludos', direccion: 'Urdesa Central, Calle 3era', telefono: '0943210987', email_contacto: 'angelespeludos@fund.org', cedula_contacto: '0956789012', nombre_contacto: 'Luisa', apellido_contacto: 'Vargas', comentarios: 'Buscamos crear un futuro mejor para todos los animales abandonados. Conoce más en @AngelesPeludosFundacion en Facebook.', estado: 'pendiente', createdAt: new Date('2025-10-23T18:55:00') },
     ]);
     console.log('  10 solicitudes_fundacion');
+
+    await resetSequences(tables);
 
     console.log('\n=== SEED COMPLETADO ===');
     console.log(`Contraseña: ${PASSWORD}`);

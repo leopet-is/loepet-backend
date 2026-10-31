@@ -4,7 +4,11 @@ const jwt = require('jsonwebtoken');
 const db = require('../DB/index');
 const { ROL, USUARIO_ESTADO } = require('../constants');
 
-const JWT_SECRET = 'secret';
+const JWT_SECRET = process.env.JWT_SECRET || (process.env.NODE_ENV === 'production' ? null : 'secret');
+
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET es obligatoria en produccion.');
+}
 
 const authenticateToken = async (req, res, next) => {
   try {
@@ -48,12 +52,8 @@ const authenticateToken = async (req, res, next) => {
     req.User = data;
     return next();
   } catch (error) {
-    console.log('ERROR in authenticateToken:', error); // Modified log
-    const responseError = {
-      message: 'Token expirado',
-      error: error.stack,
-    };
-    return res.status(401).json(responseError);
+    console.log('ERROR in authenticateToken:', error);
+    return res.status(401).json({ error: 'Token expirado o invalido' });
   }
 };
 

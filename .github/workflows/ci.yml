@@ -1,0 +1,48 @@
+name: Backend CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Lint runtime and database migrations
+        run: >-
+          npm exec eslint --
+          DB/index.js config/config.js controllers/loginController.js
+          middlewares/passport.js server.js
+          migrations/20260901130021-add-activacion-usuario.js
+          migrations/20260901150023-token-activacion-relacion.js
+          migrations/20260901170024-remove-habilitado-usuario.js
+          migrations/20260901180025-update-animal-apadrinamiento.js
+
+  test:
+    runs-on: ubuntu-latest
+    env:
+      NODE_ENV: test
+      JWT_SECRET: secret
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DB_SSL: "true"
+      STORAGE_PROVIDER: local
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Verify test database secret
+        run: node -e "if (!process.env.DATABASE_URL) { console.error('Configure DATABASE_URL as the disposable test-project connection in GitHub Actions secrets'); process.exit(1); }"
+      - run: npm run db:migrate:test
+      - run: npm run test:unit -- --runInBand

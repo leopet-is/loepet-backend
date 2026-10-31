@@ -4,17 +4,19 @@
   "description": "backend_proyecto_materia_integradora",
   "main": "server.js",
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.0.0"
   },
   "scripts": {
-    "test": "cross-env NODE_ENV=test DATABASE_URL=postgresql://leopet:leopet@localhost:5432/leopet_dev DB_SSL=false STORAGE_PROVIDER=local jest --coverage",
-    "test:watch": "cross-env NODE_ENV=test DATABASE_URL=postgresql://leopet:leopet@localhost:5432/leopet_dev DB_SSL=false STORAGE_PROVIDER=local jest --watch",
-    "test:unit": "cross-env NODE_ENV=test DATABASE_URL=postgresql://leopet:leopet@localhost:5432/leopet_dev DB_SSL=false STORAGE_PROVIDER=local jest test/db test/lib test/middleware --passWithNoTests",
+    "test": "cross-env NODE_ENV=test JWT_SECRET=secret STORAGE_PROVIDER=local jest --coverage",
+    "test:watch": "cross-env NODE_ENV=test JWT_SECRET=secret STORAGE_PROVIDER=local jest --watch",
+    "test:unit": "cross-env NODE_ENV=test JWT_SECRET=secret STORAGE_PROVIDER=local jest test/db test/lib test/middleware --passWithNoTests",
     "start": "cross-env NODE_ENV=development nodemon server.js",
     "start:test": "cross-env NODE_ENV=test nodemon server.js",
     "lint": "eslint . --ext .js --ignore-path .gitignore",
     "db:migrate": "sequelize-cli db:migrate",
     "db:undo": "sequelize-cli db:migrate:undo",
+    "db:migrate:test": "cross-env NODE_ENV=test sequelize-cli db:migrate",
+    "db:undo:test": "cross-env NODE_ENV=test sequelize-cli db:migrate:undo",
     "email:test": "node scripts/test-email.js"
   },
   "repository": {
@@ -68,6 +70,6 @@
     "supertest": "^6.3.3"
   },
   "volta": {
-    "node": "20.19.6"
+    "node": "22.20.0"
   }
 }

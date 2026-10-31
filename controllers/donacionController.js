@@ -4,7 +4,7 @@ const _ = require('lodash');
 const dayjs = require('dayjs');
 const { Op } = require('sequelize');
 
-const { getEvidencia } = require('./helpers');
+const { getActualizacionesAnimal } = require('./helpers');
 const { createPlanManada } = require('./helpersPayPal');
 
 const db = require('../DB/index');
@@ -20,6 +20,7 @@ const db = require('../DB/index');
  *     security:
  *       - bearerAuth: []
  *     summary: Obtiene las donaciones de una fundacion con paginacion (rol admin de fundacion)
+ *     description: Cada donacion incluye las actualizaciones visibles del animal donado.
  *     parameters:
  *       - in: query
  *         name: q
@@ -54,7 +55,7 @@ const db = require('../DB/index');
  *                       dinero: { type: number }
  *                       status: { type: boolean, description: Campo aprobado de la donacion }
  *                       fecha: { type: string }
- *                       evidencia: { type: object }
+ *                       actualizaciones: { type: array }
  *       '500':
  *         description: Error interno del servidor
  *   post:
@@ -192,7 +193,8 @@ exports.getDonaciones = async (req, res) => {
     const totalPages = Math.ceil(count / limit);
     const result = await Promise.all(rows.map(async (row) => {
       const id = _.get(row, 'id');
-      const evidencia = await getEvidencia(id);
+      const animalId = _.get(row, 'Animal.id');
+      const actualizaciones = await getActualizacionesAnimal(animalId);
       return {
         id,
         donador: `${_.get(row, 'Usuario.apellidos')} ${_.get(
@@ -203,7 +205,7 @@ exports.getDonaciones = async (req, res) => {
         dinero: _.get(row, 'monto'),
         status: _.get(row, 'aprobado'),
         fecha: dayjs(_.get(row, 'createdAt')).format('DD/MM/YYYY HH:mm:ss'),
-        evidencia,
+        actualizaciones,
       };
     }));
     const response = {

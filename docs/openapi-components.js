@@ -285,17 +285,6 @@ const components = {
         updatedAt: { type: 'string', format: 'date-time' },
       },
     },
-    Evidencia: {
-      type: 'object',
-      properties: {
-        id: { type: 'integer' },
-        donacion_id: { type: 'integer' },
-        descripcion: { type: 'string' },
-        galeria: { type: 'object' },
-        createdAt: { type: 'string', format: 'date-time' },
-        updatedAt: { type: 'string', format: 'date-time' },
-      },
-    },
     Denuncia: {
       type: 'object',
       properties: {

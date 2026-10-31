@@ -7,37 +7,39 @@ const animalController = require('../controllers/animalController');
 
 // Middlewares
 const passport = require('../middlewares/passport');
+const optionalPassport = require('../middlewares/optionalPassport');
 const validations = require('../controllers/validations');
 
 const router = express.Router();
 
 router.get(
   '/',
+  optionalPassport,
   validations.allAnimals,
   AsyncWrapper(animalController.getAllAnimals),
 );
 
 router.get(
   '/app',
-  passport,
+  optionalPassport,
   validations.allAnimals,
   AsyncWrapper(animalController.getAllAnimalsApp),
 );
 
 router.get(
   '/app/fundacion/:fundacionId',
-  passport,
+  optionalPassport,
   validations.fundacionParam,
   AsyncWrapper(animalController.getAllAnimalsFundacionApp),
 );
 
-router.get('/especies', passport, AsyncWrapper(animalController.getEspecies));
+router.get('/especies', optionalPassport, AsyncWrapper(animalController.getEspecies));
 
-router.get('/search', passport, AsyncWrapper(animalController.searchAnimal));
+router.get('/search', optionalPassport, AsyncWrapper(animalController.searchAnimal));
 
 router.get(
   '/:animalId',
-  passport,
+  optionalPassport,
   validations.animal,
   AsyncWrapper(animalController.getAnimal),
 );

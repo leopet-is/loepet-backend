@@ -41,7 +41,7 @@ const NUMERO_MAXIMO_FOTOS = 4;
  *               type: object
  *               properties:
  *                 mensaje: { type: string }
- *                 result: { $ref: '#/components/schemas/Manada' }
+ *                 manada: { $ref: '#/components/schemas/Manada' }
  *       '401':
  *         description: No autorizado para realizar la operacion
  *       '500':
@@ -277,22 +277,28 @@ exports.addAnimals = async (req, res) => {
     const manada = req.body;
     const animals = _.get(manada, 'animalId');
 
+    if (!_.isArray(animals) || _.isEmpty(animals)) {
+      return res
+        .status(400)
+        .send({ error: 'El campo animalId debe ser un arreglo de ids no vacio' });
+    }
+
     if (!(await validateManada(manadaId, User.id))) {
       return res
         .status(401)
         .send({ error: 'No esta autorizado para realizar esta operacion!' });
     }
 
-    const responses = await Promise.all(animals.map(async (animal) => {
+    const animalesUnicos = _.uniq(animals).map((animal) => Number(animal));
+    const responses = await Promise.all(animalesUnicos.map(async (animal) => {
       const query = {
         manada_id: manadaId,
-        userId: User.id,
         animal_id: animal,
       };
       if (await validateAnimalManada(manadaId, animal)) {
         return db.ManadaAnimal.create(query);
       }
-      return 'Este animal ya se encuentra agregado a la manada';
+      return { animal_id: animal, mensaje: 'Este animal ya se encuentra agregado a la manada' };
     }));
 
     const response = {
@@ -361,14 +367,10 @@ exports.getManadas = async (req, res) => {
           },
         });
         const firstPhoto = _.first(_.get(animalData1, 'galeria.fotos'));
-        if (fotos.length <= NUMERO_MAXIMO_FOTOS) {
+        if (!_.isEmpty(firstPhoto) && fotos.length < NUMERO_MAXIMO_FOTOS) {
           fotos.push(firstPhoto);
         }
       }));
-
-      if (fotos.length === 3) {
-        fotos.pop();
-      }
 
       return {
         id: manadaId,
@@ -408,6 +410,13 @@ exports.getAnimalManadas = async (req, res) => {
   try {
     const { User } = req;
     const { manadaId } = req.params;
+
+    if (!(await validateManada(manadaId, User.id))) {
+      return res
+        .status(401)
+        .send({ error: 'No esta autorizado para realizar esta operacion!' });
+    }
+
     const responseBody = await db.ManadaAnimal.findAll({
       where: {
         manada_id: manadaId,
@@ -421,6 +430,9 @@ exports.getAnimalManadas = async (req, res) => {
           visible: true,
         },
       });
+      if (_.isEmpty(animals)) {
+        return null;
+      }
       const fundacionId = _.get(animals, 'fundacion_id');
       const fundacion = await db.Fundacion.findOne({
         where: {
@@ -446,7 +458,7 @@ exports.getAnimalManadas = async (req, res) => {
     }));
 
     const response = {
-      result,
+      result: result.filter(Boolean),
     };
     return res.send(response);
   } catch (error) {
@@ -467,13 +479,21 @@ exports.getAnimalManadas = async (req, res) => {
  */
 exports.searchManada = async (req, res) => {
   try {
+    const { User } = req;
     const { q } = req.query;
     let result = [];
     const response = {
       result,
     };
+    if (_.isEmpty(q)) {
+      return res.send(response);
+    }
     const responseBody = await db.Manada.findAll({
-      where: { nombre: { [Op.regexp]: `${q}` } },
+      where: {
+        nombre: { [Op.regexp]: `${q}` },
+        userId: User.id,
+        status: true,
+      },
     });
 
     if (_.isEmpty(responseBody)) {
@@ -508,6 +528,12 @@ exports.deleteAnimalManada = async (req, res) => {
       return res
         .status(401)
         .send({ error: 'No esta autorizado para realizar esta operacion!' });
+    }
+    const existente = await db.ManadaAnimal.findOne({
+      where: { manada_id: manadaId, animal_id: animalId },
+    });
+    if (_.isEmpty(existente)) {
+      return res.status(404).send({ error: 'El animal no se encuentra en la manada' });
     }
     await db.ManadaAnimal.destroy({
       where: { manada_id: manadaId, animal_id: animalId },
@@ -575,25 +601,25 @@ exports.updateInfoManada = async (req, res) => {
       nombre, monto,
     } = req.body;
     const validationManada = await validateManada(manadaId, User.id);
-    const response = {
-      result: 'No tiene credenciales',
-    };
-    if (validationManada) {
-      const update = {
-        ...(!_.isEmpty(nombre) ? { nombre } : {}),
-        updatedAt: Date.now(),
-      };
-      await db.Manada.update(update, {
-        where: { id: manadaId },
-      });
-      if (!_.isEmpty(monto)) {
-        const suscripcion = await db.SuscripcionPadrino.findOne({ where: { manadaId } });
-        if (suscripcion) {
-          await suscripcion.update({ montoTotal: monto, updatedAt: Date.now() });
-        }
-      }
-      response.result = 'Informacion actualizada';
+    if (!validationManada) {
+      return res
+        .status(401)
+        .send({ error: 'No esta autorizado para realizar esta operacion!' });
     }
+    const update = {
+      ...(!_.isEmpty(nombre) ? { nombre } : {}),
+      updatedAt: Date.now(),
+    };
+    await db.Manada.update(update, {
+      where: { id: manadaId },
+    });
+    if (!_.isEmpty(monto)) {
+      const suscripcion = await db.SuscripcionPadrino.findOne({ where: { manadaId } });
+      if (suscripcion) {
+        await suscripcion.update({ montoTotal: monto, updatedAt: Date.now() });
+      }
+    }
+    const response = { result: 'Informacion actualizada' };
     return res.send(response);
   } catch (error) {
     console.log('ERROR', error);

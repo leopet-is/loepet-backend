@@ -102,6 +102,8 @@ describe('Validacion de RUC, cédula y teléfono en solicitudes y fundaciones', 
       await db.Fundacion.create({
         ruc: RUC_JURIDICA,
         nombre: 'Fundacion Existente',
+        direccion: 'Quito',
+        telefono: '0987654321',
         aprobado: true,
         comision: 0,
       });
@@ -211,10 +213,19 @@ describe('Validacion de RUC, cédula y teléfono en solicitudes y fundaciones', 
     });
   });
 
-  describe('POST/PUT /fundacion (superadmin)', () => {
+  describe('POST/PUT /fundacion', () => {
     beforeAll(async () => {
       await db.Fundacion.destroy({ where: { ruc: { [Op.in]: RUCS_FUNDACION } } });
       await db.SolicitudFundacion.destroy({ where: { ruc: { [Op.in]: RUCS_FUNDACION } } });
+      const fundacion = await db.Fundacion.create({
+        ruc: RUC_F_A,
+        nombre: 'Fundacion Creada',
+        direccion: 'Quito',
+        telefono: '0987654321',
+        aprobado: true,
+        comision: 0,
+      });
+      fundacionAId = fundacion.id;
     });
 
     afterAll(async () => {
@@ -222,7 +233,7 @@ describe('Validacion de RUC, cédula y teléfono en solicitudes y fundaciones', 
       await db.SolicitudFundacion.destroy({ where: { ruc: { [Op.in]: RUCS_FUNDACION } } });
     });
 
-    it('crea una fundacion con RUC valido (200)', async () => {
+    it('no expone un endpoint manual para crear fundaciones', async () => {
       const res = await request(app)
         .post('/fundacion')
         .set('Authorization', `Bearer ${adminToken}`)
@@ -233,62 +244,7 @@ describe('Validacion de RUC, cédula y teléfono en solicitudes y fundaciones', 
           telefono: '0987654321',
         });
 
-      expect(res.status).toBe(200);
-      expect(res.body.result.ruc).toBe(RUC_F_A);
-      fundacionAId = res.body.result.id;
-    });
-
-    it('rechaza crear fundacion con RUC ya registrado (409)', async () => {
-      const res = await request(app)
-        .post('/fundacion')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .send({
-          ruc: RUC_F_A,
-          nombre: 'Fundacion Duplicada',
-          direccion: 'Quito',
-        });
-
-      expect(res.status).toBe(409);
-      expect(res.body.error).toContain('fundacion con ese RUC');
-    });
-
-    it('rechaza crear fundacion con RUC de una solicitud pendiente (409)', async () => {
-      await db.SolicitudFundacion.create({
-        ruc: RUC_F_B,
-        nombre: 'Solicitud Pendiente',
-        direccion: 'Quito',
-        telefono: '0987654321',
-        email_contacto: `${EMAIL_BASE}-pendiente@leopet.test`,
-        nombre_contacto: 'Ana',
-        apellido_contacto: 'Gutierrez',
-        cedula_contacto: '1710034065',
-        estado: 'pendiente',
-      });
-
-      const res = await request(app)
-        .post('/fundacion')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .send({
-          ruc: RUC_F_B,
-          nombre: 'Fundacion Overlap',
-          direccion: 'Quito',
-        });
-
-      expect(res.status).toBe(409);
-      expect(res.body.error).toContain('solicitud de fundacion');
-    });
-
-    it('rechaza crear fundacion con RUC sin verificador valido (400)', async () => {
-      const res = await request(app)
-        .post('/fundacion')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .send({
-          ruc: '1790016918001',
-          nombre: 'Fundacion Invalida',
-          direccion: 'Quito',
-        });
-
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(404);
     });
 
     it('actualiza el RUC de una fundacion (200)', async () => {
@@ -304,6 +260,8 @@ describe('Validacion de RUC, cédula y teléfono en solicitudes y fundaciones', 
       await db.Fundacion.create({
         ruc: RUC_F_B,
         nombre: 'Fundacion Con Ese RUC',
+        direccion: 'Quito',
+        telefono: '0987654321',
         aprobado: true,
         comision: 0,
       });

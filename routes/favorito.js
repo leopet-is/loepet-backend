@@ -5,6 +5,9 @@ const { AsyncWrapper } = require('../helpers');
 // Controladores
 const favoritoController = require('../controllers/favoritoController');
 
+// Validaciones
+const validations = require('../controllers/validations');
+
 // Middlewares
 const passport = require('../middlewares/passport');
 
@@ -14,6 +17,7 @@ const router = express.Router();
 router.post(
   '/',
   passport,
+  validations.agregarFavorito,
   AsyncWrapper(favoritoController.agregarFavorito),
 );
 
@@ -21,6 +25,7 @@ router.post(
 router.delete(
   '/:fundacionId',
   passport,
+  validations.favoritoUrl,
   AsyncWrapper(favoritoController.eliminarFavorito),
 );
 
@@ -35,6 +40,7 @@ router.get(
 router.get(
   '/:fundacionId',
   passport,
+  validations.favoritoUrl,
   AsyncWrapper(favoritoController.verificarFavorito),
 );
 

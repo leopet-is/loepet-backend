@@ -90,11 +90,20 @@ exports.obtenerFavoritos = async (req, res) => {
       include: [
         {
           model: db.Fundacion,
+          as: 'fundacion',
           attributes: ['id', 'nombre', 'telefono', 'direccion', 'logo'],
           include: [
             {
-              model: db.Usuario,
-              attributes: ['email'],
+              model: db.AdminFund,
+              as: 'administradores',
+              attributes: ['id'],
+              include: [
+                {
+                  model: db.Usuario,
+                  as: 'usuario',
+                  attributes: ['email'],
+                },
+              ],
             },
           ],
         },

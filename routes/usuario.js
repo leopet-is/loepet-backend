@@ -8,6 +8,13 @@ const usuarioController = require('../controllers/usuarioController');
 // Middlewares
 const passport = require('../middlewares/passport');
 
+const adminOnly = (req,res,next) => {
+  if(req.User.role !== 1){
+    return res.status(403).json({message: 'No tienes permiso para realizar esta accion'});
+  }
+  next();
+}
+
 const router = express.Router();
 
 // Router.get("/:usuarioId", passport, AsyncWrapper(usuarioController.getInfo));
@@ -23,6 +30,7 @@ router.patch(
 router.put(
   '/:usuarioId/status',
   passport,
+  adminOnly,
   AsyncWrapper(usuarioController.updateUserStatus),
 );
 

@@ -2,9 +2,19 @@ const request = require('supertest');
 const bcrypt = require('bcrypt');
 
 // MOCK PAYPAL: Must be defined BEFORE importing app
-jest.mock('../../controllers/helpersPayPal', () => ({
-  createProductManada: jest.fn(() => Promise.resolve({ id: 'mock-paypal-id' })),
-}));
+jest.mock('../../controllers/helpersPayPal', () => {
+  /* eslint-disable-next-line global-require */
+  const mockDb = require('../../DB/index');
+  return {
+    createProductManada: jest.fn(async (data) => {
+      await mockDb.SuscripcionPadrino.findOrCreate({
+        where: { manadaId: data.manadaId },
+        defaults: { manadaId: data.manadaId, montoTotal: data.montoTotal || 0, statusSubscription: false },
+      });
+      return { id: 'mock-paypal-id' };
+    }),
+  };
+});
 
 const app = require('../../app');
 const db = require('../../DB/index');
@@ -25,6 +35,7 @@ describe('E2E: Manada Management', () => {
 
     // 2. Crear Fundación (Usuario + Perfil + AdminFund)
     const foundationUser = await db.Usuario.create({
+      cedula: '0912345603',
       nombres: 'Fundacion Manada',
       apellidos: 'Test',
       email: FOUNDATION_EMAIL,
@@ -35,13 +46,13 @@ describe('E2E: Manada Management', () => {
     });
 
     const foundationProfile = await db.Fundacion.create({
+      ruc: '0998884442001',
       nombre: 'Fundación Manada Test',
       descripcion: 'Fundación para pruebas de manada',
       telefono: '0999999999',
       direccion: 'Test Address',
-      email: FOUNDATION_EMAIL,
       logo: 'default.jpg',
-      usuario_id: foundationUser.id,
+      aprobado: true,
     });
     fundacionId = foundationProfile.id;
 
@@ -56,19 +67,19 @@ describe('E2E: Manada Management', () => {
       nombre: 'Animal Manada',
       especie: 'PERRO',
       raza: 'Mestizo',
-      edad: 2,
+      fecha_nacimiento_estimada: '2022-01-01',
       peso: 10,
       sexo: 'MACHO',
       descripcion: 'Perro para pruebas de manada',
       fundacion_id: fundacionId,
       visible: true,
-      habilitado: true,
       imagen: 'default.jpg',
     });
     animalId = animal.id;
 
     // 4. Crear Usuario Donador
     await db.Usuario.create({
+      cedula: '0912345604',
       nombres: 'Donador Manada',
       apellidos: 'Test',
       email: DONOR_EMAIL,

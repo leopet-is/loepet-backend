@@ -86,6 +86,7 @@ describe('Commission System - Corrected Tests', () => {
       nombre: 'Comision Test Animal',
       status: 'REQUIERE_PADRINOS',
       especie: 'PERRO',
+      sexo: 'MACHO',
       raza: 'Mestizo',
       descripcion: 'Animal de prueba',
       imagen: 'http://example.com/test-animal.jpg',
@@ -97,6 +98,7 @@ describe('Commission System - Corrected Tests', () => {
     actualizacion = await ActualizacionAnimal.create({
       descripcion: 'Comision test evidence',
       estado_salud: 'Bueno',
+      imagen: 'http://example.com/test-actualizacion.jpg',
       animal_id: animal.id,
       fundacion_id: fundacion.id,
       fecha: new Date(),
@@ -200,6 +202,7 @@ describe('Commission System - Corrected Tests', () => {
       const actualizacion2 = await ActualizacionAnimal.create({
         descripcion: 'ECT test 2',
         estado_salud: 'Bueno',
+        imagen: 'http://example.com/test-actualizacion.jpg',
         animal_id: animal2.id,
         fundacion_id: animal.fundacion_id,
         fecha: new Date(),
@@ -248,6 +251,7 @@ describe('Commission System - Corrected Tests', () => {
       const actualizacion3 = await ActualizacionAnimal.create({
         descripcion: 'ECT test 3',
         estado_salud: 'Bueno',
+        imagen: 'http://example.com/test-actualizacion.jpg',
         animal_id: animal3.id,
         fundacion_id: animal.fundacion_id,
         fecha: new Date(),
@@ -377,6 +381,7 @@ describe('Commission System - Corrected Tests', () => {
       const actualizacion4 = await ActualizacionAnimal.create({
         descripcion: 'BVA test',
         estado_salud: 'Bueno',
+        imagen: 'http://example.com/test-actualizacion.jpg',
         animal_id: animal4.id,
         fundacion_id: animal.fundacion_id,
         fecha: new Date(),
@@ -517,6 +522,7 @@ describe('Commission System - Corrected Tests', () => {
       const actualizacion5 = await ActualizacionAnimal.create({
         descripcion: 'DTT test',
         estado_salud: 'Bueno',
+        imagen: 'http://example.com/test-actualizacion.jpg',
         animal_id: animal5.id,
         fundacion_id: animal.fundacion_id,
         fecha: new Date(),

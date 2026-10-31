@@ -308,6 +308,8 @@ describe.skip('E2E: Commission Flow - Money by Stars', () => {
 
       const actualizacionSinDonacion = await db.ActualizacionAnimal.create({
         descripcion: 'Evidence without donation',
+        estado_salud: 'Bueno',
+        imagen: 'http://example.com/test-actualizacion.jpg',
         animal_id: animalSinDonacion.id,
         fundacion_id: fundacion.id,
       });
@@ -436,6 +438,8 @@ describe.skip('E2E: Commission Flow - Money by Stars', () => {
 
         const actualizacionCalc = await db.ActualizacionAnimal.create({
           descripcion: `Evidence for ${stars} stars`,
+          estado_salud: 'Bueno',
+          imagen: 'http://example.com/test-actualizacion.jpg',
           animal_id: animalCalc.id,
           fundacion_id: fundacion.id,
         });

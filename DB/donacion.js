@@ -66,12 +66,6 @@ module.exports = (sequelize, DataTypes) => {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
     });
-    Donacion.hasMany(models.Evidencia, {
-      foreignKey: 'donacion_id',
-      as: 'evidencias',
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
-    });
   };
 
   return Donacion;

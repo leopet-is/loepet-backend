@@ -65,17 +65,20 @@ module.exports = {
     //    - ADOPTADO -> INACTIVO (retirado del programa; el dato historico se
     //                  conserva aunque el ciclo de adopcion ya no aplica).
     // -----------------------------------------------------------------
-
-    await seq.query(`ALTER TABLE "animal" ALTER COLUMN "status" DROP DEFAULT;`);
-
-    await seq.query(`
-      ALTER TABLE "animal" ALTER COLUMN "status" TYPE VARCHAR(50)
-      USING ("status"::text);
-    `);
-
+    // La migracion inicial creo enum_animal_status con los valores antiguos.
+    // Se agregan los nuevos valores antes de normalizar los registros existentes.
+    if (await typeExists(seq, 'enum_animal_status')) {
+      await seq.query(`
+        ALTER TYPE "enum_animal_status" ADD VALUE IF NOT EXISTS 'REQUIERE_PADRINOS';
+        ALTER TYPE "enum_animal_status" ADD VALUE IF NOT EXISTS 'APADRINADO';
+        ALTER TYPE "enum_animal_status" ADD VALUE IF NOT EXISTS 'EN_TRATAMIENTO';
+        ALTER TYPE "enum_animal_status" ADD VALUE IF NOT EXISTS 'FALLECIDO';
+        ALTER TYPE "enum_animal_status" ADD VALUE IF NOT EXISTS 'INACTIVO';
+      `);
+    }
     await seq.query(`
       UPDATE animal SET status = 'INACTIVO'
-      WHERE status = 'ADOPTADO';
+      WHERE status::text = 'ADOPTADO';
     `);
     await seq.query(`
       UPDATE animal SET status = 'REQUIERE_PADRINOS'
