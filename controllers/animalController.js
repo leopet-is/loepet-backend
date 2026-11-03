@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop, no-console, prefer-const, camelcase, eqeqeq */
 const _ = require('lodash');
-const { Op } = require('sequelize');
+const { Op, literal } = require('sequelize');
 
 const { STATUS_ANIMAL } = require('../constants');
 const {
@@ -27,7 +27,7 @@ const db = require('../DB/index');
  *   get:
  *     tags: [Animales]
  *     summary: Obtiene todos los animales con paginacion
- *     description: Si se envia el parametro `manada` se listan los animales de esa manada (debe pertenecer al usuario). Soporta filtros por especie y busqueda por nombre.
+ *     description: Si se envia el parametro `manada` se listan los animales de esa manada (debe pertenecer al usuario). Soporta filtros por especie y busqueda por nombre. Ordena primero animales en tratamiento y con mayor necesidad mensual de apadrinamiento.
  *     parameters:
  *       - in: query
  *         name: especie
@@ -43,10 +43,10 @@ const db = require('../DB/index');
  *         description: Busqueda por nombre del animal
  *       - in: query
  *         name: page
- *         schema: { type: integer, default: 1 }
+ *         schema: { type: integer, default: 1, minimum: 1 }
  *       - in: query
  *         name: limit
- *         schema: { type: integer, default: 1 }
+ *         schema: { type: integer, default: 10, minimum: 1, maximum: 100 }
  *     responses:
  *       '200':
  *         description: Lista paginada de animales
@@ -93,10 +93,10 @@ const db = require('../DB/index');
  *         description: Filtro por especie. Enviar `TODOS` (o no enviar) para listar todos.
  *       - in: query
  *         name: page
- *         schema: { type: integer, default: 1 }
+ *         schema: { type: integer, default: 1, minimum: 1 }
  *       - in: query
  *         name: limit
- *         schema: { type: integer, default: 1 }
+ *         schema: { type: integer, default: 10, minimum: 1, maximum: 100 }
  *     responses:
  *       '200':
  *         description: Lista paginada de animales
@@ -118,10 +118,10 @@ const db = require('../DB/index');
  *         schema: { type: integer }
  *       - in: query
  *         name: page
- *         schema: { type: integer, default: 1 }
+ *         schema: { type: integer, default: 1, minimum: 1 }
  *       - in: query
  *         name: limit
- *         schema: { type: integer, default: 1 }
+ *         schema: { type: integer, default: 10, minimum: 1, maximum: 100 }
  *     responses:
  *       '200':
  *         description: Lista paginada de animales de la fundacion
@@ -392,8 +392,25 @@ exports.getAllAnimals = async (req, res) => {
     const fundacionId = req.params.fundacionId || req.query.fundacionId;
     const { q } = req.query;
     const page = parseInt(req.query.page || '1', 10);
-    const limit = parseInt(req.query.limit || '1', 10);
+    const limit = parseInt(req.query.limit || '10', 10);
     const view = getAnimalView(User);
+    const prioridadEstado = literal(`CASE status
+      WHEN '${STATUS_ANIMAL.EN_TRATAMIENTO}' THEN 0
+      WHEN '${STATUS_ANIMAL.REQUIERE_PADRINOS}' THEN 1
+      WHEN '${STATUS_ANIMAL.APADRINADO}' THEN 2
+      WHEN '${STATUS_ANIMAL.INACTIVO}' THEN 3
+      WHEN '${STATUS_ANIMAL.FALLECIDO}' THEN 4
+      ELSE 5
+    END`);
+    const necesidadMensual = literal(
+      'GREATEST(COALESCE(monto_meta_mensual, 0) - COALESCE(monto_recaudado_actual, 0), 0)',
+    );
+    const ordenAnimales = [
+      [prioridadEstado, 'ASC'],
+      [necesidadMensual, 'DESC'],
+      ['updatedAt', 'ASC'],
+      ['id', 'DESC'],
+    ];
     let total = 0;
     let result = [];
 
@@ -413,20 +430,40 @@ exports.getAllAnimals = async (req, res) => {
         where: {
           manada_id: manadaId,
         },
+        include: [{
+          model: db.Animal,
+          as: 'animal',
+          where: { visible: true },
+          required: true,
+        }],
+        order: [
+          [literal(`CASE "animal"."status"
+            WHEN '${STATUS_ANIMAL.EN_TRATAMIENTO}' THEN 0
+            WHEN '${STATUS_ANIMAL.REQUIERE_PADRINOS}' THEN 1
+            WHEN '${STATUS_ANIMAL.APADRINADO}' THEN 2
+            WHEN '${STATUS_ANIMAL.INACTIVO}' THEN 3
+            WHEN '${STATUS_ANIMAL.FALLECIDO}' THEN 4
+            ELSE 5
+          END`), 'ASC'],
+          [literal('GREATEST(COALESCE("animal"."monto_meta_mensual", 0) - COALESCE("animal"."monto_recaudado_actual", 0), 0)'), 'DESC'],
+          [{ model: db.Animal, as: 'animal' }, 'updatedAt', 'ASC'],
+          [{ model: db.Animal, as: 'animal' }, 'id', 'DESC'],
+        ],
         offset: (page - 1) * limit,
         limit,
       });
       total = relations.count;
+      const animals = relations.rows.map((relation) => relation.animal);
+      const fundacionIds = _.uniq(animals.map((animal) => animal.fundacion_id));
+      const fundaciones = await db.Fundacion.findAll({
+        where: { id: { [Op.in]: fundacionIds } },
+      });
+      const fundacionesPorId = new Map(fundaciones.map((fundacion) => [fundacion.id, fundacion]));
       result = await Promise.all(relations.rows.map(async (relation) => {
-        const animal = await db.Animal.findOne({
-          where: { id: relation.animal_id, visible: true },
-        });
-        if (!animal) return null;
-        const fundacion = await getFundacionInfo(animal.fundacion_id);
+        const { animal } = relation;
         const historial = await getHistorialAnimal(User.id, animal.id);
-        return serializeAnimal(animal, fundacion, historial || {}, view);
+        return serializeAnimal(animal, fundacionesPorId.get(animal.fundacion_id), historial || {}, view);
       }));
-      result = result.filter(Boolean);
     } else {
       const approvedFoundations = await db.Fundacion.findAll({
         where: {
@@ -446,7 +483,7 @@ exports.getAllAnimals = async (req, res) => {
           ...(!_.isEmpty(q) ? { nombre: { [Op.regexp]: q } } : {}),
           visible: true,
         },
-        order: [['id', 'DESC']],
+        order: ordenAnimales,
         offset: (page - 1) * limit,
         limit,
       };

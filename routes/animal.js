@@ -29,6 +29,7 @@ router.get(
 router.get(
   '/app/fundacion/:fundacionId',
   optionalPassport,
+  validations.allAnimals,
   validations.fundacionParam,
   AsyncWrapper(animalController.getAllAnimalsFundacionApp),
 );

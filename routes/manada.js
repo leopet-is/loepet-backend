@@ -38,7 +38,7 @@ router.delete(
   AsyncWrapper(manadaController.deleteAnimalManada),
 );
 
-router.put('/:manadaId', passport, validations.manadaParam, AsyncWrapper(manadaController.updateInfoManada));
+router.put('/:manadaId', passport, validations.updateManada, AsyncWrapper(manadaController.updateInfoManada));
 
 router.delete('/:manadaId', passport, validations.manadaParam, AsyncWrapper(manadaController.deleteManada));
 

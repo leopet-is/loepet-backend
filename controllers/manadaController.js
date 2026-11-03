@@ -5,7 +5,6 @@ const { Op } = require('sequelize');
 const { createProductManada } = require('./helpersPayPal');
 
 const {
-  getHistorialAnimal,
   validateManada,
   validateAnimalManada,
 } = require('./helpers');
@@ -350,37 +349,38 @@ exports.getManadas = async (req, res) => {
     const totalPages = Math.ceil(count / limit);
     const manadas = responseBody.rows;
 
-    const responses = await Promise.all(manadas.map(async (manada) => {
-      const manadaId = _.get(manada, 'id');
-      const animals = await db.ManadaAnimal.findAndCountAll({
-        where: {
-          manada_id: manadaId,
-        },
-      });
+    const manadaIds = manadas.map((manada) => manada.id);
+    const relaciones = await db.ManadaAnimal.findAll({
+      where: { manada_id: { [Op.in]: manadaIds } },
+      order: [['id', 'ASC']],
+    });
+    const animalIds = _.uniq(relaciones.map((relacion) => relacion.animal_id));
+    const animales = await db.Animal.findAll({
+      where: { id: { [Op.in]: animalIds }, visible: true },
+    });
+    const animalesPorId = new Map(animales.map((animal) => [animal.id, animal]));
+    const relacionesPorManada = _.groupBy(relaciones, 'manada_id');
 
-      const fotos = [];
-      await Promise.all(animals.rows.map(async (animal) => {
-        const animalData1 = await db.Animal.findOne({
-          where: {
-            id: animal.animal_id,
-            visible: true,
-          },
-        });
-        const firstPhoto = _.first(_.get(animalData1, 'galeria.fotos'));
-        if (!_.isEmpty(firstPhoto) && fotos.length < NUMERO_MAXIMO_FOTOS) {
-          fotos.push(firstPhoto);
-        }
-      }));
+    const responses = manadas.map((manada) => {
+      const manadaId = manada.id;
+      const relacionesManada = relacionesPorManada[manadaId] || [];
+      const fotos = relacionesManada.reduce((fotosManada, relacion) => {
+        if (fotosManada.length >= NUMERO_MAXIMO_FOTOS) return fotosManada;
+        const animal = animalesPorId.get(relacion.animal_id);
+        const firstPhoto = _.first(_.get(animal, 'galeria.fotos'));
+        if (!_.isEmpty(firstPhoto)) fotosManada.push(firstPhoto);
+        return fotosManada;
+      }, []);
 
       return {
         id: manadaId,
         nombre: _.get(manada, 'nombre'),
         monto: _.get(manada, 'suscripcionPadrino.montoTotal', 0),
         statusSubscription: _.get(manada, 'suscripcionPadrino.statusSubscription', false),
-        apadrinados: animals.count,
+        apadrinados: relacionesManada.length,
         galeria: fotos,
       };
-    }));
+    });
 
     const response = {
       limit,
@@ -421,44 +421,49 @@ exports.getAnimalManadas = async (req, res) => {
       where: {
         manada_id: manadaId,
       },
+      include: [{
+        model: db.Animal,
+        as: 'animal',
+        where: { visible: true },
+        required: true,
+      }],
     });
+    const animals = responseBody.map((relation) => relation.animal);
+    const animalIds = animals.map((animal) => animal.id);
+    const fundacionIds = _.uniq(animals.map((animal) => animal.fundacion_id));
+    const [fundaciones, actualizaciones] = await Promise.all([
+      db.Fundacion.findAll({
+        where: { id: { [Op.in]: fundacionIds }, aprobado: true },
+      }),
+      db.ActualizacionAnimal.findAll({
+        where: { animal_id: { [Op.in]: animalIds }, visible: true },
+        order: [['id', 'DESC']],
+      }),
+    ]);
+    const fundacionesPorId = new Map(fundaciones.map((fundacion) => [fundacion.id, fundacion]));
+    const historialPorAnimal = _.groupBy(actualizaciones, 'animal_id');
 
-    const result = await Promise.all(responseBody.map(async (animal) => {
-      const animals = await db.Animal.findOne({
-        where: {
-          id: animal.animal_id,
-          visible: true,
-        },
-      });
-      if (_.isEmpty(animals)) {
-        return null;
-      }
-      const fundacionId = _.get(animals, 'fundacion_id');
-      const fundacion = await db.Fundacion.findOne({
-        where: {
-          id: fundacionId,
-          aprobado: true,
-        },
-      });
-      const historial = await getHistorialAnimal(User.id, animals.id);
+    const result = animals.map((animal) => {
+      const fundacion = fundacionesPorId.get(animal.fundacion_id);
+      const historial = (historialPorAnimal[animal.id] || []).slice(0, 10);
       return {
-        id: _.get(animals, 'id'),
-        nombre: _.get(animals, 'nombre'),
-        status: _.get(animals, 'status'),
-        especie: _.get(animals, 'especie'),
-        raza: _.get(animals, 'raza'),
-        descripcion: _.get(animals, 'descripcion'),
-        galeria: _.get(animals, 'galeria'),
-        fundacion_id: _.get(animals, 'fundacion_id'),
+        id: _.get(animal, 'id'),
+        nombre: _.get(animal, 'nombre'),
+        status: _.get(animal, 'status'),
+        especie: _.get(animal, 'especie'),
+        raza: _.get(animal, 'raza'),
+        descripcion: _.get(animal, 'descripcion'),
+        galeria: _.get(animal, 'galeria'),
+        fundacion_id: _.get(animal, 'fundacion_id'),
         fundacion: _.get(fundacion, 'nombre'),
         historial,
-        createdAt: _.get(animals, 'createdAt'),
-        updatedAt: _.get(animals, 'updatedAt'),
+        createdAt: _.get(animal, 'createdAt'),
+        updatedAt: _.get(animal, 'updatedAt'),
       };
-    }));
+    });
 
     const response = {
-      result: result.filter(Boolean),
+      result,
     };
     return res.send(response);
   } catch (error) {
