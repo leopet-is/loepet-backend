@@ -40,17 +40,17 @@ exports.serializeAnimal = (animal, fundacion, historial = {}, view = 'public') =
     fundacion: _.get(fundacion, 'nombre'),
     sexo: _.get(animal, 'sexo'),
     fecha_nacimiento_estimada: _.get(animal, 'fecha_nacimiento_estimada'),
+    enfermedades: _.get(animal, 'enfermedades'),
+    esterilizacion: _.get(animal, 'esterilizacion'),
+    vacunacion: _.get(animal, 'vacunacion'),
+    desparasitacion: _.get(animal, 'desparasitacion'),
+    fecha_rescate: _.get(animal, 'fecha_rescate'),
+    fecha_registro: _.get(animal, 'fecha_registro'),
   };
 
   if (view === 'fundacion' || view === 'admin' || view === 'full') {
     Object.assign(data, {
       peso: _.get(animal, 'peso'),
-      enfermedades: _.get(animal, 'enfermedades'),
-      esterilizacion: _.get(animal, 'esterilizacion'),
-      vacunacion: _.get(animal, 'vacunacion'),
-      desparasitacion: _.get(animal, 'desparasitacion'),
-      fecha_rescate: _.get(animal, 'fecha_rescate'),
-      fecha_registro: _.get(animal, 'fecha_registro'),
     });
   }
 
