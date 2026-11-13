@@ -64,17 +64,6 @@ module.exports.allAnimals = [
     .isInt({ min: 1, max: 100 })
     .withMessage('El campo limit debe ser un numero entero entre 1 y 100')
     .toInt(),
-  query('status')
-    .optional()
-    .isIn([
-      'BORRADOR',
-      'REQUIERE_PADRINOS',
-      'APADRINADO',
-      'EN_TRATAMIENTO',
-      'FALLECIDO',
-      'INACTIVO',
-    ])
-    .withMessage('El campo status debe ser uno de: BORRADOR, REQUIERE_PADRINOS, APADRINADO, EN_TRATAMIENTO, FALLECIDO, INACTIVO'),
   validate,
 ];
 
@@ -131,7 +120,6 @@ module.exports.createAnimal = [
   body('status')
     .optional()
     .isIn([
-      'BORRADOR',
       'REQUIERE_PADRINOS',
       'APADRINADO',
       'EN_TRATAMIENTO',
@@ -139,16 +127,8 @@ module.exports.createAnimal = [
       'INACTIVO',
     ])
     .withMessage(
-      'El campo status debe ser uno de: BORRADOR, REQUIERE_PADRINOS, APADRINADO, EN_TRATAMIENTO, FALLECIDO, INACTIVO',
+      'El campo status debe ser uno de: REQUIERE_PADRINOS, APADRINADO, EN_TRATAMIENTO, FALLECIDO, INACTIVO',
     ),
-  body('imagen')
-    .optional()
-    .isString()
-    .withMessage('El campo imagen debe ser de tipo String'),
-  body('visible')
-    .optional()
-    .isBoolean()
-    .withMessage('El campo visible debe ser booleano'),
   body('peso')
     .optional()
     .isDecimal({ decimal_digits: '0,2' })
@@ -223,7 +203,6 @@ module.exports.updateAnimal = [
   body('status')
     .optional()
     .isIn([
-      'BORRADOR',
       'REQUIERE_PADRINOS',
       'APADRINADO',
       'EN_TRATAMIENTO',
@@ -231,16 +210,8 @@ module.exports.updateAnimal = [
       'INACTIVO',
     ])
     .withMessage(
-      'El campo status debe ser uno de: BORRADOR, REQUIERE_PADRINOS, APADRINADO, EN_TRATAMIENTO, FALLECIDO, INACTIVO',
+      'El campo status debe ser uno de: REQUIERE_PADRINOS, APADRINADO, EN_TRATAMIENTO, FALLECIDO, INACTIVO',
     ),
-  body('imagen')
-    .optional()
-    .isString()
-    .withMessage('El campo imagen debe ser de tipo String'),
-  body('visible')
-    .optional()
-    .isBoolean()
-    .withMessage('El campo visible debe ser booleano'),
   body('peso')
     .optional()
     .isDecimal({ decimal_digits: '0,2' })
@@ -628,11 +599,38 @@ module.exports.createManada = [
     .withMessage('El campo nombre debe ser de tipo String')
     .trim()
     .notEmpty()
-    .withMessage('El campo nombre no puede estar vacio'),
+    .withMessage('El campo nombre no puede estar vacio')
+    .isLength({ max: 100 })
+    .withMessage('El campo nombre no puede superar 100 caracteres'),
+  body('monto')
+    .exists()
+    .withMessage('Es necesario el campo monto')
+    .isFloat({ min: 0.01, max: 99999999.99 })
+    .isDecimal({ decimal_digits: '0,2' })
+    .withMessage('El campo monto debe ser un numero positivo de hasta 2 decimales'),
+  validate,
+];
+
+module.exports.updateManada = [
+  param('manadaId')
+    .exists()
+    .withMessage('Es necesario el campo manadaId')
+    .isInt({ min: 1 })
+    .withMessage('El campo manadaId debe ser un numero entero positivo'),
+  body('nombre')
+    .optional()
+    .isString()
+    .withMessage('El campo nombre debe ser de tipo String')
+    .trim()
+    .notEmpty()
+    .withMessage('El campo nombre no puede estar vacio')
+    .isLength({ max: 100 })
+    .withMessage('El campo nombre no puede superar 100 caracteres'),
   body('monto')
     .optional()
-    .isInt()
-    .withMessage('El campo monto debe ser un numero entero'),
+    .isFloat({ min: 0.01, max: 99999999.99 })
+    .isDecimal({ decimal_digits: '0,2' })
+    .withMessage('El campo monto debe ser un numero positivo de hasta 2 decimales'),
   validate,
 ];
 
@@ -640,8 +638,8 @@ module.exports.manadaParam = [
   param('manadaId')
     .exists()
     .withMessage('Es necesario el campo manadaId')
-    .isInt()
-    .withMessage('El campo manadaId debe ser un numero entero'),
+    .isInt({ min: 1 })
+    .withMessage('El campo manadaId debe ser un numero entero positivo'),
   validate,
 ];
 
@@ -649,16 +647,16 @@ module.exports.addAnimalsManada = [
   param('manadaId')
     .exists()
     .withMessage('Es necesario el campo manadaId')
-    .isInt()
-    .withMessage('El campo manadaId debe ser un numero entero'),
+    .isInt({ min: 1 })
+    .withMessage('El campo manadaId debe ser un numero entero positivo'),
   body('animalId')
     .exists()
     .withMessage('Es necesario el campo animalId')
-    .isArray()
+    .isArray({ min: 1 })
     .withMessage('El campo animalId debe ser un arreglo de ids'),
   body('animalId.*')
-    .isInt()
-    .withMessage('Cada animalId debe ser un numero entero'),
+    .isInt({ min: 1 })
+    .withMessage('Cada animalId debe ser un numero entero positivo'),
   validate,
 ];
 
@@ -666,13 +664,13 @@ module.exports.animalManadaParam = [
   param('manadaId')
     .exists()
     .withMessage('Es necesario el campo manadaId')
-    .isInt()
-    .withMessage('El campo manadaId debe ser un numero entero'),
+    .isInt({ min: 1 })
+    .withMessage('El campo manadaId debe ser un numero entero positivo'),
   param('animalId')
     .exists()
     .withMessage('Es necesario el campo animalId')
-    .isInt()
-    .withMessage('El campo animalId debe ser un numero entero'),
+    .isInt({ min: 1 })
+    .withMessage('El campo animalId debe ser un numero entero positivo'),
   validate,
 ];
 

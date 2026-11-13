@@ -2,7 +2,6 @@ require('dotenv').config();
 
 module.exports = {
   STATUS_ANIMAL: {
-    BORRADOR: 'BORRADOR',
     REQUIERE_PADRINOS: 'REQUIERE_PADRINOS',
     APADRINADO: 'APADRINADO',
     EN_TRATAMIENTO: 'EN_TRATAMIENTO',

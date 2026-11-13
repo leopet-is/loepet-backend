@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop, no-console, prefer-const, camelcase, eqeqeq */
 const _ = require('lodash');
-const { Op } = require('sequelize');
+const { Op, literal } = require('sequelize');
 
 const { STATUS_ANIMAL } = require('../constants');
 const {
@@ -27,7 +27,7 @@ const db = require('../DB/index');
  *   get:
  *     tags: [Animales]
  *     summary: Obtiene todos los animales con paginacion
- *     description: Si se envia el parametro `manada` se listan los animales de esa manada (debe pertenecer al usuario). Soporta filtros por especie y busqueda por nombre.
+ *     description: Si se envia el parametro `manada` se listan los animales de esa manada (debe pertenecer al usuario). Soporta filtros por especie y busqueda por nombre. Ordena primero animales en tratamiento y con mayor necesidad mensual de apadrinamiento.
  *     parameters:
  *       - in: query
  *         name: especie
@@ -43,10 +43,10 @@ const db = require('../DB/index');
  *         description: Busqueda por nombre del animal
  *       - in: query
  *         name: page
- *         schema: { type: integer, default: 1 }
+ *         schema: { type: integer, default: 1, minimum: 1 }
  *       - in: query
  *         name: limit
- *         schema: { type: integer, default: 1 }
+ *         schema: { type: integer, default: 10, minimum: 1, maximum: 100 }
  *     responses:
  *       '200':
  *         description: Lista paginada de animales
@@ -93,10 +93,10 @@ const db = require('../DB/index');
  *         description: Filtro por especie. Enviar `TODOS` (o no enviar) para listar todos.
  *       - in: query
  *         name: page
- *         schema: { type: integer, default: 1 }
+ *         schema: { type: integer, default: 1, minimum: 1 }
  *       - in: query
  *         name: limit
- *         schema: { type: integer, default: 1 }
+ *         schema: { type: integer, default: 10, minimum: 1, maximum: 100 }
  *     responses:
  *       '200':
  *         description: Lista paginada de animales
@@ -118,10 +118,10 @@ const db = require('../DB/index');
  *         schema: { type: integer }
  *       - in: query
  *         name: page
- *         schema: { type: integer, default: 1 }
+ *         schema: { type: integer, default: 1, minimum: 1 }
  *       - in: query
  *         name: limit
- *         schema: { type: integer, default: 1 }
+ *         schema: { type: integer, default: 10, minimum: 1, maximum: 100 }
  *     responses:
  *       '200':
  *         description: Lista paginada de animales de la fundacion
@@ -263,9 +263,6 @@ exports.createAnimal = async (req, res) => {
       esterilizacion,
       vacunacion,
       desparasitacion,
-      status,
-      visible,
-      imagen,
     } = req.body;
 
     if (!(await validateAdminFund(User.id))) {
@@ -273,28 +270,20 @@ exports.createAnimal = async (req, res) => {
         .status(401)
         .send({ error: 'No esta autorizado para realizar esta operacion!' });
     }
-
-    const animalStatus = status === STATUS_ANIMAL.BORRADOR
-      ? STATUS_ANIMAL.BORRADOR
-      : (status || STATUS_ANIMAL.REQUIERE_PADRINOS);
-    const isVisible = visible !== undefined
-      ? Boolean(visible)
-      : (animalStatus !== STATUS_ANIMAL.BORRADOR);
-
     const animal = await db.Animal.create({
       nombre,
-      status: animalStatus,
-      especie: especie || 'PERRO',
-      raza: raza || 'Mestizo',
-      descripcion: descripcion || '',
-      imagen: imagen || '',
-      galeria: galeria || [],
+      status: STATUS_ANIMAL.REQUIERE_PADRINOS,
+      especie,
+      raza,
+      descripcion,
+      imagen: '',
+      galeria,
       fundacion_id: User.fundacionId,
-      visible: isVisible,
-      sexo: sexo || 'MACHO',
-      peso: peso || 0,
-      monto_meta_mensual: monto_meta_mensual || 0,
-      monto_recaudado_actual: monto_recaudado_actual || 0,
+      visible: true,
+      sexo,
+      peso,
+      monto_meta_mensual,
+      monto_recaudado_actual,
       fecha_nacimiento_estimada,
       enfermedades,
       esterilizacion,
@@ -302,16 +291,12 @@ exports.createAnimal = async (req, res) => {
       desparasitacion,
     });
 
-    // Solo notificar a donadores si NO es un borrador
-    if (animalStatus !== STATUS_ANIMAL.BORRADOR) {
-      crearNotificacionesNuevoAnimal(animal);
-      crearNotificacionesAlerta(animal);
-    }
+    // Crear notificaciones para donadores que tienen esta fundación en favoritos
+    crearNotificacionesNuevoAnimal(animal);
+    crearNotificacionesAlerta(animal);
 
     const response = {
-      mensaje: animalStatus === STATUS_ANIMAL.BORRADOR
-        ? 'Borrador creado exitosamente.'
-        : 'Animal creado exitosamente.',
+      mensaje: 'Animal creado exitosamente.',
       result: animal,
     };
     return res.send(response);
@@ -346,9 +331,6 @@ exports.updateAnimal = async (req, res) => {
       esterilizacion,
       vacunacion,
       desparasitacion,
-      status,
-      visible,
-      imagen,
     } = req.body;
     if (!(await validateAdminFund(User.id))) {
       return res.status(401).send({ error: 'No esta autorizado para realizar esta operacion!' });
@@ -357,21 +339,13 @@ exports.updateAnimal = async (req, res) => {
       return res.status(404).send({ error: 'Animal no encontrado en la fundacion' });
     }
 
-    const animalPrevio = await db.Animal.findByPk(animalId);
-    if (!animalPrevio) {
-      return res.status(404).send({ error: 'Animal no encontrado en la fundacion' });
-    }
-
     const update = {
       ...(!_.isEmpty(nombre) ? { nombre } : {}),
       ...(!_.isEmpty(especie) ? { especie } : {}),
       ...(!_.isEmpty(raza) ? { raza } : {}),
       ...(!_.isEmpty(descripcion) ? { descripcion } : {}),
-      ...(!_.isUndefined(imagen) ? { imagen } : {}),
       ...(!_.isEmpty(galeria) ? { galeria } : {}),
       ...(_.isUndefined(sexo) ? {} : { sexo }),
-      ...(_.isUndefined(status) ? {} : { status }),
-      ...(_.isUndefined(visible) ? {} : { visible }),
       ...(_.isUndefined(fecha_nacimiento_estimada) ? {} : { fecha_nacimiento_estimada }),
       ...(_.isUndefined(peso) ? {} : { peso }),
       ...(_.isUndefined(monto_meta_mensual) ? {} : { monto_meta_mensual }),
@@ -387,14 +361,7 @@ exports.updateAnimal = async (req, res) => {
     });
 
     const animalActualizado = await db.Animal.findByPk(animalId);
-
-    // Si se pasa de BORRADOR a publicado, disparar alertas y notificaciones a donadores
-    if (animalPrevio.status === STATUS_ANIMAL.BORRADOR && animalActualizado.status !== STATUS_ANIMAL.BORRADOR) {
-      crearNotificacionesNuevoAnimal(animalActualizado);
-      crearNotificacionesAlerta(animalActualizado);
-    } else if (animalActualizado.status !== STATUS_ANIMAL.BORRADOR) {
-      crearNotificacionesAlerta(animalActualizado);
-    }
+    crearNotificacionesAlerta(animalActualizado);
 
     return res.send({
       mensaje: 'Informacion del animal actualizada.',
@@ -425,8 +392,25 @@ exports.getAllAnimals = async (req, res) => {
     const fundacionId = req.params.fundacionId || req.query.fundacionId;
     const { q } = req.query;
     const page = parseInt(req.query.page || '1', 10);
-    const limit = parseInt(req.query.limit || '1', 10);
+    const limit = parseInt(req.query.limit || '10', 10);
     const view = getAnimalView(User);
+    const prioridadEstado = literal(`CASE status
+      WHEN '${STATUS_ANIMAL.EN_TRATAMIENTO}' THEN 0
+      WHEN '${STATUS_ANIMAL.REQUIERE_PADRINOS}' THEN 1
+      WHEN '${STATUS_ANIMAL.APADRINADO}' THEN 2
+      WHEN '${STATUS_ANIMAL.INACTIVO}' THEN 3
+      WHEN '${STATUS_ANIMAL.FALLECIDO}' THEN 4
+      ELSE 5
+    END`);
+    const necesidadMensual = literal(
+      'GREATEST(COALESCE(monto_meta_mensual, 0) - COALESCE(monto_recaudado_actual, 0), 0)',
+    );
+    const ordenAnimales = [
+      [prioridadEstado, 'ASC'],
+      [necesidadMensual, 'DESC'],
+      ['updatedAt', 'ASC'],
+      ['id', 'DESC'],
+    ];
     let total = 0;
     let result = [];
 
@@ -446,20 +430,40 @@ exports.getAllAnimals = async (req, res) => {
         where: {
           manada_id: manadaId,
         },
+        include: [{
+          model: db.Animal,
+          as: 'animal',
+          where: { visible: true },
+          required: true,
+        }],
+        order: [
+          [literal(`CASE "animal"."status"
+            WHEN '${STATUS_ANIMAL.EN_TRATAMIENTO}' THEN 0
+            WHEN '${STATUS_ANIMAL.REQUIERE_PADRINOS}' THEN 1
+            WHEN '${STATUS_ANIMAL.APADRINADO}' THEN 2
+            WHEN '${STATUS_ANIMAL.INACTIVO}' THEN 3
+            WHEN '${STATUS_ANIMAL.FALLECIDO}' THEN 4
+            ELSE 5
+          END`), 'ASC'],
+          [literal('GREATEST(COALESCE("animal"."monto_meta_mensual", 0) - COALESCE("animal"."monto_recaudado_actual", 0), 0)'), 'DESC'],
+          [{ model: db.Animal, as: 'animal' }, 'updatedAt', 'ASC'],
+          [{ model: db.Animal, as: 'animal' }, 'id', 'DESC'],
+        ],
         offset: (page - 1) * limit,
         limit,
       });
       total = relations.count;
+      const animals = relations.rows.map((relation) => relation.animal);
+      const fundacionIds = _.uniq(animals.map((animal) => animal.fundacion_id));
+      const fundaciones = await db.Fundacion.findAll({
+        where: { id: { [Op.in]: fundacionIds } },
+      });
+      const fundacionesPorId = new Map(fundaciones.map((fundacion) => [fundacion.id, fundacion]));
       result = await Promise.all(relations.rows.map(async (relation) => {
-        const animal = await db.Animal.findOne({
-          where: { id: relation.animal_id, visible: true },
-        });
-        if (!animal) return null;
-        const fundacion = await getFundacionInfo(animal.fundacion_id);
+        const { animal } = relation;
         const historial = await getHistorialAnimal(User.id, animal.id);
-        return serializeAnimal(animal, fundacion, historial || {}, view);
+        return serializeAnimal(animal, fundacionesPorId.get(animal.fundacion_id), historial || {}, view);
       }));
-      result = result.filter(Boolean);
     } else {
       const approvedFoundations = await db.Fundacion.findAll({
         where: {
@@ -477,13 +481,9 @@ exports.getAllAnimals = async (req, res) => {
             ? { especie: _.includes(['PERRO', 'GATO', 'OTRO'], normalizedSpecies) ? normalizedSpecies : 'OTRO' }
             : {}),
           ...(!_.isEmpty(q) ? { nombre: { [Op.regexp]: q } } : {}),
-          ...(req.query.status
-            ? { status: req.query.status }
-            : (view !== 'admin' && view !== 'admin_fund'
-              ? { visible: true, status: { [Op.ne]: STATUS_ANIMAL.BORRADOR } }
-              : {})),
+          visible: true,
         },
-        order: [['id', 'DESC']],
+        order: ordenAnimales,
         offset: (page - 1) * limit,
         limit,
       };
