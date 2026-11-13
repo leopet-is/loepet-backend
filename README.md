@@ -213,10 +213,10 @@ Variables principales (`cp .env.example .env` para desarrollo; en producción se
 | `PORT` | Sí | Puerto del servidor |
 | `DATABASE_URL` | Sí | Única cadena de PostgreSQL; usa el proyecto de pruebas localmente/en CI y producción solo en Render |
 | `DB_SSL` | No | `true` para Supabase; `false` para Postgres local sin TLS |
-| `STORAGE_PROVIDER` | No | `local` (desarrollo) o `supabase` (producción) |
-| `SUPABASE_URL` | En prod | URL del proyecto Supabase |
-| `SUPABASE_KEY` | En prod | Anon o service-role key de Supabase |
-| `SUPABASE_BUCKET` | No | Bucket de imágenes en Supabase (default `uploads`) |
+| `STORAGE_PROVIDER` | No | `local` (desarrollo, valor por defecto) o `cloudinary` (producción) |
+| `CLOUDINARY_CLOUD_NAME` | En prod | Nombre de la cuenta Cloudinary |
+| `CLOUDINARY_API_KEY` | En prod | API key de Cloudinary |
+| `CLOUDINARY_API_SECRET` | En prod | API secret de Cloudinary; solo se usa para firmar la carga |
 | `API_URL` | No | URL base para archivos del storage local (dev: `http://localhost:8181`) |
 | `RESEND_API_KEY` | No (usa `console` si falta) | API key de Resend (desarrollo: omitir → solo imprime) |
 | `RESEND_FROM` | No | Remitente por defecto (debe usar dominio verificado en Resend) |
@@ -231,7 +231,7 @@ Variables principales (`cp .env.example .env` para desarrollo; en producción se
 
 ## Despliegue en Render
 
-El archivo `render.yaml` configura el servicio web usando el `Dockerfile` y el health check `/api/health`. Configura en Render `DATABASE_URL`, `JWT_SECRET`, `SUPABASE_URL` y `SUPABASE_KEY`; `STORAGE_PROVIDER=supabase` y `DB_SSL=true` están declaradas en el Blueprint. Antes del primer despliegue, aplica migraciones a la BD de producción con `npm run db:migrate` usando su `DATABASE_URL`. No ejecutes `db:migrate:test` en producción.
+El archivo `render.yaml` configura el servicio web usando el `Dockerfile` y el health check `/api/health`. Configura en Render `DATABASE_URL`, `JWT_SECRET` y las credenciales `CLOUDINARY_*`; `STORAGE_PROVIDER=cloudinary` y `DB_SSL=true` están declaradas en el Blueprint. La base de datos puede seguir alojada en Supabase mediante `DATABASE_URL`. Antes del primer despliegue, aplica migraciones a la BD de producción con `npm run db:migrate` usando su `DATABASE_URL`. No ejecutes `db:migrate:test` en producción.
 
 ## Notas sobre Docker
 

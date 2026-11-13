@@ -43,7 +43,8 @@ const updateFile = (name, filePath) => new Promise((resolve, reject) => {
 
 const deleteFile = (name) => new Promise((resolve, reject) => {
   try {
-    const filePath = path.join(UPLOAD_DIR, name);
+    const fileName = name.startsWith('http') ? path.basename(new URL(name).pathname) : name;
+    const filePath = path.join(UPLOAD_DIR, fileName);
 
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);

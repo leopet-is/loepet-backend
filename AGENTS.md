@@ -71,9 +71,9 @@ The Supabase project used to be paused; when that happens connections fail with
 `middlewares/passport.js` and `loginController.js` both use the hardcoded string `'secret'`.
 The `JWT_SECRET` env var in `.env` is never read. Token expires in 28800s (8 hours).
 
-### Storage Provider defaults to Supabase
-`services/storage/index.js` defaults to `supabase` when `STORAGE_PROVIDER` is unset.
-Set `STORAGE_PROVIDER=local` explicitly for local development.
+### Image storage provider
+`services/storage/index.js` defaults to `local` when `STORAGE_PROVIDER` is unset.
+Set `STORAGE_PROVIDER=cloudinary` and the `CLOUDINARY_*` variables for Cloudinary image storage.
 
 ### PayPal auto-mocks at startup
 If `PAYPAL_CLIENT` or `PAYPAL_SECRET` are missing, `server.js` loads `mocks/paypal-nock.js`

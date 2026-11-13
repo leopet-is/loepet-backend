@@ -5,12 +5,15 @@ const { AsyncWrapper } = require('../helpers');
 
 // Controladores
 const amazonS3 = require('../controllers/uploadController');
+const cloudinary = require('../services/storage/CloudinarySignature');
 
 // Middlewares
 const passport = require('../middlewares/passport');
 const { esMimePermitido } = require('../utils/mimeValidator');
 
 const router = express.Router();
+
+router.get('/cloudinary-signature', passport, cloudinary.getCloudinarySignature);
 
 const NUMERO_FOTOS = 5;
 const TAMANO_MAXIMO = 10 * 1024 * 1024; // 10 MB por archivo

@@ -84,6 +84,7 @@ describe('Gestion de animales y consultas publicas', () => {
   });
 
   it('crea un animal con fecha_registro automatica', async () => {
+    const imagen = 'https://res.cloudinary.com/test-cloud/image/upload/v123/mascotas/animal.jpg';
     const response = await request(app)
       .post('/animal')
       .set('Authorization', `Bearer ${token}`)
@@ -92,12 +93,18 @@ describe('Gestion de animales y consultas publicas', () => {
         especie: 'PERRO',
         sexo: 'MACHO',
         raza: 'Mestizo',
+        imagen,
       });
 
     expect(response.status).toBe(200);
     expect(response.body.result).toHaveProperty('id');
     expect(response.body.result.fecha_registro).toBe(dayjs().format('YYYY-MM-DD'));
+    expect(response.body.result.imagen).toBe(imagen);
     animal = response.body.result;
+
+    const getResponse = await request(app).get(`/animal/${animal.id}`);
+    expect(getResponse.status).toBe(200);
+    expect(getResponse.body.result.imagen).toBe(imagen);
   });
 
   it('actualiza parcialmente un animal sin borrar campos no enviados', async () => {
