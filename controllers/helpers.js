@@ -32,6 +32,7 @@ exports.serializeAnimal = (animal, fundacion, historial = {}, view = 'public') =
     especie: _.get(animal, 'especie'),
     raza: _.get(animal, 'raza'),
     descripcion: _.get(animal, 'descripcion'),
+    historia: _.get(animal, 'historia'),
     imagen: _.get(animal, 'imagen'),
     galeria: _.get(animal, 'galeria'),
     fundacion_id: _.get(animal, 'fundacion_id'),
@@ -49,6 +50,7 @@ exports.serializeAnimal = (animal, fundacion, historial = {}, view = 'public') =
   if (view === 'fundacion' || view === 'admin' || view === 'full') {
     Object.assign(data, {
       peso: _.get(animal, 'peso'),
+      visible: _.get(animal, 'visible'),
     });
   }
 
@@ -164,16 +166,20 @@ exports.parseDataNotificacion = (
   return data;
 };
 
-exports.parseDataPadrinosAnimal = (animal, manada, donador = {}) => {
-  const monto = _.get(manada, 'suscripcionPadrino.montoTotal', _.get(manada, 'monto', 0));
+exports.parseDataPadrinosAnimal = (animal, manada, donador = {}, montoMensual = 0) => {
   const data = {
+    id: `${_.get(manada, 'id')}-${_.get(animal, 'id')}`,
+    animalId: _.get(animal, 'id'),
+    manadaId: _.get(manada, 'id'),
     nombre: _.get(animal, 'nombre'),
     especie: _.get(animal, 'especie'),
     raza: _.get(animal, 'raza'),
     padrinoNombre: _.get(donador, 'nombres'),
     padrinoApellido: _.get(donador, 'apellidos'),
     manadaNombre: _.get(manada, 'nombre'),
-    monto,
+    montoMensual,
+    estado: _.get(manada, 'suscripcionPadrino.statusSubscription') ? 'activo' : 'pausado',
+    fechaInicio: _.get(manada, 'suscripcionPadrino.createdAt', _.get(manada, 'createdAt')),
   };
   return data;
 };

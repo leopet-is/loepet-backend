@@ -2,8 +2,6 @@
 const _ = require('lodash');
 const { Op } = require('sequelize');
 
-const { createProductManada } = require('./helpersPayPal');
-
 const {
   validateManada,
   validateAnimalManada,
@@ -24,7 +22,7 @@ const NUMERO_MAXIMO_FOTOS = 4;
  *     security:
  *       - bearerAuth: []
  *     summary: Crea una manada (rol donador)
- *     description: Al crear la manada se solicita el producto/plan en PayPal (en pruebas sin credenciales PayPal se usa un mock).
+ *     description: Crea una manada en estado pendiente; el producto y la suscripcion PayPal se crean al iniciar el checkout.
  *     requestBody:
  *       required: true
  *       content:
@@ -233,19 +231,24 @@ exports.createManada = async (req, res) => {
 
   try {
     const { nombre, monto } = req.body;
-
-    const manada = await db.Manada.create({
-      nombre,
-      userId: User.id,
-      status: 1,
-    });
-    const data = {
-      id: _.get(manada, 'id'),
-      manadaId: _.get(manada, 'id'),
-      nombre,
-      montoTotal: monto || 0,
-    };
-    await createProductManada(data);
+    const transaction = await db.sequelize.transaction();
+    let manada;
+    try {
+      manada = await db.Manada.create({
+        nombre,
+        userId: User.id,
+        status: 1,
+      }, { transaction });
+      await db.SuscripcionPadrino.create({
+        manadaId: manada.id,
+        montoTotal: monto || 0,
+        statusSubscription: false,
+      }, { transaction });
+      await transaction.commit();
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
 
     const response = {
       mensaje: 'Manada creada exitosamente',

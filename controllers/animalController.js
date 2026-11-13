@@ -253,9 +253,12 @@ exports.createAnimal = async (req, res) => {
   try {
     const { User } = req;
     const {
-      nombre, especie, raza, descripcion, galeria,
+      nombre, especie, raza, descripcion, historia, galeria,
+      imagen,
       sexo,
       peso,
+      status,
+      visible,
       monto_meta_mensual,
       monto_recaudado_actual,
       fecha_nacimiento_estimada,
@@ -272,14 +275,15 @@ exports.createAnimal = async (req, res) => {
     }
     const animal = await db.Animal.create({
       nombre,
-      status: STATUS_ANIMAL.REQUIERE_PADRINOS,
+      status: status || STATUS_ANIMAL.REQUIERE_PADRINOS,
       especie,
       raza,
       descripcion,
-      imagen: '',
+      historia,
+      imagen: imagen || '',
       galeria,
       fundacion_id: User.fundacionId,
-      visible: true,
+      visible: visible !== false,
       sexo,
       peso,
       monto_meta_mensual,
@@ -291,9 +295,10 @@ exports.createAnimal = async (req, res) => {
       desparasitacion,
     });
 
-    // Crear notificaciones para donadores que tienen esta fundación en favoritos
-    crearNotificacionesNuevoAnimal(animal);
-    crearNotificacionesAlerta(animal);
+    if (animal.visible) {
+      crearNotificacionesNuevoAnimal(animal);
+      crearNotificacionesAlerta(animal);
+    }
 
     const response = {
       mensaje: 'Animal creado exitosamente.',
@@ -321,7 +326,10 @@ exports.updateAnimal = async (req, res) => {
     const { User } = req;
     const { animalId } = req.params;
     const {
-      nombre, especie, raza, descripcion, galeria,
+      nombre, especie, raza, descripcion, historia, galeria,
+      imagen,
+      status,
+      visible,
       sexo,
       fecha_nacimiento_estimada,
       peso,
@@ -344,7 +352,11 @@ exports.updateAnimal = async (req, res) => {
       ...(!_.isEmpty(especie) ? { especie } : {}),
       ...(!_.isEmpty(raza) ? { raza } : {}),
       ...(!_.isEmpty(descripcion) ? { descripcion } : {}),
+      ...(_.isUndefined(historia) ? {} : { historia }),
       ...(!_.isEmpty(galeria) ? { galeria } : {}),
+      ...(_.isUndefined(imagen) ? {} : { imagen }),
+      ...(_.isUndefined(status) ? {} : { status }),
+      ...(_.isUndefined(visible) ? {} : { visible }),
       ...(_.isUndefined(sexo) ? {} : { sexo }),
       ...(_.isUndefined(fecha_nacimiento_estimada) ? {} : { fecha_nacimiento_estimada }),
       ...(_.isUndefined(peso) ? {} : { peso }),
@@ -394,6 +406,7 @@ exports.getAllAnimals = async (req, res) => {
     const page = parseInt(req.query.page || '1', 10);
     const limit = parseInt(req.query.limit || '10', 10);
     const view = getAnimalView(User);
+    const ownerFoundationId = view === 'fundacion' && String(User.fundacionId) === String(fundacionId);
     const prioridadEstado = literal(`CASE status
       WHEN '${STATUS_ANIMAL.EN_TRATAMIENTO}' THEN 0
       WHEN '${STATUS_ANIMAL.REQUIERE_PADRINOS}' THEN 1
@@ -481,7 +494,7 @@ exports.getAllAnimals = async (req, res) => {
             ? { especie: _.includes(['PERRO', 'GATO', 'OTRO'], normalizedSpecies) ? normalizedSpecies : 'OTRO' }
             : {}),
           ...(!_.isEmpty(q) ? { nombre: { [Op.regexp]: q } } : {}),
-          visible: true,
+          ...(!ownerFoundationId ? { visible: true } : {}),
         },
         order: ordenAnimales,
         offset: (page - 1) * limit,

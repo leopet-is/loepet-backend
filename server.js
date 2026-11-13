@@ -1,19 +1,16 @@
 // Load environment variables first
 require('dotenv').config();
 
-// Conditional Nock setup for E2E tests and development - MUST BE AFTER dotenv
-console.log('NODE_ENV in server.js:', process.env.NODE_ENV);
-if (!process.env.PAYPAL_CLIENT || !process.env.PAYPAL_SECRET) {
+// PayPal stubs are only allowed in tests; missing credentials must never simulate a live payment.
+if (process.env.NODE_ENV === 'test' && (!process.env.PAYPAL_CLIENT || !process.env.PAYPAL_SECRET)) {
   try {
     // eslint-disable-next-line global-require
     const { setupPayPalNock } = require('./mocks/paypal-nock');
     setupPayPalNock();
-    console.log('Nock for PayPal API enabled (no PayPal credentials found).');
-  } catch (err) {
-    console.log('PayPal mocks not available (nock not installed in production). PayPal features will fail if called.');
+  } catch (error) {
+    console.error('PayPal test mock could not be loaded:', error.message);
+    throw error;
   }
-} else {
-  console.log('Nock for PayPal API is NOT enabled (production mode with credentials).');
 }
 
 const app = require('./app');

@@ -381,6 +381,10 @@ exports.getAnimalFundaciones = async (req, res) => {
 exports.getAnimalPadrinosFundacion = async (req, res) => {
   try {
     const { fundacionId } = req.params;
+    const { User } = req;
+    if (getAnimalView(User) !== 'fundacion' || String(User.fundacionId) !== String(fundacionId)) {
+      return res.status(403).send({ error: 'No está autorizado para consultar estos padrinos.' });
+    }
     const limit = parseInt(req.query.limit || '1', 10);
     const page = parseInt(req.query.page || '1', 10);
     const result = [];
@@ -413,13 +417,21 @@ exports.getAnimalPadrinosFundacion = async (req, res) => {
             },
           ],
         });
+        const suscripcion = _.get(manada, 'suscripcionPadrino');
+        if (!suscripcion || !suscripcion.statusSubscription) return;
         const donadorId = _.get(manada, 'userId');
         const donador = await db.Usuario.findOne({
           where: {
             id: donadorId,
           },
         });
-        const data = parseDataPadrinosAnimal(animal, manada, donador);
+        const animalesEnManada = await db.ManadaAnimal.count({
+          where: { manada_id: manadaId },
+        });
+        const montoMensual = animalesEnManada > 0
+          ? Number(suscripcion.montoTotal) / animalesEnManada
+          : 0;
+        const data = parseDataPadrinosAnimal(animal, manada, donador, montoMensual);
         result.push(data);
       }));
     }));

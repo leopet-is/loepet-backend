@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 const _ = require('lodash');
+const axios = require('axios');
 const request = require('request');
 
 const { changeStatus } = require('./helpers');
@@ -9,6 +10,20 @@ const db = require('../DB/index');
 const auth = {
   user: process.env.PAYPAL_CLIENT,
   pass: process.env.PAYPAL_SECRET,
+};
+
+exports.getAvailability = (req, res) => {
+  const available = Boolean(
+    process.env.PAYPAL_CLIENT
+    && process.env.PAYPAL_SECRET
+    && process.env.PAYPAL_URI
+    && process.env.PAYPAL_WEBHOOK_ID
+    && process.env.FRONTEND_URL,
+  );
+  return res.send({
+    available,
+    ...(available ? {} : { message: 'Pagos PayPal no configurados en el servidor.' }),
+  });
 };
 
 /**
@@ -137,18 +152,19 @@ exports.verifySubscription = async (req, res) => {
   const data = _.isEmpty(body) ? {} : body;
   const subscription = _.get(data, 'resource');
   const status = _.get(subscription, 'status');
-  if (_.isEqual(status, 'ACTIVE')) {
+  const event = _.get(data, 'event_type');
+  if (_.isEqual(event, 'BILLING.SUBSCRIPTION.ACTIVATED') && _.isEqual(status, 'ACTIVE')) {
     const subscriptionId = _.get(subscription, 'id');
     // Localizar la suscripcion de pago (antes ese estado vivia en manada).
     const suscripcion = await db.SuscripcionPadrino.findOne({
       where: { subscriptionId },
     });
     if (suscripcion) {
-      const update = {
-        statusSubscription: true,
-        updatedAt: Date.now(),
-      };
-      await suscripcion.update(update);
+      const [updatedCount] = await db.SuscripcionPadrino.update(
+        { statusSubscription: true, updatedAt: Date.now() },
+        { where: { id: suscripcion.id, statusSubscription: false } },
+      );
+      if (!updatedCount) return res.json({ data });
       const { manadaId } = suscripcion;
       const { rows, count } = await db.ManadaAnimal.findAndCountAll({
         include: [
@@ -174,7 +190,7 @@ exports.verifySubscription = async (req, res) => {
       }));
     }
   }
-  res.json({ data });
+  return res.json({ data });
 };
 
 /**
@@ -225,7 +241,8 @@ exports.verifyCancelSubscription = async (req, res) => {
   const data = _.isEmpty(body) ? {} : body;
   const subscription = _.get(data, 'resource');
   const status = _.get(subscription, 'status');
-  if (_.isEqual(status, 'CANCELLED')) {
+  const event = _.get(data, 'event_type');
+  if (_.isEqual(event, 'BILLING.SUBSCRIPTION.CANCELLED') && _.isEqual(status, 'CANCELLED')) {
     const subscriptionId = _.get(subscription, 'id');
     const update = {
       statusSubscription: false,
@@ -247,40 +264,39 @@ exports.verifyCancelSubscription = async (req, res) => {
  */
 exports.cancelSubscription = async (req, res) => {
   try {
+    const { User } = req;
     const { manadaId } = req.body;
-    const subscription = {
-      reason: 'No estoy satisfecho',
-    };
     const manada = await db.Manada.findOne({
       where: { id: manadaId },
     });
+    if (!manada || String(manada.userId) !== String(User.id)) {
+      return res.status(404).send({ error: 'Manada no encontrada.' });
+    }
     // El subscriptionId vive ahora en la suscripcion de la manada.
     const suscripcion = await db.SuscripcionPadrino.findOne({
       where: { manadaId },
     });
     const subscriptionId = _.get(suscripcion, 'subscriptionId') || _.get(manada, 'subscriptionId');
-    let result = {};
-    if (!_.isEmpty(subscriptionId)) {
-      request.post(
-        `${process.env.PAYPAL_URI}/v1/billing/subscriptions/${subscriptionId}/cancel`,
-        {
-          auth,
-          body: subscription,
-          json: true,
-        },
-        (err, response) => {
-          console.log('RESPONSE', response.body);
-          result = response;
-        },
-      );
+    if (_.isEmpty(subscriptionId)) {
+      return res.status(404).send({ error: 'No existe una suscripción de PayPal para esta manada.' });
     }
-    return res.send(result);
+    if (!process.env.PAYPAL_CLIENT || !process.env.PAYPAL_SECRET || !process.env.PAYPAL_URI) {
+      return res.status(503).send({ error: 'Cancelación de PayPal no disponible: faltan credenciales del proveedor.' });
+    }
+    const response = await axios.post(
+      `${process.env.PAYPAL_URI}/v1/billing/subscriptions/${subscriptionId}/cancel`,
+      { reason: 'Cancelación solicitada por el padrino' },
+      {
+        auth: {
+          username: process.env.PAYPAL_CLIENT,
+          password: process.env.PAYPAL_SECRET,
+        },
+        headers: { 'Content-Type': 'application/json' },
+      },
+    );
+    return res.send({ mensaje: 'Solicitud de cancelación enviada a PayPal.', result: response.data });
   } catch (error) {
-    console.log('ERROR', error);
-    const responseError = {
-      message: 'Something bad happened!',
-      error: error.stack,
-    };
-    return res.status(500).send(JSON.stringify(responseError));
+    console.error('PayPal subscription cancellation failed:', error.message);
+    return res.status(502).send({ error: 'No se pudo cancelar la suscripción con PayPal.' });
   }
 };

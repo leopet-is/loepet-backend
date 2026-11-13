@@ -8,25 +8,31 @@ const manadaController = require('../controllers/manadaController');
 // Middlewares
 const passport = require('../middlewares/passport');
 const validations = require('../controllers/validations');
+const { ROL } = require('../constants');
 
 const router = express.Router();
 
-router.post('/', passport, validations.createManada, AsyncWrapper(manadaController.createManada));
+const checkDonador = (req, res, next) => {
+  if (req.User && req.User.role === ROL.DONADOR.ROL_ID) return next();
+  return res.status(403).json({ message: 'Acceso denegado: Permisos insuficientes' });
+};
 
-router.get('/', passport, AsyncWrapper(manadaController.getManadas));
+router.use(passport, checkDonador);
 
-router.get('/search', passport, validations.searchManada, AsyncWrapper(manadaController.searchManada));
+router.post('/', validations.createManada, AsyncWrapper(manadaController.createManada));
+
+router.get('/', AsyncWrapper(manadaController.getManadas));
+
+router.get('/search', validations.searchManada, AsyncWrapper(manadaController.searchManada));
 
 router.post(
   '/:manadaId/animals',
-  passport,
   validations.addAnimalsManada,
   AsyncWrapper(manadaController.addAnimals),
 );
 
 router.get(
   '/:manadaId/animals',
-  passport,
   validations.manadaParam,
   AsyncWrapper(manadaController.getAnimalManadas),
 );
@@ -38,8 +44,8 @@ router.delete(
   AsyncWrapper(manadaController.deleteAnimalManada),
 );
 
-router.put('/:manadaId', passport, validations.updateManada, AsyncWrapper(manadaController.updateInfoManada));
+router.put('/:manadaId', validations.updateManada, AsyncWrapper(manadaController.updateInfoManada));
 
-router.delete('/:manadaId', passport, validations.manadaParam, AsyncWrapper(manadaController.deleteManada));
+router.delete('/:manadaId', validations.manadaParam, AsyncWrapper(manadaController.deleteManada));
 
 module.exports = router;

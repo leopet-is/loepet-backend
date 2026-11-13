@@ -1,8 +1,6 @@
 /* eslint-disable no-console */
 const _ = require('lodash');
-const dayjs = require('dayjs');
 const axios = require('axios');
-const utc = require('dayjs/plugin/utc');
 
 const db = require('../DB/index');
 
@@ -15,6 +13,15 @@ const config = {
     password: process.env.PAYPAL_SECRET,
   },
 };
+
+function validatePayPalConfig() {
+  if (!process.env.PAYPAL_CLIENT || !process.env.PAYPAL_SECRET || !process.env.PAYPAL_URI) {
+    throw Object.assign(
+      new Error('Pagos PayPal deshabilitados: faltan PAYPAL_CLIENT, PAYPAL_SECRET o PAYPAL_URI.'),
+      { statusCode: 503 },
+    );
+  }
+}
 
 /**
  * Crea (o actualiza) la suscripcion de pago de una manada. Antes estos
@@ -44,6 +51,7 @@ async function obtenerOCrearSuscripcion(data) {
  */
 exports.createProductManada = async (data) => {
   try {
+    validatePayPalConfig();
     const product = {
       name: _.get(data, 'nombre'),
       description: 'Apadrinamiento de animales',
@@ -65,8 +73,8 @@ exports.createProductManada = async (data) => {
       updatedAt: Date.now(),
     });
   } catch (error) {
-    console.log('ERROR', error);
-    throw new Error(error);
+    console.error('PayPal product creation failed:', error.message);
+    throw error;
   }
 };
 
@@ -78,9 +86,15 @@ exports.createProductManada = async (data) => {
  */
 const createSubscription = async (data) => {
   try {
+    validatePayPalConfig();
+    if (!process.env.FRONTEND_URL) {
+      throw Object.assign(
+        new Error('Pagos PayPal deshabilitados: falta configurar FRONTEND_URL.'),
+        { statusCode: 503 },
+      );
+    }
     const subscription = {
       plan_id: _.get(data, 'planId'),
-      start_time: dayjs.extend(utc),
       quantity: 1,
       subscriber: {
         name: {
@@ -89,8 +103,8 @@ const createSubscription = async (data) => {
         },
         email_address: _.get(data, 'email'),
       },
-      return_url: 'http://localhost:5173/?status=approved',
-      cancel_url: 'http://localhost:5173/?status=cancelled',
+      return_url: `${process.env.FRONTEND_URL}/configurar-manada?status=approved&manadaId=${encodeURIComponent(_.get(data, 'id'))}`,
+      cancel_url: `${process.env.FRONTEND_URL}/configurar-manada?status=cancelled&manadaId=${encodeURIComponent(_.get(data, 'id'))}`,
     };
     const payloadSubscription = await axios.post(
       `${process.env.PAYPAL_URI}/v1/billing/subscriptions`,
@@ -105,11 +119,14 @@ const createSubscription = async (data) => {
       responseSubscription,
       updatedAt: Date.now(),
     });
-    const link = _.first(_.get(responseSubscription, 'links'));
-    return _.get(link, 'href');
+    const approvalLink = _.find(_.get(responseSubscription, 'links', []), { rel: 'approve' });
+    if (!approvalLink || !approvalLink.href) {
+      throw new Error('PayPal no devolvió un enlace de aprobación para la suscripción.');
+    }
+    return approvalLink.href;
   } catch (error) {
-    console.log('ERROR', error);
-    throw new Error(error);
+    console.error('PayPal subscription creation failed:', error.message);
+    throw error;
   }
 };
 
@@ -121,6 +138,7 @@ const createSubscription = async (data) => {
  */
 exports.createPlanManada = async (data) => {
   try {
+    validatePayPalConfig();
     const plan = {
       name: `Subscripción de la manada ${_.get(data, 'nombre')}`,
       product_id: _.get(data, 'productId'),
@@ -166,7 +184,7 @@ exports.createPlanManada = async (data) => {
     const link = await createSubscription(newData);
     return link;
   } catch (error) {
-    console.log('ERROR', error);
-    throw new Error(error);
+    console.error('PayPal plan creation failed:', error.message);
+    throw error;
   }
 };

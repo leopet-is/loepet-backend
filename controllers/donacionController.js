@@ -5,7 +5,7 @@ const dayjs = require('dayjs');
 const { Op } = require('sequelize');
 
 const { getActualizacionesAnimal } = require('./helpers');
-const { createPlanManada } = require('./helpersPayPal');
+const { createPlanManada, createProductManada } = require('./helpersPayPal');
 
 const db = require('../DB/index');
 
@@ -63,7 +63,7 @@ const db = require('../DB/index');
  *     security:
  *       - bearerAuth: []
  *     summary: Crea una donacion para una manada (rol donador)
- *     description: Retorna el link de pago (PayPal) generado para la donacion. En pruebas sin credenciales PayPal se usa un mock.
+ *     description: Retorna el enlace de aprobacion de PayPal para una manada propiedad del donador. Falla si las credenciales del proveedor no estan configuradas.
  *     requestBody:
  *       required: true
  *       content:
@@ -279,6 +279,7 @@ exports.getDineroDisponible = async (req, res) => {
  */
 exports.crearDonacion = async (req, res) => {
   try {
+    const { User } = req;
     const { manadaId } = req.body;
     const manada = await db.Manada.findOne({
       where: {
@@ -295,15 +296,19 @@ exports.crearDonacion = async (req, res) => {
         },
       ],
     });
+    if (!manada || String(manada.userId) !== String(User.id)) {
+      return res.status(404).send({ error: 'Manada no encontrada.' });
+    }
     const suscripcion = _.get(manada, 'suscripcionPadrino');
 
-    if (!suscripcion || _.isEmpty(_.get(suscripcion, 'productId'))) {
-      throw new Error('ERROR - No existe una un producto asociado a la manada');
+    if (!suscripcion) {
+      return res.status(400).send({ error: 'La manada no tiene configurada una suscripción.' });
     }
-    const data = {
+    const datosManada = {
       id: _.get(manada, 'id'),
+      manadaId: _.get(manada, 'id'),
       nombre: _.get(manada, 'nombre'),
-      monto: _.get(suscripcion, 'montoTotal'),
+      montoTotal: _.get(suscripcion, 'montoTotal'),
       productId: _.get(suscripcion, 'productId'),
       planId: _.get(suscripcion, 'planId'),
       subscriptionId: _.get(suscripcion, 'subscriptionId'),
@@ -311,19 +316,23 @@ exports.crearDonacion = async (req, res) => {
       apellidos: _.get(manada, 'Usuario.apellidos'),
       email: _.get(manada, 'Usuario.email'),
     };
-    const link = await createPlanManada(data);
+    if (_.isEmpty(datosManada.productId)) {
+      await createProductManada(datosManada);
+      const actualizada = await db.SuscripcionPadrino.findOne({ where: { manadaId } });
+      datosManada.productId = _.get(actualizada, 'productId');
+    }
+    const link = await createPlanManada(datosManada);
     const response = {
       message: 'Donacion realizada exitosamente',
       result: link,
     };
     return res.send(response);
   } catch (error) {
-    console.log('ERROR', error);
-    const responseError = {
-      message: 'Something bad happened!',
-      error: error.stack,
-    };
-    return res.status(500).send(JSON.stringify(responseError));
+    console.error('Donacion checkout failed:', error.message);
+    if (error.statusCode === 503) {
+      return res.status(503).send({ error: error.message });
+    }
+    return res.status(502).send({ error: 'No se pudo iniciar el checkout con PayPal.' });
   }
 };
 
@@ -335,15 +344,14 @@ exports.crearDonacion = async (req, res) => {
  */
 exports.aprobarDonacion = async (req, res) => {
   try {
+    const { User } = req;
     const { donacionId } = req.params;
     const { aprobado } = req.body;
-    const update = {
-      aprobado,
-      updatedAt: Date.now(),
-    };
-    const donacionInfo = await db.Donacion.update(update, {
-      where: { id: donacionId },
+    const donacionInfo = await db.Donacion.findOne({
+      where: { id: donacionId, donador_id: User.id },
     });
+    if (!donacionInfo) return res.status(404).send({ error: 'Donación no encontrada.' });
+    await donacionInfo.update({ aprobado, updatedAt: Date.now() });
 
     const response = {
       result: donacionInfo,
@@ -366,28 +374,6 @@ exports.aprobarDonacion = async (req, res) => {
  * @param  {*} res
  * @return {Object} response
  */
-exports.pagarDonacion = async (req, res) => {
-  try {
-    const { donacionId } = req.params;
-    const { status } = req.body;
-    const update = {
-      pagado: _.isEqual(_.toLower(status), 'success'),
-      updatedAt: Date.now(),
-    };
-    const donacionInfo = await db.Donacion.update(update, {
-      where: { id: donacionId },
-    });
-
-    const response = {
-      result: donacionInfo,
-    };
-    return res.send(response);
-  } catch (error) {
-    console.log('ERROR', error);
-    const responseError = {
-      message: 'Something bad happened!',
-      error: error.stack,
-    };
-    return res.status(500).send(JSON.stringify(responseError));
-  }
-};
+exports.pagarDonacion = (req, res) => res.status(501).send({
+  error: 'Los desembolsos a fundaciones no están habilitados hasta integrar y verificar un proveedor de pagos.',
+});

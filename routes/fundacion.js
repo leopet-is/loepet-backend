@@ -21,6 +21,7 @@ router.get(
 
 router.get(
   '/padrinos/:fundacionId',
+  passport,
   AsyncWrapper(fundacionController.getAnimalPadrinosFundacion),
 );
 

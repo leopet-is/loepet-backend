@@ -117,9 +117,14 @@ module.exports.createAnimal = [
     .optional()
     .isString()
     .withMessage('El campo descripcion debe ser de tipo String'),
+  body('historia')
+    .optional()
+    .isString()
+    .withMessage('El campo historia debe ser de tipo String'),
   body('status')
     .optional()
     .isIn([
+      'BORRADOR',
       'REQUIERE_PADRINOS',
       'APADRINADO',
       'EN_TRATAMIENTO',
@@ -127,8 +132,16 @@ module.exports.createAnimal = [
       'INACTIVO',
     ])
     .withMessage(
-      'El campo status debe ser uno de: REQUIERE_PADRINOS, APADRINADO, EN_TRATAMIENTO, FALLECIDO, INACTIVO',
+      'El campo status debe ser BORRADOR, REQUIERE_PADRINOS, APADRINADO, EN_TRATAMIENTO, FALLECIDO o INACTIVO',
     ),
+  body('visible')
+    .optional()
+    .isBoolean()
+    .withMessage('El campo visible debe ser booleano'),
+  body('imagen')
+    .optional()
+    .isString()
+    .withMessage('El campo imagen debe ser una URL o ruta de archivo'),
   body('peso')
     .optional()
     .isDecimal({ decimal_digits: '0,2' })
@@ -200,9 +213,14 @@ module.exports.updateAnimal = [
     .optional()
     .isString()
     .withMessage('El campo descripcion debe ser de tipo String'),
+  body('historia')
+    .optional()
+    .isString()
+    .withMessage('El campo historia debe ser de tipo String'),
   body('status')
     .optional()
     .isIn([
+      'BORRADOR',
       'REQUIERE_PADRINOS',
       'APADRINADO',
       'EN_TRATAMIENTO',
@@ -210,8 +228,16 @@ module.exports.updateAnimal = [
       'INACTIVO',
     ])
     .withMessage(
-      'El campo status debe ser uno de: REQUIERE_PADRINOS, APADRINADO, EN_TRATAMIENTO, FALLECIDO, INACTIVO',
+      'El campo status debe ser BORRADOR, REQUIERE_PADRINOS, APADRINADO, EN_TRATAMIENTO, FALLECIDO o INACTIVO',
     ),
+  body('visible')
+    .optional()
+    .isBoolean()
+    .withMessage('El campo visible debe ser booleano'),
+  body('imagen')
+    .optional()
+    .isString()
+    .withMessage('El campo imagen debe ser una URL o ruta de archivo'),
   body('peso')
     .optional()
     .isDecimal({ decimal_digits: '0,2' })

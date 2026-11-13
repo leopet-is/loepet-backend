@@ -11,6 +11,7 @@ const {
 
 exports.createActualizacion = async (req, res) => {
   try {
+    const { User } = req;
     const {
       descripcion,
       estado_salud: estadoSalud,
@@ -20,7 +21,15 @@ exports.createActualizacion = async (req, res) => {
       galeria,
       imagen,
     } = req.body;
-    console.log(`createActualizacion: animal_id=${animalId}, fundacion_id=${fundacionId}`);
+    if (!(await validateAdminFund(User.id)) || String(fundacionId) !== String(User.fundacionId)) {
+      return res.status(403).send({ error: 'La fundación no está autorizada para publicar esta actualización.' });
+    }
+    const animal = await db.Animal.findOne({
+      where: { id: animalId, fundacion_id: User.fundacionId, visible: true },
+    });
+    if (!animal) {
+      return res.status(404).send({ error: 'La mascota no existe o no pertenece a la fundación.' });
+    }
     const actualizacion = await db.ActualizacionAnimal.create({
       descripcion,
       estado_salud: estadoSalud,
@@ -64,26 +73,23 @@ exports.updateActualizacion = async (req, res) => {
       imagen,
     } = req.body;
 
-    const response = {
-      result: [],
-    };
-    if (
-      (await validateAdminFund(User.id))
-
-    ) {
-      const update = {
-        ...(!_.isEmpty(descripcion) ? { descripcion } : {}),
-        ...(!_.isEmpty(estadoSalud) ? { estado_salud: estadoSalud } : {}),
-        ...(!_.isEmpty(galeria) ? { galeria } : {}),
-        ...(!_.isEmpty(imagen) ? { imagen } : {}),
-        updatedAt: Date.now(),
-      };
-      const actualizacion = await db.ActualizacionAnimal.update(update, {
-        where: { id: actualizacionId, fundacion_id: User.fundacionId },
-      });
-      response.mensaje = 'Informacion del animal actualizada.';
-      response.result = actualizacion;
+    if (!(await validateAdminFund(User.id))) {
+      return res.status(403).send({ error: 'No está autorizado para modificar actualizaciones.' });
     }
+    const update = {
+      ...(!_.isEmpty(descripcion) ? { descripcion } : {}),
+      ...(!_.isEmpty(estadoSalud) ? { estado_salud: estadoSalud } : {}),
+      ...(!_.isEmpty(galeria) ? { galeria } : {}),
+      ...(!_.isEmpty(imagen) ? { imagen } : {}),
+      updatedAt: Date.now(),
+    };
+    const [updatedCount] = await db.ActualizacionAnimal.update(update, {
+      where: { id: actualizacionId, fundacion_id: User.fundacionId },
+    });
+    if (!updatedCount) return res.status(404).send({ error: 'Actualización no encontrada.' });
+    const response = {
+      mensaje: 'Información de la actualización guardada.',
+    };
     return res.send(response);
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -109,7 +115,7 @@ exports.deleteActualizacion = async (req, res) => {
 
     let mensaje = 'Actualizacion eliminado exitosamente';
     const actualizacion = await db.ActualizacionAnimal.findOne({
-      where: { id: actualizacionId, visible: true },
+      where: { id: actualizacionId, fundacion_id: User.fundacionId, visible: true },
     });
     if (_.isEmpty(actualizacion)) {
       mensaje = 'Actualizacion no encontrada';
