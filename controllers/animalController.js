@@ -263,6 +263,9 @@ exports.createAnimal = async (req, res) => {
       esterilizacion,
       vacunacion,
       desparasitacion,
+      status,
+      visible,
+      imagen,
     } = req.body;
 
     if (!(await validateAdminFund(User.id))) {
@@ -270,20 +273,28 @@ exports.createAnimal = async (req, res) => {
         .status(401)
         .send({ error: 'No esta autorizado para realizar esta operacion!' });
     }
+
+    const animalStatus = status === STATUS_ANIMAL.BORRADOR
+      ? STATUS_ANIMAL.BORRADOR
+      : (status || STATUS_ANIMAL.REQUIERE_PADRINOS);
+    const isVisible = visible !== undefined
+      ? Boolean(visible)
+      : (animalStatus !== STATUS_ANIMAL.BORRADOR);
+
     const animal = await db.Animal.create({
       nombre,
-      status: STATUS_ANIMAL.REQUIERE_PADRINOS,
-      especie,
-      raza,
-      descripcion,
-      imagen: '',
-      galeria,
+      status: animalStatus,
+      especie: especie || 'PERRO',
+      raza: raza || 'Mestizo',
+      descripcion: descripcion || '',
+      imagen: imagen || '',
+      galeria: galeria || [],
       fundacion_id: User.fundacionId,
-      visible: true,
-      sexo,
-      peso,
-      monto_meta_mensual,
-      monto_recaudado_actual,
+      visible: isVisible,
+      sexo: sexo || 'MACHO',
+      peso: peso || 0,
+      monto_meta_mensual: monto_meta_mensual || 0,
+      monto_recaudado_actual: monto_recaudado_actual || 0,
       fecha_nacimiento_estimada,
       enfermedades,
       esterilizacion,
@@ -291,12 +302,16 @@ exports.createAnimal = async (req, res) => {
       desparasitacion,
     });
 
-    // Crear notificaciones para donadores que tienen esta fundación en favoritos
-    crearNotificacionesNuevoAnimal(animal);
-    crearNotificacionesAlerta(animal);
+    // Solo notificar a donadores si NO es un borrador
+    if (animalStatus !== STATUS_ANIMAL.BORRADOR) {
+      crearNotificacionesNuevoAnimal(animal);
+      crearNotificacionesAlerta(animal);
+    }
 
     const response = {
-      mensaje: 'Animal creado exitosamente.',
+      mensaje: animalStatus === STATUS_ANIMAL.BORRADOR
+        ? 'Borrador creado exitosamente.'
+        : 'Animal creado exitosamente.',
       result: animal,
     };
     return res.send(response);
@@ -331,6 +346,9 @@ exports.updateAnimal = async (req, res) => {
       esterilizacion,
       vacunacion,
       desparasitacion,
+      status,
+      visible,
+      imagen,
     } = req.body;
     if (!(await validateAdminFund(User.id))) {
       return res.status(401).send({ error: 'No esta autorizado para realizar esta operacion!' });
@@ -339,13 +357,21 @@ exports.updateAnimal = async (req, res) => {
       return res.status(404).send({ error: 'Animal no encontrado en la fundacion' });
     }
 
+    const animalPrevio = await db.Animal.findByPk(animalId);
+    if (!animalPrevio) {
+      return res.status(404).send({ error: 'Animal no encontrado en la fundacion' });
+    }
+
     const update = {
       ...(!_.isEmpty(nombre) ? { nombre } : {}),
       ...(!_.isEmpty(especie) ? { especie } : {}),
       ...(!_.isEmpty(raza) ? { raza } : {}),
       ...(!_.isEmpty(descripcion) ? { descripcion } : {}),
+      ...(!_.isUndefined(imagen) ? { imagen } : {}),
       ...(!_.isEmpty(galeria) ? { galeria } : {}),
       ...(_.isUndefined(sexo) ? {} : { sexo }),
+      ...(_.isUndefined(status) ? {} : { status }),
+      ...(_.isUndefined(visible) ? {} : { visible }),
       ...(_.isUndefined(fecha_nacimiento_estimada) ? {} : { fecha_nacimiento_estimada }),
       ...(_.isUndefined(peso) ? {} : { peso }),
       ...(_.isUndefined(monto_meta_mensual) ? {} : { monto_meta_mensual }),
@@ -361,7 +387,14 @@ exports.updateAnimal = async (req, res) => {
     });
 
     const animalActualizado = await db.Animal.findByPk(animalId);
-    crearNotificacionesAlerta(animalActualizado);
+
+    // Si se pasa de BORRADOR a publicado, disparar alertas y notificaciones a donadores
+    if (animalPrevio.status === STATUS_ANIMAL.BORRADOR && animalActualizado.status !== STATUS_ANIMAL.BORRADOR) {
+      crearNotificacionesNuevoAnimal(animalActualizado);
+      crearNotificacionesAlerta(animalActualizado);
+    } else if (animalActualizado.status !== STATUS_ANIMAL.BORRADOR) {
+      crearNotificacionesAlerta(animalActualizado);
+    }
 
     return res.send({
       mensaje: 'Informacion del animal actualizada.',
@@ -444,7 +477,11 @@ exports.getAllAnimals = async (req, res) => {
             ? { especie: _.includes(['PERRO', 'GATO', 'OTRO'], normalizedSpecies) ? normalizedSpecies : 'OTRO' }
             : {}),
           ...(!_.isEmpty(q) ? { nombre: { [Op.regexp]: q } } : {}),
-          visible: true,
+          ...(req.query.status
+            ? { status: req.query.status }
+            : (view !== 'admin' && view !== 'admin_fund'
+              ? { visible: true, status: { [Op.ne]: STATUS_ANIMAL.BORRADOR } }
+              : {})),
         },
         order: [['id', 'DESC']],
         offset: (page - 1) * limit,

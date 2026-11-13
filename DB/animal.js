@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
        * ya esta apadrinado, estan en tratamiento, fallecio o fue retirado. */
       status: {
         type: DataTypes.ENUM(
+          STATUS_ANIMAL.BORRADOR,
           STATUS_ANIMAL.REQUIERE_PADRINOS,
           STATUS_ANIMAL.APADRINADO,
           STATUS_ANIMAL.EN_TRATAMIENTO,

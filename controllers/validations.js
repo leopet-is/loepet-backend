@@ -33,6 +33,48 @@ module.exports.allAnimals = [
     .optional()
     .isString()
     .withMessage('La especie debe ser de tipo String'),
+  query('tipoAnimal')
+    .optional()
+    .isString()
+    .withMessage('El tipo de animal debe ser de tipo String'),
+  query('manada')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('El campo manada debe ser un numero entero positivo')
+    .toInt(),
+  query('fundacionId')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('El campo fundacionId debe ser un numero entero positivo')
+    .toInt(),
+  query('q')
+    .optional()
+    .isString()
+    .withMessage('El campo q debe ser de tipo String')
+    .trim()
+    .notEmpty()
+    .withMessage('El campo q no puede estar vacio'),
+  query('page')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('El campo page debe ser un numero entero positivo')
+    .toInt(),
+  query('limit')
+    .optional()
+    .isInt({ min: 1, max: 100 })
+    .withMessage('El campo limit debe ser un numero entero entre 1 y 100')
+    .toInt(),
+  query('status')
+    .optional()
+    .isIn([
+      'BORRADOR',
+      'REQUIERE_PADRINOS',
+      'APADRINADO',
+      'EN_TRATAMIENTO',
+      'FALLECIDO',
+      'INACTIVO',
+    ])
+    .withMessage('El campo status debe ser uno de: BORRADOR, REQUIERE_PADRINOS, APADRINADO, EN_TRATAMIENTO, FALLECIDO, INACTIVO'),
   validate,
 ];
 
@@ -89,6 +131,7 @@ module.exports.createAnimal = [
   body('status')
     .optional()
     .isIn([
+      'BORRADOR',
       'REQUIERE_PADRINOS',
       'APADRINADO',
       'EN_TRATAMIENTO',
@@ -96,8 +139,16 @@ module.exports.createAnimal = [
       'INACTIVO',
     ])
     .withMessage(
-      'El campo status debe ser uno de: REQUIERE_PADRINOS, APADRINADO, EN_TRATAMIENTO, FALLECIDO, INACTIVO',
+      'El campo status debe ser uno de: BORRADOR, REQUIERE_PADRINOS, APADRINADO, EN_TRATAMIENTO, FALLECIDO, INACTIVO',
     ),
+  body('imagen')
+    .optional()
+    .isString()
+    .withMessage('El campo imagen debe ser de tipo String'),
+  body('visible')
+    .optional()
+    .isBoolean()
+    .withMessage('El campo visible debe ser booleano'),
   body('peso')
     .optional()
     .isDecimal({ decimal_digits: '0,2' })
@@ -172,6 +223,7 @@ module.exports.updateAnimal = [
   body('status')
     .optional()
     .isIn([
+      'BORRADOR',
       'REQUIERE_PADRINOS',
       'APADRINADO',
       'EN_TRATAMIENTO',
@@ -179,8 +231,16 @@ module.exports.updateAnimal = [
       'INACTIVO',
     ])
     .withMessage(
-      'El campo status debe ser uno de: REQUIERE_PADRINOS, APADRINADO, EN_TRATAMIENTO, FALLECIDO, INACTIVO',
+      'El campo status debe ser uno de: BORRADOR, REQUIERE_PADRINOS, APADRINADO, EN_TRATAMIENTO, FALLECIDO, INACTIVO',
     ),
+  body('imagen')
+    .optional()
+    .isString()
+    .withMessage('El campo imagen debe ser de tipo String'),
+  body('visible')
+    .optional()
+    .isBoolean()
+    .withMessage('El campo visible debe ser booleano'),
   body('peso')
     .optional()
     .isDecimal({ decimal_digits: '0,2' })
