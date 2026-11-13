@@ -117,6 +117,12 @@ module.exports.createAnimal = [
     .optional()
     .isString()
     .withMessage('El campo descripcion debe ser de tipo String'),
+  body('imagen')
+    .optional()
+    .isString()
+    .withMessage('El campo imagen debe ser de tipo String')
+    .isLength({ max: 500 })
+    .withMessage('El campo imagen no puede superar 500 caracteres'),
   body('status')
     .optional()
     .isIn([
@@ -200,6 +206,12 @@ module.exports.updateAnimal = [
     .optional()
     .isString()
     .withMessage('El campo descripcion debe ser de tipo String'),
+  body('imagen')
+    .optional()
+    .isString()
+    .withMessage('El campo imagen debe ser de tipo String')
+    .isLength({ max: 500 })
+    .withMessage('El campo imagen no puede superar 500 caracteres'),
   body('status')
     .optional()
     .isIn([
@@ -779,6 +791,12 @@ module.exports.updateActualizacion = [
     .optional()
     .isString()
     .withMessage('El campo descripcion debe ser de tipo String'),
+  body('imagen')
+    .optional()
+    .isString()
+    .withMessage('El campo imagen debe ser de tipo String')
+    .isLength({ max: 500 })
+    .withMessage('El campo imagen no puede superar 500 caracteres'),
   body('estado_salud')
     .optional()
     .isString()

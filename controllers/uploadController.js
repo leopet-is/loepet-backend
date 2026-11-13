@@ -13,9 +13,11 @@ exports.uploadFile = async (req, res) => {
 
     const fotos = await Promise.all(files.map(async (file) => {
       const { path: filePath, originalname: fileName } = file;
-      const location = await storage.updateFile(fileName, filePath);
-      fs.unlinkSync(filePath);
-      return location;
+      try {
+        return await storage.updateFile(fileName, filePath);
+      } finally {
+        fs.unlinkSync(filePath);
+      }
     }));
 
     return res.status(200).send({
@@ -34,10 +36,11 @@ exports.uploadFile = async (req, res) => {
 exports.deleteFile = async (req, res) => {
   try {
     const { file } = req.body;
-    const url = new URL(file);
-    const filePath = url.pathname.split('/').pop();
+    if (typeof file !== 'string' || !file) {
+      return res.status(400).send({ message: 'File URL is required' });
+    }
 
-    await storage.deleteFile(filePath);
+    await storage.deleteFile(file);
 
     return res.status(200).send({
       message: 'Imagen eliminada exitosamente',

@@ -28,7 +28,7 @@ services:
       PORT: 8181
       DATABASE_URL: postgresql://leopet:leopet@postgres:5432/leopet_dev
       DB_SSL: "false"
-      STORAGE_PROVIDER: local
+      STORAGE_PROVIDER: cloudinary
       API_URL: "http://localhost:8181"
     env_file:
       - .env

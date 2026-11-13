@@ -253,7 +253,7 @@ exports.createAnimal = async (req, res) => {
   try {
     const { User } = req;
     const {
-      nombre, especie, raza, descripcion, galeria,
+      nombre, especie, raza, descripcion, imagen, galeria,
       sexo,
       peso,
       monto_meta_mensual,
@@ -276,7 +276,7 @@ exports.createAnimal = async (req, res) => {
       especie,
       raza,
       descripcion,
-      imagen: '',
+      imagen: imagen || '',
       galeria,
       fundacion_id: User.fundacionId,
       visible: true,
@@ -321,7 +321,7 @@ exports.updateAnimal = async (req, res) => {
     const { User } = req;
     const { animalId } = req.params;
     const {
-      nombre, especie, raza, descripcion, galeria,
+      nombre, especie, raza, descripcion, imagen, galeria,
       sexo,
       fecha_nacimiento_estimada,
       peso,
@@ -344,6 +344,7 @@ exports.updateAnimal = async (req, res) => {
       ...(!_.isEmpty(especie) ? { especie } : {}),
       ...(!_.isEmpty(raza) ? { raza } : {}),
       ...(!_.isEmpty(descripcion) ? { descripcion } : {}),
+      ...(_.isUndefined(imagen) ? {} : { imagen }),
       ...(!_.isEmpty(galeria) ? { galeria } : {}),
       ...(_.isUndefined(sexo) ? {} : { sexo }),
       ...(_.isUndefined(fecha_nacimiento_estimada) ? {} : { fecha_nacimiento_estimada }),

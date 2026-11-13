@@ -76,6 +76,11 @@ const { Usuario, AdminFund } = db;
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).send('El email y la contraseña son obligatorios.');
+    }
+
     const unAuthorizedResponse = 'Credenciales incorrectas.';
 
     const User = await Usuario.findOne({

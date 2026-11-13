@@ -35,7 +35,8 @@ describe('JWT Authentication', () => {
     await db.disconnect();
   });
 
-  it('Should return 200 OK and a token for a valid login', async () => {
+  // C01: Registered | Correct -> 200 OK
+  it('C01: Should return 200 OK and a token for valid credentials', async () => {
     const response = await supertest(app)
       .post('/auth/login')
       .send({ email: testUser.email, password: testUser.password });
@@ -45,11 +46,66 @@ describe('JWT Authentication', () => {
     expect(response.body).toHaveProperty('result.id', createdUser.id);
   });
 
-  it('Should return 401 Unauthorized for an invalid password', async () => {
+  // C02: Registered | Incorrect -> 401 Unauthorized
+  it('C02: Should return 401 Unauthorized for an invalid password', async () => {
     const response = await supertest(app)
       .post('/auth/login')
       .send({ email: testUser.email, password: 'wrongpassword' });
 
     expect(response.status).toBe(401);
+  });
+
+  // C03: Unregistered | Any ordinary password -> 401 Unauthorized
+  it('C03: Should return 401 Unauthorized for an unregistered email', async () => {
+    const response = await supertest(app)
+      .post('/auth/login')
+      .send({ email: 'nonexistent@example.com', password: 'anypassword123' });
+
+    expect(response.status).toBe(401);
+  });
+
+  // C04: Malformed | Correct-looking password -> Validation error (400)
+  it('C04: Should return 400 Validation Error for a malformed email format', async () => {
+    const response = await supertest(app)
+      .post('/auth/login')
+      .send({ email: 'invalid-email-format', password: testUser.password });
+
+    expect(response.status).toBe(400);
+  });
+
+  // C05: Empty | Correct-looking password -> Validation error (400)
+  it('C05: Should return 400 Validation Error for an empty email field', async () => {
+    const response = await supertest(app)
+      .post('/auth/login')
+      .send({ email: '', password: testUser.password });
+
+    expect(response.status).toBe(400);
+  });
+
+  // C06: Registered | Empty -> Validation error (400)
+  it('C06: Should return 400 Validation Error for an empty password field', async () => {
+    const response = await supertest(app)
+      .post('/auth/login')
+      .send({ email: testUser.email, password: '' });
+
+    expect(response.status).toBe(400);
+  });
+
+  // C07: Unregistered | Incorrect -> 401 Unauthorized
+  it('C07: Should return 401 Unauthorized for unregistered email and incorrect password combination', async () => {
+    const response = await supertest(app)
+      .post('/auth/login')
+      .send({ email: 'unregistered-user@leopet.org', password: 'wrongpassword' });
+
+    expect(response.status).toBe(401);
+  });
+
+  // C08: Missing | Missing -> Validation error (400)
+  it('C08: Should return 400 Validation Error when both email and password are missing from payload', async () => {
+    const response = await supertest(app)
+      .post('/auth/login')
+      .send({}); // Payload vacío
+
+    expect(response.status).toBe(400);
   });
 });
