@@ -2,33 +2,41 @@ name: Backend CI
 
 on:
   push:
+    branches: [main] # Ajusta según tus ramas principales (o déjalo abierto si prefieres)
   pull_request:
 
 permissions:
   contents: read
 
+# Cancela ejecuciones anteriores si haces varios push seguidos en la misma rama/PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lint:
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
+
       - run: npm ci
+
       - name: Lint runtime and database migrations
+        # Si ya tienes un script "lint" en package.json, puedes cambiar esto por: npm run lint
         run: >-
-          npm exec eslint --
-          DB/index.js config/config.js controllers/loginController.js
-          middlewares/passport.js server.js
-          migrations/20260901130021-add-activacion-usuario.js
-          migrations/20260901150023-token-activacion-relacion.js
-          migrations/20260901170024-remove-habilitado-usuario.js
-          migrations/20260901180025-update-animal-apadrinamiento.js
+          npm run lint
 
   test:
+    name: Integration & Unit Tests
     runs-on: ubuntu-latest
+    # Si más adelante creas un Environment llamado "test" en GitHub, descomenta la siguiente línea:
+    # environment: test
     env:
       NODE_ENV: test
       JWT_SECRET: secret
@@ -37,12 +45,23 @@ jobs:
       STORAGE_PROVIDER: local
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
+
       - run: npm ci
+
       - name: Verify test database secret
-        run: node -e "if (!process.env.DATABASE_URL) { console.error('Configure DATABASE_URL as the disposable test-project connection in GitHub Actions secrets'); process.exit(1); }"
-      - run: npm run db:migrate:test
-      - run: npm run test:unit -- --runInBand
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "Error: Configura DATABASE_URL apuntando a la BD de pruebas en los secretos de GitHub Actions."
+            exit 1
+          fi
+
+      - name: Run test migrations
+        run: npm run db:migrate:test
+
+      - name: Run tests
+        run: npm run test:unit -- --runInBand
