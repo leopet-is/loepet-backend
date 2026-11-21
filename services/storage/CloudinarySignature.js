@@ -3,7 +3,11 @@ const crypto = require('crypto');
 const UPLOAD_FOLDER = 'mascotas';
 
 exports.getCloudinarySignature = (req, res) => {
-  const { CLOUDINARY_API_SECRET: apiSecret, CLOUDINARY_API_KEY: apiKey, CLOUDINARY_CLOUD_NAME: cloudName } = process.env;
+  const {
+    CLOUDINARY_API_SECRET: apiSecret,
+    CLOUDINARY_API_KEY: apiKey,
+    CLOUDINARY_CLOUD_NAME: cloudName,
+  } = process.env;
 
   if (!apiSecret || !apiKey || !cloudName) {
     return res.status(503).json({

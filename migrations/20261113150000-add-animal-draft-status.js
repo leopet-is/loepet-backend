@@ -7,7 +7,7 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    const sequelize = queryInterface.sequelize;
+    const { sequelize } = queryInterface;
     await sequelize.transaction(async (transaction) => {
       await sequelize.query(
         'UPDATE "animal" SET "status" = \'INACTIVO\' WHERE "status"::text = \'BORRADOR\';',
