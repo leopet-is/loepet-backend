@@ -7,9 +7,10 @@
     "node": ">=22.0.0"
   },
   "scripts": {
-    "test": "cross-env NODE_ENV=test JWT_SECRET=secret STORAGE_PROVIDER=local jest --coverage",
-    "test:watch": "cross-env NODE_ENV=test JWT_SECRET=secret STORAGE_PROVIDER=local jest --watch",
+    "test": "cross-env NODE_ENV=test JWT_SECRET=secret STORAGE_PROVIDER=local QA_BASE_URL=http://localhost:8181 jest --coverage",
+    "test:watch": "cross-env NODE_ENV=test JWT_SECRET=secret STORAGE_PROVIDER=local QA_BASE_URL=http://localhost:8181 jest --watch",
     "test:unit": "cross-env NODE_ENV=test JWT_SECRET=secret STORAGE_PROVIDER=local jest test/db test/lib test/middleware --passWithNoTests",
+    "test:functional": "cross-env NODE_ENV=test JWT_SECRET=secret STORAGE_PROVIDER=local QA_BASE_URL=http://localhost:8181 jest test/functional-qa --runInBand",
     "start": "cross-env NODE_ENV=development nodemon server.js",
     "start:test": "cross-env NODE_ENV=test nodemon server.js",
     "lint": "eslint . --ext .js --ignore-path .gitignore",

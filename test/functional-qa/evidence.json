@@ -1,6 +1,6 @@
 {
   "baseUrl": "http://localhost:8181",
-  "generadoEn": "2026-11-21T21:48:40.710Z",
+  "generadoEn": "2026-11-22T16:08:41.032Z",
   "totalEvidencias": 48,
   "resumen": {
     "PASS": 41,
@@ -12,7 +12,7 @@
       "tecnica": "Smoke",
       "hu": "Infraestructura",
       "caso": "Backend responde health check",
-      "ejecutadoEn": "2026-11-21T21:47:52.738Z",
+      "ejecutadoEn": "2026-11-22T16:08:07.909Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "GET",
@@ -24,7 +24,7 @@
         "status": 200,
         "body": {
           "status": "OK",
-          "timestamp": "2026-11-21T21:47:52.685Z"
+          "timestamp": "2026-11-22T16:08:07.851Z"
         }
       },
       "esperado": "200 OK",
@@ -35,7 +35,7 @@
       "tecnica": "Decision Table",
       "hu": "HU-ADM-1",
       "caso": "Login admin con credenciales validas",
-      "ejecutadoEn": "2026-11-21T21:47:57.674Z",
+      "ejecutadoEn": "2026-11-22T16:08:12.525Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "POST",
@@ -50,7 +50,7 @@
         "status": 200,
         "body": {
           "result": {
-            "id": 47,
+            "id": 11,
             "role": 1,
             "cedula": "1710034069",
             "nombres": "QA",
@@ -58,8 +58,8 @@
             "telefono": "0987654321",
             "email": "qa-admin@leopet.test",
             "direccion": null,
-            "createdAt": "2026-11-21T21:47:55.536Z",
-            "updatedAt": "2026-11-21T21:47:55.537Z",
+            "createdAt": "2026-11-22T16:08:10.651Z",
+            "updatedAt": "2026-11-22T16:08:10.661Z",
             "token": "[REDACTED]"
           },
           "expiresIn": 28800,
@@ -74,7 +74,7 @@
       "tecnica": "Decision Table",
       "hu": "HU-DON-1",
       "caso": "Registro y login donador",
-      "ejecutadoEn": "2026-11-21T21:47:58.501Z",
+      "ejecutadoEn": "2026-11-22T16:08:13.099Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "POST",
@@ -89,7 +89,7 @@
         "status": 200,
         "body": {
           "result": {
-            "id": 48,
+            "id": 12,
             "role": 3,
             "cedula": "1710034065",
             "nombres": "QA",
@@ -97,8 +97,8 @@
             "telefono": "0987654321",
             "direccion": null,
             "email": "qa-donor@leopet.test",
-            "createdAt": "2026-11-21T21:47:58.319Z",
-            "updatedAt": "2026-11-21T21:47:58.321Z",
+            "createdAt": "2026-11-22T16:08:12.942Z",
+            "updatedAt": "2026-11-22T16:08:12.943Z",
             "token": "[REDACTED]"
           },
           "expiresIn": 28800,
@@ -113,7 +113,7 @@
       "tecnica": "Decision Table",
       "hu": "HU-DON-1",
       "caso": "Login donador con credenciales validas",
-      "ejecutadoEn": "2026-11-21T21:47:58.986Z",
+      "ejecutadoEn": "2026-11-22T16:08:13.483Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "POST",
@@ -128,7 +128,7 @@
         "status": 200,
         "body": {
           "result": {
-            "id": 48,
+            "id": 12,
             "role": 3,
             "cedula": "1710034065",
             "nombres": "QA",
@@ -136,8 +136,8 @@
             "telefono": "0987654321",
             "email": "qa-donor@leopet.test",
             "direccion": null,
-            "createdAt": "2026-11-21T21:47:58.319Z",
-            "updatedAt": "2026-11-21T21:47:58.321Z",
+            "createdAt": "2026-11-22T16:08:12.942Z",
+            "updatedAt": "2026-11-22T16:08:12.943Z",
             "token": "[REDACTED]"
           },
           "expiresIn": 28800,
@@ -152,7 +152,7 @@
       "tecnica": "Decision Table",
       "hu": "HU-ADM-2",
       "caso": "Solicitud de fundacion creada",
-      "ejecutadoEn": "2026-11-21T21:47:59.490Z",
+      "ejecutadoEn": "2026-11-22T16:08:13.948Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "POST",
@@ -167,10 +167,10 @@
         "body": {
           "mensaje": "Solicitud de fundación enviada exitosamente.",
           "result": {
-            "createdAt": "2026-11-21T21:47:59.318Z",
-            "updatedAt": "2026-11-21T21:47:59.322Z",
+            "createdAt": "2026-11-22T16:08:13.796Z",
+            "updatedAt": "2026-11-22T16:08:13.797Z",
             "ready_for_creation": false,
-            "id": 28,
+            "id": 3,
             "ruc": "1726119835001",
             "nombre": "QA Fundacion 1726119835001",
             "direccion": "Quito, Ecuador",
@@ -193,11 +193,11 @@
       "tecnica": "Decision Table",
       "hu": "HU-ADM-2",
       "caso": "Admin aprueba solicitud",
-      "ejecutadoEn": "2026-11-21T21:48:02.464Z",
+      "ejecutadoEn": "2026-11-22T16:08:15.895Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "PUT",
-        "endpoint": "/admin/solicitudes/28/aprobar",
+        "endpoint": "/admin/solicitudes/3/aprobar",
         "body": null,
         "tokenRole": "admin"
       },
@@ -207,7 +207,7 @@
           "mensaje": "Solicitud aprobada exitosamente. Se envio el correo de activacion a la fundacion.",
           "result": {
             "solicitud": {
-              "id": 28,
+              "id": 3,
               "ruc": "1726119835001",
               "nombre": "QA Fundacion 1726119835001",
               "direccion": "Quito, Ecuador",
@@ -220,13 +220,13 @@
               "estado": "aprobada",
               "ready_for_creation": false,
               "notas_admin": "Solicitud aprobada. Correo de activacion enviado a la fundacion.",
-              "createdAt": "2026-11-21T21:47:59.318Z",
-              "updatedAt": "2026-11-21T21:48:00.808Z"
+              "createdAt": "2026-11-22T16:08:13.796Z",
+              "updatedAt": "2026-11-22T16:08:15.150Z"
             },
             "fundacion": {
-              "createdAt": "2026-11-21T21:48:00.157Z",
-              "updatedAt": "2026-11-21T21:48:00.158Z",
-              "id": 26,
+              "createdAt": "2026-11-22T16:08:14.546Z",
+              "updatedAt": "2026-11-22T16:08:14.546Z",
+              "id": 9,
               "ruc": "1726119835001",
               "nombre": "QA Fundacion 1726119835001",
               "direccion": "Quito, Ecuador",
@@ -234,13 +234,13 @@
               "aprobado": true,
               "comision": "0.00",
               "logo": "/logo.png",
-              "solicitud_id": 28,
+              "solicitud_id": 3,
               "descripcion": null
             },
             "usuario": {
-              "createdAt": "2026-11-21T21:48:00.327Z",
-              "updatedAt": "2026-11-21T21:48:00.327Z",
-              "id": 49,
+              "createdAt": "2026-11-22T16:08:14.700Z",
+              "updatedAt": "2026-11-22T16:08:14.700Z",
+              "id": 13,
               "cedula": "0909090904",
               "nombres": "Ana",
               "apellidos": "Perez",
@@ -261,7 +261,7 @@
       "tecnica": "Decision Table",
       "hu": "HU-ADM-2",
       "caso": "Fundacion activa su cuenta",
-      "ejecutadoEn": "2026-11-21T21:48:03.837Z",
+      "ejecutadoEn": "2026-11-22T16:08:16.881Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "POST",
@@ -286,7 +286,7 @@
       "tecnica": "Decision Table",
       "hu": "HU-FND-1",
       "caso": "Login fundacion activada",
-      "ejecutadoEn": "2026-11-21T21:48:04.584Z",
+      "ejecutadoEn": "2026-11-22T16:08:17.415Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "POST",
@@ -301,7 +301,7 @@
         "status": 200,
         "body": {
           "result": {
-            "id": 49,
+            "id": 13,
             "role": 2,
             "cedula": "0909090904",
             "nombres": "Ana",
@@ -309,9 +309,9 @@
             "telefono": "0987654321",
             "email": "qa-fundacion@leopet.test",
             "direccion": "Quito, Ecuador",
-            "createdAt": "2026-11-21T21:48:00.327Z",
-            "updatedAt": "2026-11-21T21:48:03.358Z",
-            "fundacionId": 26,
+            "createdAt": "2026-11-22T16:08:14.700Z",
+            "updatedAt": "2026-11-22T16:08:16.433Z",
+            "fundacionId": 9,
             "token": "[REDACTED]"
           },
           "expiresIn": 28800,
@@ -326,11 +326,11 @@
       "tecnica": "Decision Table",
       "hu": "HU-ADM-2",
       "caso": "Admin rechaza solicitud",
-      "ejecutadoEn": "2026-11-21T21:48:05.914Z",
+      "ejecutadoEn": "2026-11-22T16:08:18.611Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "PUT",
-        "endpoint": "/admin/solicitudes/29/rechazar",
+        "endpoint": "/admin/solicitudes/4/rechazar",
         "body": {
           "notas_admin": "QA - solicitud duplicada"
         },
@@ -341,7 +341,7 @@
         "body": {
           "mensaje": "Solicitud rechazada exitosamente. Se envio el correo de rechazo.",
           "result": {
-            "id": 29,
+            "id": 4,
             "ruc": "1790016919002",
             "nombre": "QA Fundacion 1790016919002",
             "direccion": "Quito, Ecuador",
@@ -354,8 +354,8 @@
             "estado": "rechazada",
             "ready_for_creation": false,
             "notas_admin": "QA - solicitud duplicada",
-            "createdAt": "2026-11-21T21:48:04.903Z",
-            "updatedAt": "2026-11-21T21:48:05.457Z"
+            "createdAt": "2026-11-22T16:08:17.717Z",
+            "updatedAt": "2026-11-22T16:08:18.167Z"
           }
         }
       },
@@ -367,7 +367,7 @@
       "tecnica": "EP",
       "hu": "HU-FND-2",
       "caso": "Fundacion publica tres animales",
-      "ejecutadoEn": "2026-11-21T21:48:11.073Z",
+      "ejecutadoEn": "2026-11-22T16:08:23.090Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "POST",
@@ -382,12 +382,12 @@
         "body": {
           "mensaje": "Animal creado exitosamente.",
           "result": {
-            "createdAt": "2026-11-21T21:48:10.917Z",
-            "updatedAt": "2026-11-21T21:48:10.917Z",
-            "fecha_registro": "2026-11-21",
+            "createdAt": "2026-11-22T16:08:22.927Z",
+            "updatedAt": "2026-11-22T16:08:22.927Z",
+            "fecha_registro": "2026-11-22",
             "esterilizacion": false,
             "desparasitacion": false,
-            "id": 22,
+            "id": 6,
             "nombre": "QA Gato",
             "status": "REQUIERE_PADRINOS",
             "especie": "GATO",
@@ -398,7 +398,7 @@
             "galeria": [
               "/images/qa.png"
             ],
-            "fundacion_id": 26,
+            "fundacion_id": 9,
             "visible": true,
             "sexo": "HEMBRA",
             "peso": null,
@@ -419,7 +419,7 @@
       "tecnica": "Decision Table",
       "hu": "HU-DON-7",
       "caso": "Donador crea manada con monto valido",
-      "ejecutadoEn": "2026-11-21T21:48:11.914Z",
+      "ejecutadoEn": "2026-11-22T16:08:23.886Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "POST",
@@ -435,11 +435,11 @@
         "body": {
           "mensaje": "Manada creada exitosamente",
           "manada": {
-            "createdAt": "2026-11-21T21:48:11.417Z",
-            "updatedAt": "2026-11-21T21:48:11.423Z",
-            "id": 7,
+            "createdAt": "2026-11-22T16:08:23.416Z",
+            "updatedAt": "2026-11-22T16:08:23.416Z",
+            "id": 2,
             "nombre": "Manada QA",
-            "userId": 48,
+            "userId": 12,
             "status": true
           }
         }
@@ -452,15 +452,15 @@
       "tecnica": "Decision Table",
       "hu": "HU-DON-7",
       "caso": "Agregar 2 animales a la manada",
-      "ejecutadoEn": "2026-11-21T21:48:12.588Z",
+      "ejecutadoEn": "2026-11-22T16:08:24.507Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "POST",
-        "endpoint": "/manada/7/animals",
+        "endpoint": "/manada/2/animals",
         "body": {
           "animalId": [
-            20,
-            21
+            4,
+            5
           ]
         },
         "tokenRole": "donador"
@@ -471,18 +471,18 @@
           "mensaje": "Animales agregados exitosamente a la manada",
           "data": [
             {
-              "createdAt": "2026-11-21T21:48:12.421Z",
-              "updatedAt": "2026-11-21T21:48:12.421Z",
-              "id": 10,
-              "manada_id": 7,
-              "animal_id": 20
+              "createdAt": "2026-11-22T16:08:24.347Z",
+              "updatedAt": "2026-11-22T16:08:24.347Z",
+              "id": 3,
+              "manada_id": 2,
+              "animal_id": 4
             },
             {
-              "createdAt": "2026-11-21T21:48:12.420Z",
-              "updatedAt": "2026-11-21T21:48:12.420Z",
-              "id": 9,
-              "manada_id": 7,
-              "animal_id": 21
+              "createdAt": "2026-11-22T16:08:24.346Z",
+              "updatedAt": "2026-11-22T16:08:24.346Z",
+              "id": 4,
+              "manada_id": 2,
+              "animal_id": 5
             }
           ]
         }
@@ -495,13 +495,13 @@
       "tecnica": "Decision Table",
       "hu": "Transversal/Comisiones",
       "caso": "Fundacion crea actualizacion",
-      "ejecutadoEn": "2026-11-21T21:48:13.417Z",
+      "ejecutadoEn": "2026-11-22T16:08:25.286Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "POST",
         "endpoint": "/actualizacion/",
         "body": {
-          "animal_id": 20
+          "animal_id": 4
         },
         "tokenRole": "fundacion"
       },
@@ -510,14 +510,14 @@
         "body": {
           "mensaje": "Actualizacion registrada exitosamente.",
           "result": {
-            "createdAt": "2026-11-21T21:48:13.242Z",
-            "updatedAt": "2026-11-21T21:48:13.243Z",
-            "fecha": "2026-11-21T21:48:13.242Z",
-            "id": 5,
+            "createdAt": "2026-11-22T16:08:25.130Z",
+            "updatedAt": "2026-11-22T16:08:25.130Z",
+            "fecha": "2026-11-22T16:08:25.130Z",
+            "id": 1,
             "descripcion": "Actualizacion QA",
             "estado_salud": "Estable",
-            "animal_id": 20,
-            "fundacion_id": 26,
+            "animal_id": 4,
+            "fundacion_id": 9,
             "galeria": null,
             "imagen": "/images/qa-update.png",
             "visible": true,
@@ -533,7 +533,7 @@
       "tecnica": "Decision Table",
       "hu": "HU-DON-1",
       "caso": "Password incorrecto",
-      "ejecutadoEn": "2026-11-21T21:48:14.161Z",
+      "ejecutadoEn": "2026-11-22T16:08:25.670Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "POST",
@@ -556,7 +556,7 @@
       "tecnica": "Decision Table",
       "hu": "HU-DON-1",
       "caso": "Email inexistente",
-      "ejecutadoEn": "2026-11-21T21:48:14.334Z",
+      "ejecutadoEn": "2026-11-22T16:08:25.823Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "POST",
@@ -578,11 +578,11 @@
       "tecnica": "Decision Table",
       "hu": "HU-ADM-1",
       "caso": "Admin deshabilita donador",
-      "ejecutadoEn": "2026-11-21T21:48:14.825Z",
+      "ejecutadoEn": "2026-11-22T16:08:26.278Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "PUT",
-        "endpoint": "/usuario/48/status",
+        "endpoint": "/usuario/12/status",
         "body": {
           "estado": "INACTIVO"
         },
@@ -603,7 +603,7 @@
       "tecnica": "Decision Table",
       "hu": "HU-DON-1",
       "caso": "Login con cuenta deshabilitada",
-      "ejecutadoEn": "2026-11-21T21:48:14.991Z",
+      "ejecutadoEn": "2026-11-22T16:08:26.430Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "POST",
@@ -625,7 +625,7 @@
       "tecnica": "Decision Table",
       "hu": "HU-FND-1",
       "caso": "Fundacion intenta acceder a accion de donador",
-      "ejecutadoEn": "2026-11-21T21:48:15.789Z",
+      "ejecutadoEn": "2026-11-22T16:08:27.184Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "POST",
@@ -650,7 +650,7 @@
       "tecnica": "BVA",
       "hu": "HU-ADM-1",
       "caso": "Intento fallido 1",
-      "ejecutadoEn": "2026-11-21T21:48:22.653Z",
+      "ejecutadoEn": "2026-11-22T16:08:27.805Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "POST",
@@ -672,7 +672,7 @@
       "tecnica": "BVA",
       "hu": "HU-ADM-1",
       "caso": "Intento fallido 2",
-      "ejecutadoEn": "2026-11-21T21:48:22.653Z",
+      "ejecutadoEn": "2026-11-22T16:08:27.805Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "POST",
@@ -694,7 +694,7 @@
       "tecnica": "BVA",
       "hu": "HU-ADM-1",
       "caso": "Intento fallido 3",
-      "ejecutadoEn": "2026-11-21T21:48:22.653Z",
+      "ejecutadoEn": "2026-11-22T16:08:27.805Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "POST",
@@ -716,7 +716,7 @@
       "tecnica": "BVA",
       "hu": "HU-ADM-1",
       "caso": "Intento fallido 4",
-      "ejecutadoEn": "2026-11-21T21:48:22.653Z",
+      "ejecutadoEn": "2026-11-22T16:08:27.805Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "POST",
@@ -738,7 +738,7 @@
       "tecnica": "Decision Table",
       "hu": "HU-ADM-2",
       "caso": "Listado admin refleja estados",
-      "ejecutadoEn": "2026-11-21T21:48:25.395Z",
+      "ejecutadoEn": "2026-11-22T16:08:29.894Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "GET",
@@ -755,7 +755,7 @@
           "total": 3,
           "result": [
             {
-              "id": 30,
+              "id": 5,
               "ruc": "3012345678001",
               "nombre": "QA Fundacion 3012345678001",
               "direccion": "Quito, Ecuador",
@@ -768,11 +768,11 @@
               "estado": "aprobada",
               "ready_for_creation": false,
               "notas_admin": "Solicitud aprobada. Correo de activacion enviado a la fundacion.",
-              "createdAt": "2026-11-21T21:48:06.234Z",
-              "updatedAt": "2026-11-21T21:48:07.681Z"
+              "createdAt": "2026-11-22T16:08:18.919Z",
+              "updatedAt": "2026-11-22T16:08:20.278Z"
             },
             {
-              "id": 29,
+              "id": 4,
               "ruc": "1790016919002",
               "nombre": "QA Fundacion 1790016919002",
               "direccion": "Quito, Ecuador",
@@ -785,11 +785,11 @@
               "estado": "rechazada",
               "ready_for_creation": false,
               "notas_admin": "QA - solicitud duplicada",
-              "createdAt": "2026-11-21T21:48:04.903Z",
-              "updatedAt": "2026-11-21T21:48:05.457Z"
+              "createdAt": "2026-11-22T16:08:17.717Z",
+              "updatedAt": "2026-11-22T16:08:18.167Z"
             },
             {
-              "id": 28,
+              "id": 3,
               "ruc": "1726119835001",
               "nombre": "QA Fundacion 1726119835001",
               "direccion": "Quito, Ecuador",
@@ -802,8 +802,8 @@
               "estado": "aprobada",
               "ready_for_creation": false,
               "notas_admin": "Solicitud aprobada. Correo de activacion enviado a la fundacion.",
-              "createdAt": "2026-11-21T21:47:59.318Z",
-              "updatedAt": "2026-11-21T21:48:00.808Z"
+              "createdAt": "2026-11-22T16:08:13.796Z",
+              "updatedAt": "2026-11-22T16:08:15.150Z"
             }
           ]
         }
@@ -816,11 +816,11 @@
       "tecnica": "EP",
       "hu": "HU-DON-3",
       "caso": "Filtro por especie PERRO",
-      "ejecutadoEn": "2026-11-21T21:48:25.909Z",
+      "ejecutadoEn": "2026-11-22T16:08:30.349Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "GET",
-        "endpoint": "/animal?fundacionId=26&especie=PERRO",
+        "endpoint": "/animal?fundacionId=9&especie=PERRO",
         "body": null,
         "tokenRole": "publico"
       },
@@ -833,7 +833,7 @@
           "total": 2,
           "result": [
             {
-              "id": 20,
+              "id": 4,
               "nombre": "QA Urgente",
               "status": "EN_TRATAMIENTO",
               "especie": "PERRO",
@@ -844,7 +844,7 @@
               "galeria": [
                 "/images/qa.png"
               ],
-              "fundacion_id": 26,
+              "fundacion_id": 9,
               "fundacion": "QA Fundacion 1726119835001",
               "sexo": "HEMBRA",
               "fecha_nacimiento_estimada": null,
@@ -853,10 +853,10 @@
               "vacunacion": true,
               "desparasitacion": false,
               "fecha_rescate": null,
-              "fecha_registro": "2026-11-21"
+              "fecha_registro": "2026-11-22"
             },
             {
-              "id": 21,
+              "id": 5,
               "nombre": "QA Normal",
               "status": "REQUIERE_PADRINOS",
               "especie": "PERRO",
@@ -867,7 +867,7 @@
               "galeria": [
                 "/images/qa.png"
               ],
-              "fundacion_id": 26,
+              "fundacion_id": 9,
               "fundacion": "QA Fundacion 1726119835001",
               "sexo": "HEMBRA",
               "fecha_nacimiento_estimada": null,
@@ -876,7 +876,7 @@
               "vacunacion": true,
               "desparasitacion": false,
               "fecha_rescate": null,
-              "fecha_registro": "2026-11-21"
+              "fecha_registro": "2026-11-22"
             }
           ]
         }
@@ -889,11 +889,11 @@
       "tecnica": "EP",
       "hu": "HU-DON-3",
       "caso": "Filtro por manada",
-      "ejecutadoEn": "2026-11-21T21:48:27.364Z",
+      "ejecutadoEn": "2026-11-22T16:08:31.099Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "GET",
-        "endpoint": "/animal?manada=7",
+        "endpoint": "/animal?manada=2",
         "body": null,
         "tokenRole": "donador"
       },
@@ -906,7 +906,7 @@
           "total": 2,
           "result": [
             {
-              "id": 20,
+              "id": 4,
               "nombre": "QA Urgente",
               "status": "EN_TRATAMIENTO",
               "especie": "PERRO",
@@ -917,7 +917,7 @@
               "galeria": [
                 "/images/qa.png"
               ],
-              "fundacion_id": 26,
+              "fundacion_id": 9,
               "fundacion": "QA Fundacion 1726119835001",
               "sexo": "HEMBRA",
               "fecha_nacimiento_estimada": null,
@@ -926,26 +926,26 @@
               "vacunacion": true,
               "desparasitacion": false,
               "fecha_rescate": null,
-              "fecha_registro": "2026-11-21",
+              "fecha_registro": "2026-11-22",
               "historial": [
                 {
-                  "id": 5,
-                  "animal_id": 20,
-                  "fundacion_id": 26,
-                  "fecha": "2026-11-21T21:48:13.242Z",
+                  "id": 1,
+                  "animal_id": 4,
+                  "fundacion_id": 9,
+                  "fecha": "2026-11-22T16:08:25.130Z",
                   "descripcion": "Actualizacion QA",
                   "estado_salud": "Estable",
                   "imagen": "/images/qa-update.png",
                   "calificacion": null,
                   "visible": true,
-                  "createdAt": "2026-11-21T21:48:13.242Z",
-                  "updatedAt": "2026-11-21T21:48:13.243Z",
+                  "createdAt": "2026-11-22T16:08:25.130Z",
+                  "updatedAt": "2026-11-22T16:08:25.130Z",
                   "galeria": null
                 }
               ]
             },
             {
-              "id": 21,
+              "id": 5,
               "nombre": "QA Normal",
               "status": "REQUIERE_PADRINOS",
               "especie": "PERRO",
@@ -956,7 +956,7 @@
               "galeria": [
                 "/images/qa.png"
               ],
-              "fundacion_id": 26,
+              "fundacion_id": 9,
               "fundacion": "QA Fundacion 1726119835001",
               "sexo": "HEMBRA",
               "fecha_nacimiento_estimada": null,
@@ -965,7 +965,7 @@
               "vacunacion": true,
               "desparasitacion": false,
               "fecha_rescate": null,
-              "fecha_registro": "2026-11-21"
+              "fecha_registro": "2026-11-22"
             }
           ]
         }
@@ -978,11 +978,11 @@
       "tecnica": "Decision Table",
       "hu": "HU-DON-3",
       "caso": "EN_TRATAMIENTO aparece antes que REQUIERE_PADRINOS",
-      "ejecutadoEn": "2026-11-21T21:48:27.858Z",
+      "ejecutadoEn": "2026-11-22T16:08:31.553Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "GET",
-        "endpoint": "/animal?fundacionId=26",
+        "endpoint": "/animal?fundacionId=9",
         "body": null,
         "tokenRole": "publico"
       },
@@ -995,7 +995,7 @@
           "total": 3,
           "result": [
             {
-              "id": 20,
+              "id": 4,
               "nombre": "QA Urgente",
               "status": "EN_TRATAMIENTO",
               "especie": "PERRO",
@@ -1006,7 +1006,7 @@
               "galeria": [
                 "/images/qa.png"
               ],
-              "fundacion_id": 26,
+              "fundacion_id": 9,
               "fundacion": "QA Fundacion 1726119835001",
               "sexo": "HEMBRA",
               "fecha_nacimiento_estimada": null,
@@ -1015,10 +1015,10 @@
               "vacunacion": true,
               "desparasitacion": false,
               "fecha_rescate": null,
-              "fecha_registro": "2026-11-21"
+              "fecha_registro": "2026-11-22"
             },
             {
-              "id": 22,
+              "id": 6,
               "nombre": "QA Gato",
               "status": "REQUIERE_PADRINOS",
               "especie": "GATO",
@@ -1029,7 +1029,7 @@
               "galeria": [
                 "/images/qa.png"
               ],
-              "fundacion_id": 26,
+              "fundacion_id": 9,
               "fundacion": "QA Fundacion 1726119835001",
               "sexo": "HEMBRA",
               "fecha_nacimiento_estimada": null,
@@ -1038,10 +1038,10 @@
               "vacunacion": true,
               "desparasitacion": false,
               "fecha_rescate": null,
-              "fecha_registro": "2026-11-21"
+              "fecha_registro": "2026-11-22"
             },
             {
-              "id": 21,
+              "id": 5,
               "nombre": "QA Normal",
               "status": "REQUIERE_PADRINOS",
               "especie": "PERRO",
@@ -1052,7 +1052,7 @@
               "galeria": [
                 "/images/qa.png"
               ],
-              "fundacion_id": 26,
+              "fundacion_id": 9,
               "fundacion": "QA Fundacion 1726119835001",
               "sexo": "HEMBRA",
               "fecha_nacimiento_estimada": null,
@@ -1061,7 +1061,7 @@
               "vacunacion": true,
               "desparasitacion": false,
               "fecha_rescate": null,
-              "fecha_registro": "2026-11-21"
+              "fecha_registro": "2026-11-22"
             }
           ]
         }
@@ -1074,11 +1074,11 @@
       "tecnica": "Decision Table",
       "hu": "HU-DON-3",
       "caso": "Orden cambia tras apadrinamiento",
-      "ejecutadoEn": "2026-11-21T21:48:30.472Z",
+      "ejecutadoEn": "2026-11-22T16:08:32.923Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "GET",
-        "endpoint": "/animal?fundacionId=26",
+        "endpoint": "/animal?fundacionId=9",
         "body": null,
         "tokenRole": "publico"
       },
@@ -1091,7 +1091,7 @@
           "total": 3,
           "result": [
             {
-              "id": 22,
+              "id": 6,
               "nombre": "QA Gato",
               "status": "REQUIERE_PADRINOS",
               "especie": "GATO",
@@ -1102,7 +1102,7 @@
               "galeria": [
                 "/images/qa.png"
               ],
-              "fundacion_id": 26,
+              "fundacion_id": 9,
               "fundacion": "QA Fundacion 1726119835001",
               "sexo": "HEMBRA",
               "fecha_nacimiento_estimada": null,
@@ -1111,10 +1111,10 @@
               "vacunacion": true,
               "desparasitacion": false,
               "fecha_rescate": null,
-              "fecha_registro": "2026-11-21"
+              "fecha_registro": "2026-11-22"
             },
             {
-              "id": 21,
+              "id": 5,
               "nombre": "QA Normal",
               "status": "REQUIERE_PADRINOS",
               "especie": "PERRO",
@@ -1125,7 +1125,7 @@
               "galeria": [
                 "/images/qa.png"
               ],
-              "fundacion_id": 26,
+              "fundacion_id": 9,
               "fundacion": "QA Fundacion 1726119835001",
               "sexo": "HEMBRA",
               "fecha_nacimiento_estimada": null,
@@ -1134,10 +1134,10 @@
               "vacunacion": true,
               "desparasitacion": false,
               "fecha_rescate": null,
-              "fecha_registro": "2026-11-21"
+              "fecha_registro": "2026-11-22"
             },
             {
-              "id": 20,
+              "id": 4,
               "nombre": "QA Urgente",
               "status": "APADRINADO",
               "especie": "PERRO",
@@ -1148,7 +1148,7 @@
               "galeria": [
                 "/images/qa.png"
               ],
-              "fundacion_id": 26,
+              "fundacion_id": 9,
               "fundacion": "QA Fundacion 1726119835001",
               "sexo": "HEMBRA",
               "fecha_nacimiento_estimada": null,
@@ -1157,7 +1157,7 @@
               "vacunacion": true,
               "desparasitacion": false,
               "fecha_rescate": null,
-              "fecha_registro": "2026-11-21"
+              "fecha_registro": "2026-11-22"
             }
           ]
         }
@@ -1170,7 +1170,7 @@
       "tecnica": "BVA",
       "hu": "HU-DON-4",
       "caso": "page=0 fuera de rango",
-      "ejecutadoEn": "2026-11-21T21:48:30.493Z",
+      "ejecutadoEn": "2026-11-22T16:08:32.927Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "GET",
@@ -1198,7 +1198,7 @@
       "tecnica": "BVA",
       "hu": "HU-DON-4",
       "caso": "page=1 limite inferior",
-      "ejecutadoEn": "2026-11-21T21:48:30.986Z",
+      "ejecutadoEn": "2026-11-22T16:08:33.386Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "GET",
@@ -1215,7 +1215,7 @@
           "total": 5,
           "result": [
             {
-              "id": 22,
+              "id": 6,
               "nombre": "QA Gato",
               "status": "REQUIERE_PADRINOS",
               "especie": "GATO",
@@ -1226,7 +1226,7 @@
               "galeria": [
                 "/images/qa.png"
               ],
-              "fundacion_id": 26,
+              "fundacion_id": 9,
               "fundacion": "QA Fundacion 1726119835001",
               "sexo": "HEMBRA",
               "fecha_nacimiento_estimada": null,
@@ -1235,7 +1235,7 @@
               "vacunacion": true,
               "desparasitacion": false,
               "fecha_rescate": null,
-              "fecha_registro": "2026-11-21"
+              "fecha_registro": "2026-11-22"
             }
           ]
         }
@@ -1248,7 +1248,7 @@
       "tecnica": "BVA",
       "hu": "HU-DON-4",
       "caso": "limit=100 limite superior valido",
-      "ejecutadoEn": "2026-11-21T21:48:32.141Z",
+      "ejecutadoEn": "2026-11-22T16:08:33.839Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "GET",
@@ -1265,7 +1265,7 @@
           "total": 5,
           "result": [
             {
-              "id": 22,
+              "id": 6,
               "nombre": "QA Gato",
               "status": "REQUIERE_PADRINOS",
               "especie": "GATO",
@@ -1276,7 +1276,7 @@
               "galeria": [
                 "/images/qa.png"
               ],
-              "fundacion_id": 26,
+              "fundacion_id": 9,
               "fundacion": "QA Fundacion 1726119835001",
               "sexo": "HEMBRA",
               "fecha_nacimiento_estimada": null,
@@ -1285,10 +1285,10 @@
               "vacunacion": true,
               "desparasitacion": false,
               "fecha_rescate": null,
-              "fecha_registro": "2026-11-21"
+              "fecha_registro": "2026-11-22"
             },
             {
-              "id": 21,
+              "id": 5,
               "nombre": "QA Normal",
               "status": "REQUIERE_PADRINOS",
               "especie": "PERRO",
@@ -1299,7 +1299,7 @@
               "galeria": [
                 "/images/qa.png"
               ],
-              "fundacion_id": 26,
+              "fundacion_id": 9,
               "fundacion": "QA Fundacion 1726119835001",
               "sexo": "HEMBRA",
               "fecha_nacimiento_estimada": null,
@@ -1308,10 +1308,10 @@
               "vacunacion": true,
               "desparasitacion": false,
               "fecha_rescate": null,
-              "fecha_registro": "2026-11-21"
+              "fecha_registro": "2026-11-22"
             },
             {
-              "id": 3,
+              "id": 2,
               "nombre": "Perrito 1",
               "status": "REQUIERE_PADRINOS",
               "especie": "PERRO",
@@ -1320,8 +1320,8 @@
               "historia": null,
               "imagen": "http://example.com/image1.jpg",
               "galeria": [],
-              "fundacion_id": 4,
-              "fundacion": "Fundación Duplicate Test 1795294092668",
+              "fundacion_id": 3,
+              "fundacion": "Fundación Duplicate Test 1795363428525",
               "sexo": "MACHO",
               "fecha_nacimiento_estimada": null,
               "enfermedades": null,
@@ -1329,10 +1329,10 @@
               "vacunacion": false,
               "desparasitacion": false,
               "fecha_rescate": null,
-              "fecha_registro": "2026-11-21"
+              "fecha_registro": "2026-11-22"
             },
             {
-              "id": 4,
+              "id": 3,
               "nombre": "Perrito 2",
               "status": "REQUIERE_PADRINOS",
               "especie": "PERRO",
@@ -1341,8 +1341,8 @@
               "historia": null,
               "imagen": "http://example.com/image2.jpg",
               "galeria": [],
-              "fundacion_id": 4,
-              "fundacion": "Fundación Duplicate Test 1795294092668",
+              "fundacion_id": 3,
+              "fundacion": "Fundación Duplicate Test 1795363428525",
               "sexo": "MACHO",
               "fecha_nacimiento_estimada": null,
               "enfermedades": null,
@@ -1350,10 +1350,10 @@
               "vacunacion": false,
               "desparasitacion": false,
               "fecha_rescate": null,
-              "fecha_registro": "2026-11-21"
+              "fecha_registro": "2026-11-22"
             },
             {
-              "id": 20,
+              "id": 4,
               "nombre": "QA Urgente",
               "status": "APADRINADO",
               "especie": "PERRO",
@@ -1364,7 +1364,7 @@
               "galeria": [
                 "/images/qa.png"
               ],
-              "fundacion_id": 26,
+              "fundacion_id": 9,
               "fundacion": "QA Fundacion 1726119835001",
               "sexo": "HEMBRA",
               "fecha_nacimiento_estimada": null,
@@ -1373,7 +1373,7 @@
               "vacunacion": true,
               "desparasitacion": false,
               "fecha_rescate": null,
-              "fecha_registro": "2026-11-21"
+              "fecha_registro": "2026-11-22"
             }
           ]
         }
@@ -1386,7 +1386,7 @@
       "tecnica": "BVA",
       "hu": "HU-DON-4",
       "caso": "limit=101 fuera de rango",
-      "ejecutadoEn": "2026-11-21T21:48:32.144Z",
+      "ejecutadoEn": "2026-11-22T16:08:33.842Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "GET",
@@ -1414,7 +1414,7 @@
       "tecnica": "EP",
       "hu": "HU-DON-4",
       "caso": "Reset sin filtros",
-      "ejecutadoEn": "2026-11-21T21:48:32.863Z",
+      "ejecutadoEn": "2026-11-22T16:08:34.296Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "GET",
@@ -1431,7 +1431,7 @@
           "total": 5,
           "result": [
             {
-              "id": 22,
+              "id": 6,
               "nombre": "QA Gato",
               "status": "REQUIERE_PADRINOS",
               "especie": "GATO",
@@ -1442,7 +1442,7 @@
               "galeria": [
                 "/images/qa.png"
               ],
-              "fundacion_id": 26,
+              "fundacion_id": 9,
               "fundacion": "QA Fundacion 1726119835001",
               "sexo": "HEMBRA",
               "fecha_nacimiento_estimada": null,
@@ -1451,10 +1451,10 @@
               "vacunacion": true,
               "desparasitacion": false,
               "fecha_rescate": null,
-              "fecha_registro": "2026-11-21"
+              "fecha_registro": "2026-11-22"
             },
             {
-              "id": 21,
+              "id": 5,
               "nombre": "QA Normal",
               "status": "REQUIERE_PADRINOS",
               "especie": "PERRO",
@@ -1465,7 +1465,7 @@
               "galeria": [
                 "/images/qa.png"
               ],
-              "fundacion_id": 26,
+              "fundacion_id": 9,
               "fundacion": "QA Fundacion 1726119835001",
               "sexo": "HEMBRA",
               "fecha_nacimiento_estimada": null,
@@ -1474,10 +1474,10 @@
               "vacunacion": true,
               "desparasitacion": false,
               "fecha_rescate": null,
-              "fecha_registro": "2026-11-21"
+              "fecha_registro": "2026-11-22"
             },
             {
-              "id": 3,
+              "id": 2,
               "nombre": "Perrito 1",
               "status": "REQUIERE_PADRINOS",
               "especie": "PERRO",
@@ -1486,8 +1486,8 @@
               "historia": null,
               "imagen": "http://example.com/image1.jpg",
               "galeria": [],
-              "fundacion_id": 4,
-              "fundacion": "Fundación Duplicate Test 1795294092668",
+              "fundacion_id": 3,
+              "fundacion": "Fundación Duplicate Test 1795363428525",
               "sexo": "MACHO",
               "fecha_nacimiento_estimada": null,
               "enfermedades": null,
@@ -1495,10 +1495,10 @@
               "vacunacion": false,
               "desparasitacion": false,
               "fecha_rescate": null,
-              "fecha_registro": "2026-11-21"
+              "fecha_registro": "2026-11-22"
             },
             {
-              "id": 4,
+              "id": 3,
               "nombre": "Perrito 2",
               "status": "REQUIERE_PADRINOS",
               "especie": "PERRO",
@@ -1507,8 +1507,8 @@
               "historia": null,
               "imagen": "http://example.com/image2.jpg",
               "galeria": [],
-              "fundacion_id": 4,
-              "fundacion": "Fundación Duplicate Test 1795294092668",
+              "fundacion_id": 3,
+              "fundacion": "Fundación Duplicate Test 1795363428525",
               "sexo": "MACHO",
               "fecha_nacimiento_estimada": null,
               "enfermedades": null,
@@ -1516,10 +1516,10 @@
               "vacunacion": false,
               "desparasitacion": false,
               "fecha_rescate": null,
-              "fecha_registro": "2026-11-21"
+              "fecha_registro": "2026-11-22"
             },
             {
-              "id": 20,
+              "id": 4,
               "nombre": "QA Urgente",
               "status": "APADRINADO",
               "especie": "PERRO",
@@ -1530,7 +1530,7 @@
               "galeria": [
                 "/images/qa.png"
               ],
-              "fundacion_id": 26,
+              "fundacion_id": 9,
               "fundacion": "QA Fundacion 1726119835001",
               "sexo": "HEMBRA",
               "fecha_nacimiento_estimada": null,
@@ -1539,7 +1539,7 @@
               "vacunacion": true,
               "desparasitacion": false,
               "fecha_rescate": null,
-              "fecha_registro": "2026-11-21"
+              "fecha_registro": "2026-11-22"
             }
           ]
         }
@@ -1552,11 +1552,11 @@
       "tecnica": "EP",
       "hu": "HU-DON-2",
       "caso": "Fundacion sin animales",
-      "ejecutadoEn": "2026-11-21T21:48:33.189Z",
+      "ejecutadoEn": "2026-11-22T16:08:34.600Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "GET",
-        "endpoint": "/fundacion/animales?fundacionId=27&limit=10",
+        "endpoint": "/fundacion/animales?fundacionId=10&limit=10",
         "body": null,
         "tokenRole": "publico"
       },
@@ -1569,7 +1569,7 @@
           "count": 5,
           "result": [
             {
-              "id": 3,
+              "id": 2,
               "nombre": "Perrito 1",
               "status": "REQUIERE_PADRINOS",
               "especie": "PERRO",
@@ -1578,10 +1578,10 @@
               "historia": null,
               "imagen": "http://example.com/image1.jpg",
               "galeria": [],
-              "fundacion_id": 4,
+              "fundacion_id": 3,
               "visible": true,
-              "createdAt": "2026-11-21T20:48:13.548Z",
-              "updatedAt": "2026-11-21T20:48:13.549Z",
+              "createdAt": "2026-11-22T16:03:49.372Z",
+              "updatedAt": "2026-11-22T16:03:49.372Z",
               "monto_meta_mensual": "0.00",
               "monto_recaudado_actual": "0.00",
               "fecha_nacimiento_estimada": null,
@@ -1589,13 +1589,13 @@
               "sexo": "MACHO",
               "enfermedades": null,
               "fecha_rescate": null,
-              "fecha_registro": "2026-11-21",
+              "fecha_registro": "2026-11-22",
               "esterilizacion": false,
               "vacunacion": false,
               "desparasitacion": false
             },
             {
-              "id": 4,
+              "id": 3,
               "nombre": "Perrito 2",
               "status": "REQUIERE_PADRINOS",
               "especie": "PERRO",
@@ -1604,10 +1604,10 @@
               "historia": null,
               "imagen": "http://example.com/image2.jpg",
               "galeria": [],
-              "fundacion_id": 4,
+              "fundacion_id": 3,
               "visible": true,
-              "createdAt": "2026-11-21T20:48:13.705Z",
-              "updatedAt": "2026-11-21T20:48:13.705Z",
+              "createdAt": "2026-11-22T16:03:49.524Z",
+              "updatedAt": "2026-11-22T16:03:49.524Z",
               "monto_meta_mensual": "0.00",
               "monto_recaudado_actual": "0.00",
               "fecha_nacimiento_estimada": null,
@@ -1615,13 +1615,13 @@
               "sexo": "MACHO",
               "enfermedades": null,
               "fecha_rescate": null,
-              "fecha_registro": "2026-11-21",
+              "fecha_registro": "2026-11-22",
               "esterilizacion": false,
               "vacunacion": false,
               "desparasitacion": false
             },
             {
-              "id": 21,
+              "id": 5,
               "nombre": "QA Normal",
               "status": "REQUIERE_PADRINOS",
               "especie": "PERRO",
@@ -1632,10 +1632,10 @@
               "galeria": [
                 "/images/qa.png"
               ],
-              "fundacion_id": 26,
+              "fundacion_id": 9,
               "visible": true,
-              "createdAt": "2026-11-21T21:48:10.122Z",
-              "updatedAt": "2026-11-21T21:48:10.123Z",
+              "createdAt": "2026-11-22T16:08:22.165Z",
+              "updatedAt": "2026-11-22T16:08:22.165Z",
               "monto_meta_mensual": "50.00",
               "monto_recaudado_actual": "0.00",
               "fecha_nacimiento_estimada": null,
@@ -1643,13 +1643,13 @@
               "sexo": "HEMBRA",
               "enfermedades": "Ninguna",
               "fecha_rescate": null,
-              "fecha_registro": "2026-11-21",
+              "fecha_registro": "2026-11-22",
               "esterilizacion": false,
               "vacunacion": true,
               "desparasitacion": false
             },
             {
-              "id": 22,
+              "id": 6,
               "nombre": "QA Gato",
               "status": "REQUIERE_PADRINOS",
               "especie": "GATO",
@@ -1660,10 +1660,10 @@
               "galeria": [
                 "/images/qa.png"
               ],
-              "fundacion_id": 26,
+              "fundacion_id": 9,
               "visible": true,
-              "createdAt": "2026-11-21T21:48:10.917Z",
-              "updatedAt": "2026-11-21T21:48:10.917Z",
+              "createdAt": "2026-11-22T16:08:22.927Z",
+              "updatedAt": "2026-11-22T16:08:22.927Z",
               "monto_meta_mensual": "80.00",
               "monto_recaudado_actual": "0.00",
               "fecha_nacimiento_estimada": null,
@@ -1671,13 +1671,13 @@
               "sexo": "HEMBRA",
               "enfermedades": "Ninguna",
               "fecha_rescate": null,
-              "fecha_registro": "2026-11-21",
+              "fecha_registro": "2026-11-22",
               "esterilizacion": false,
               "vacunacion": true,
               "desparasitacion": false
             },
             {
-              "id": 20,
+              "id": 4,
               "nombre": "QA Urgente",
               "status": "APADRINADO",
               "especie": "PERRO",
@@ -1688,10 +1688,10 @@
               "galeria": [
                 "/images/qa.png"
               ],
-              "fundacion_id": 26,
+              "fundacion_id": 9,
               "visible": true,
-              "createdAt": "2026-11-21T21:48:08.807Z",
-              "updatedAt": "2026-11-21T21:48:29.530Z",
+              "createdAt": "2026-11-22T16:08:21.239Z",
+              "updatedAt": "2026-11-22T16:08:32.167Z",
               "monto_meta_mensual": "500.00",
               "monto_recaudado_actual": "0.00",
               "fecha_nacimiento_estimada": null,
@@ -1699,7 +1699,7 @@
               "sexo": "HEMBRA",
               "enfermedades": "Ninguna",
               "fecha_rescate": null,
-              "fecha_registro": "2026-11-21",
+              "fecha_registro": "2026-11-22",
               "esterilizacion": false,
               "vacunacion": true,
               "desparasitacion": false
@@ -1715,11 +1715,11 @@
       "tecnica": "Decision Table",
       "hu": "HU-DON-5",
       "caso": "Detalle publico",
-      "ejecutadoEn": "2026-11-21T21:48:33.508Z",
+      "ejecutadoEn": "2026-11-22T16:08:34.904Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "GET",
-        "endpoint": "/animal/22",
+        "endpoint": "/animal/6",
         "body": null,
         "tokenRole": "publico"
       },
@@ -1727,7 +1727,7 @@
         "status": 200,
         "body": {
           "result": {
-            "id": 22,
+            "id": 6,
             "nombre": "QA Gato",
             "status": "REQUIERE_PADRINOS",
             "especie": "GATO",
@@ -1738,7 +1738,7 @@
             "galeria": [
               "/images/qa.png"
             ],
-            "fundacion_id": 26,
+            "fundacion_id": 9,
             "fundacion": "QA Fundacion 1726119835001",
             "sexo": "HEMBRA",
             "fecha_nacimiento_estimada": null,
@@ -1747,7 +1747,7 @@
             "vacunacion": true,
             "desparasitacion": false,
             "fecha_rescate": null,
-            "fecha_registro": "2026-11-21"
+            "fecha_registro": "2026-11-22"
           }
         }
       },
@@ -1759,11 +1759,11 @@
       "tecnica": "Decision Table",
       "hu": "HU-DON-5",
       "caso": "Detalle administrador",
-      "ejecutadoEn": "2026-11-21T21:48:33.975Z",
+      "ejecutadoEn": "2026-11-22T16:08:35.356Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "GET",
-        "endpoint": "/animal/22",
+        "endpoint": "/animal/6",
         "body": null,
         "tokenRole": "admin"
       },
@@ -1771,7 +1771,7 @@
         "status": 200,
         "body": {
           "result": {
-            "id": 22,
+            "id": 6,
             "nombre": "QA Gato",
             "status": "REQUIERE_PADRINOS",
             "especie": "GATO",
@@ -1782,7 +1782,7 @@
             "galeria": [
               "/images/qa.png"
             ],
-            "fundacion_id": 26,
+            "fundacion_id": 9,
             "fundacion": "QA Fundacion 1726119835001",
             "sexo": "HEMBRA",
             "fecha_nacimiento_estimada": null,
@@ -1791,13 +1791,13 @@
             "vacunacion": true,
             "desparasitacion": false,
             "fecha_rescate": null,
-            "fecha_registro": "2026-11-21",
+            "fecha_registro": "2026-11-22",
             "peso": null,
             "visible": true,
             "monto_meta_mensual": "80.00",
             "monto_recaudado_actual": "0.00",
-            "createdAt": "2026-11-21T21:48:10.917Z",
-            "updatedAt": "2026-11-21T21:48:10.917Z"
+            "createdAt": "2026-11-22T16:08:22.927Z",
+            "updatedAt": "2026-11-22T16:08:22.927Z"
           }
         }
       },
@@ -1809,7 +1809,7 @@
       "tecnica": "EP",
       "hu": "HU-DON-5",
       "caso": "Animal inexistente",
-      "ejecutadoEn": "2026-11-21T21:48:34.137Z",
+      "ejecutadoEn": "2026-11-22T16:08:35.511Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "GET",
@@ -1831,11 +1831,11 @@
       "tecnica": "Decision Table",
       "hu": "HU-ADM-3",
       "caso": "Deshabilitar con booleano",
-      "ejecutadoEn": "2026-11-21T21:48:34.606Z",
+      "ejecutadoEn": "2026-11-22T16:08:35.966Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "PUT",
-        "endpoint": "/usuario/48/status",
+        "endpoint": "/usuario/12/status",
         "body": {
           "habilitado": false
         },
@@ -1856,11 +1856,11 @@
       "tecnica": "Decision Table",
       "hu": "HU-ADM-3",
       "caso": "Admin no puede deshabilitarse",
-      "ejecutadoEn": "2026-11-21T21:48:35.407Z",
+      "ejecutadoEn": "2026-11-22T16:08:36.582Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "PUT",
-        "endpoint": "/usuario/47/status",
+        "endpoint": "/usuario/11/status",
         "body": {
           "estado": "INACTIVO"
         },
@@ -1880,7 +1880,7 @@
       "tecnica": "EP",
       "hu": "HU-FND-2",
       "caso": "Firma de carga (storage local en este entorno)",
-      "ejecutadoEn": "2026-11-21T21:48:35.742Z",
+      "ejecutadoEn": "2026-11-22T16:08:36.887Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "GET",
@@ -1891,8 +1891,8 @@
       "response": {
         "status": 200,
         "body": {
-          "signature": "4cccc866870dde29f3b456c621836c399700a0c4",
-          "timestamp": 1795297715,
+          "signature": "43e851723b9698c252bbaa11530f6f55e171a058",
+          "timestamp": 1795363716,
           "folder": "mascotas",
           "apiKey": "254739396789973",
           "cloudName": "fwbvh0gh"
@@ -1906,7 +1906,7 @@
       "tecnica": "EP",
       "hu": "HU-FND-2",
       "caso": "Guardar borrador incompleto",
-      "ejecutadoEn": "2026-11-21T21:48:36.082Z",
+      "ejecutadoEn": "2026-11-22T16:08:37.197Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "POST",
@@ -1956,11 +1956,11 @@
       "tecnica": "BVA",
       "hu": "HU-DON-7",
       "caso": "Manada con N=2 animales",
-      "ejecutadoEn": "2026-11-21T21:48:36.735Z",
+      "ejecutadoEn": "2026-11-22T16:08:37.804Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "GET",
-        "endpoint": "/manada/7/animals",
+        "endpoint": "/manada/2/animals",
         "body": null,
         "tokenRole": "donador"
       },
@@ -1969,23 +1969,7 @@
         "body": {
           "result": [
             {
-              "id": 21,
-              "nombre": "QA Normal",
-              "status": "REQUIERE_PADRINOS",
-              "especie": "PERRO",
-              "raza": "Mestizo",
-              "descripcion": "Animal de prueba funcional",
-              "galeria": [
-                "/images/qa.png"
-              ],
-              "fundacion_id": 26,
-              "fundacion": "QA Fundacion 1726119835001",
-              "historial": [],
-              "createdAt": "2026-11-21T21:48:10.122Z",
-              "updatedAt": "2026-11-21T21:48:10.123Z"
-            },
-            {
-              "id": 20,
+              "id": 4,
               "nombre": "QA Urgente",
               "status": "APADRINADO",
               "especie": "PERRO",
@@ -1994,26 +1978,42 @@
               "galeria": [
                 "/images/qa.png"
               ],
-              "fundacion_id": 26,
+              "fundacion_id": 9,
               "fundacion": "QA Fundacion 1726119835001",
               "historial": [
                 {
-                  "id": 5,
-                  "animal_id": 20,
-                  "fundacion_id": 26,
-                  "fecha": "2026-11-21T21:48:13.242Z",
+                  "id": 1,
+                  "animal_id": 4,
+                  "fundacion_id": 9,
+                  "fecha": "2026-11-22T16:08:25.130Z",
                   "descripcion": "Actualizacion QA",
                   "estado_salud": "Estable",
                   "imagen": "/images/qa-update.png",
                   "calificacion": null,
                   "visible": true,
-                  "createdAt": "2026-11-21T21:48:13.242Z",
-                  "updatedAt": "2026-11-21T21:48:13.243Z",
+                  "createdAt": "2026-11-22T16:08:25.130Z",
+                  "updatedAt": "2026-11-22T16:08:25.130Z",
                   "galeria": null
                 }
               ],
-              "createdAt": "2026-11-21T21:48:08.807Z",
-              "updatedAt": "2026-11-21T21:48:29.530Z"
+              "createdAt": "2026-11-22T16:08:21.239Z",
+              "updatedAt": "2026-11-22T16:08:32.167Z"
+            },
+            {
+              "id": 5,
+              "nombre": "QA Normal",
+              "status": "REQUIERE_PADRINOS",
+              "especie": "PERRO",
+              "raza": "Mestizo",
+              "descripcion": "Animal de prueba funcional",
+              "galeria": [
+                "/images/qa.png"
+              ],
+              "fundacion_id": 9,
+              "fundacion": "QA Fundacion 1726119835001",
+              "historial": [],
+              "createdAt": "2026-11-22T16:08:22.165Z",
+              "updatedAt": "2026-11-22T16:08:22.165Z"
             }
           ]
         }
@@ -2026,11 +2026,11 @@
       "tecnica": "BVA",
       "hu": "HU-DON-7",
       "caso": "Arreglo vacio de animales",
-      "ejecutadoEn": "2026-11-21T21:48:36.892Z",
+      "ejecutadoEn": "2026-11-22T16:08:37.963Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "POST",
-        "endpoint": "/manada/7/animals",
+        "endpoint": "/manada/2/animals",
         "body": {
           "animalId": []
         },
@@ -2056,14 +2056,14 @@
       "tecnica": "BVA",
       "hu": "HU-DON-7",
       "caso": "Agregar animal ya incluido",
-      "ejecutadoEn": "2026-11-21T21:48:37.362Z",
+      "ejecutadoEn": "2026-11-22T16:08:38.429Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "POST",
-        "endpoint": "/manada/7/animals",
+        "endpoint": "/manada/2/animals",
         "body": {
           "animalId": [
-            21
+            5
           ]
         },
         "tokenRole": "donador"
@@ -2074,7 +2074,7 @@
           "mensaje": "Animales agregados exitosamente a la manada",
           "data": [
             {
-              "animal_id": 21,
+              "animal_id": 5,
               "mensaje": "Este animal ya se encuentra agregado a la manada"
             }
           ]
@@ -2088,14 +2088,14 @@
       "tecnica": "EP",
       "hu": "HU-DON-7",
       "caso": "Donacion asociada a la manada",
-      "ejecutadoEn": "2026-11-21T21:48:37.564Z",
+      "ejecutadoEn": "2026-11-22T16:08:38.588Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "POST",
         "endpoint": "/donacion",
         "body": {
           "monto": "100.00",
-          "manadaId": 7
+          "manadaId": 2
         },
         "tokenRole": "donador"
       },
@@ -2113,11 +2113,11 @@
       "tecnica": "Decision Table",
       "hu": "Transversal/Comisiones",
       "caso": "Padrino califica con 4 estrellas",
-      "ejecutadoEn": "2026-11-21T21:48:38.861Z",
+      "ejecutadoEn": "2026-11-22T16:08:39.806Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "POST",
-        "endpoint": "/actualizacion/5/ratings",
+        "endpoint": "/actualizacion/1/ratings",
         "body": {
           "estrellas": 4
         },
@@ -2128,11 +2128,11 @@
         "body": {
           "mensaje": "Rating registrado exitosamente.",
           "result": {
-            "createdAt": "2026-11-21T21:48:38.524Z",
-            "updatedAt": "2026-11-21T21:48:38.526Z",
-            "id": 4,
-            "actualizacionId": 5,
-            "userId": 48,
+            "createdAt": "2026-11-22T16:08:39.498Z",
+            "updatedAt": "2026-11-22T16:08:39.498Z",
+            "id": 1,
+            "actualizacionId": 1,
+            "userId": 12,
             "estrellas": 4,
             "comentario": null
           }
@@ -2146,13 +2146,13 @@
       "tecnica": "Decision Table",
       "hu": "Transversal/Comisiones",
       "caso": "Frontend crea comision 20%",
-      "ejecutadoEn": "2026-11-21T21:48:40.051Z",
+      "ejecutadoEn": "2026-11-22T16:08:40.417Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "POST",
         "endpoint": "/comision",
         "body": {
-          "fundacionId": 26,
+          "fundacionId": 9,
           "total_comision": 20
         },
         "tokenRole": "fundacion"
@@ -2162,10 +2162,10 @@
         "body": {
           "mensaje": "Comision Creada exitosamente.",
           "result": {
-            "createdAt": "2026-11-21T21:48:39.718Z",
-            "updatedAt": "2026-11-21T21:48:39.720Z",
-            "id": 6,
-            "fundacion_id": 26,
+            "createdAt": "2026-11-22T16:08:40.111Z",
+            "updatedAt": "2026-11-22T16:08:40.111Z",
+            "id": 3,
+            "fundacion_id": 9,
             "total_comision": "20.00",
             "total_pago": "100.00",
             "visible": true
@@ -2180,7 +2180,7 @@
       "tecnica": "Decision Table",
       "hu": "Transversal/Comisiones",
       "caso": "Fundacion consulta reporte de comisiones",
-      "ejecutadoEn": "2026-11-21T21:48:40.553Z",
+      "ejecutadoEn": "2026-11-22T16:08:40.876Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "GET",
@@ -2194,10 +2194,10 @@
           "mensaje": "Comisiones obtenidas exitosamente.",
           "result": [
             {
-              "id": 6,
-              "fundacion_id": 26,
-              "createdAt": "2026-11-21T21:48:39.718Z",
-              "updatedAt": "2026-11-21T21:48:39.720Z",
+              "id": 3,
+              "fundacion_id": 9,
+              "createdAt": "2026-11-22T16:08:40.111Z",
+              "updatedAt": "2026-11-22T16:08:40.111Z",
               "visible": true,
               "total_comision": "20.00",
               "total_pago": "100.00"
@@ -2213,11 +2213,11 @@
       "tecnica": "BVA",
       "hu": "Transversal/Comisiones",
       "caso": "Estrellas=6 fuera de rango",
-      "ejecutadoEn": "2026-11-21T21:48:40.709Z",
+      "ejecutadoEn": "2026-11-22T16:08:41.030Z",
       "baseUrl": "http://localhost:8181",
       "request": {
         "method": "POST",
-        "endpoint": "/actualizacion/5/ratings",
+        "endpoint": "/actualizacion/1/ratings",
         "body": {
           "estrellas": 6
         },
