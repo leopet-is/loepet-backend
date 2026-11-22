@@ -1,0 +1,2242 @@
+{
+  "baseUrl": "http://localhost:8181",
+  "generadoEn": "2026-11-21T21:48:40.710Z",
+  "totalEvidencias": 48,
+  "resumen": {
+    "PASS": 41,
+    "GAP": 7
+  },
+  "evidencias": [
+    {
+      "id": "INFRA-01",
+      "tecnica": "Smoke",
+      "hu": "Infraestructura",
+      "caso": "Backend responde health check",
+      "ejecutadoEn": "2026-11-21T21:47:52.738Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "GET",
+        "endpoint": "/api/health",
+        "body": null,
+        "tokenRole": "publico"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "status": "OK",
+          "timestamp": "2026-11-21T21:47:52.685Z"
+        }
+      },
+      "esperado": "200 OK",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-01",
+      "tecnica": "Decision Table",
+      "hu": "HU-ADM-1",
+      "caso": "Login admin con credenciales validas",
+      "ejecutadoEn": "2026-11-21T21:47:57.674Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "POST",
+        "endpoint": "/auth/login",
+        "body": {
+          "email": "qa-admin@leopet.test",
+          "password": "[REDACTED]"
+        },
+        "tokenRole": "publico"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "result": {
+            "id": 47,
+            "role": 1,
+            "cedula": "1710034069",
+            "nombres": "QA",
+            "apellidos": "Admin",
+            "telefono": "0987654321",
+            "email": "qa-admin@leopet.test",
+            "direccion": null,
+            "createdAt": "2026-11-21T21:47:55.536Z",
+            "updatedAt": "2026-11-21T21:47:55.537Z",
+            "token": "[REDACTED]"
+          },
+          "expiresIn": 28800,
+          "tokenType": "Bearer"
+        }
+      },
+      "esperado": "200 con token",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-01",
+      "tecnica": "Decision Table",
+      "hu": "HU-DON-1",
+      "caso": "Registro y login donador",
+      "ejecutadoEn": "2026-11-21T21:47:58.501Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "POST",
+        "endpoint": "/auth/register",
+        "body": {
+          "email": "qa-donor@leopet.test",
+          "role": 3
+        },
+        "tokenRole": "publico"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "result": {
+            "id": 48,
+            "role": 3,
+            "cedula": "1710034065",
+            "nombres": "QA",
+            "apellidos": "Donador",
+            "telefono": "0987654321",
+            "direccion": null,
+            "email": "qa-donor@leopet.test",
+            "createdAt": "2026-11-21T21:47:58.319Z",
+            "updatedAt": "2026-11-21T21:47:58.321Z",
+            "token": "[REDACTED]"
+          },
+          "expiresIn": 28800,
+          "tokenType": "Bearer"
+        }
+      },
+      "esperado": "200 con token role=3",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-01",
+      "tecnica": "Decision Table",
+      "hu": "HU-DON-1",
+      "caso": "Login donador con credenciales validas",
+      "ejecutadoEn": "2026-11-21T21:47:58.986Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "POST",
+        "endpoint": "/auth/login",
+        "body": {
+          "email": "qa-donor@leopet.test",
+          "password": "[REDACTED]"
+        },
+        "tokenRole": "publico"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "result": {
+            "id": 48,
+            "role": 3,
+            "cedula": "1710034065",
+            "nombres": "QA",
+            "apellidos": "Donador",
+            "telefono": "0987654321",
+            "email": "qa-donor@leopet.test",
+            "direccion": null,
+            "createdAt": "2026-11-21T21:47:58.319Z",
+            "updatedAt": "2026-11-21T21:47:58.321Z",
+            "token": "[REDACTED]"
+          },
+          "expiresIn": 28800,
+          "tokenType": "Bearer"
+        }
+      },
+      "esperado": "200 con token",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-03",
+      "tecnica": "Decision Table",
+      "hu": "HU-ADM-2",
+      "caso": "Solicitud de fundacion creada",
+      "ejecutadoEn": "2026-11-21T21:47:59.490Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "POST",
+        "endpoint": "/public/solicitudes",
+        "body": {
+          "ruc": "1726119835001"
+        },
+        "tokenRole": "publico"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "mensaje": "Solicitud de fundación enviada exitosamente.",
+          "result": {
+            "createdAt": "2026-11-21T21:47:59.318Z",
+            "updatedAt": "2026-11-21T21:47:59.322Z",
+            "ready_for_creation": false,
+            "id": 28,
+            "ruc": "1726119835001",
+            "nombre": "QA Fundacion 1726119835001",
+            "direccion": "Quito, Ecuador",
+            "telefono": "0987654321",
+            "email_contacto": "qa-fundacion@leopet.test",
+            "nombre_contacto": "Ana",
+            "apellido_contacto": "Perez",
+            "cedula_contacto": "0909090904",
+            "comentarios": "Prueba funcional QA",
+            "estado": "pendiente",
+            "notas_admin": null
+          }
+        }
+      },
+      "esperado": "200 con solicitud pendiente",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-03",
+      "tecnica": "Decision Table",
+      "hu": "HU-ADM-2",
+      "caso": "Admin aprueba solicitud",
+      "ejecutadoEn": "2026-11-21T21:48:02.464Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "PUT",
+        "endpoint": "/admin/solicitudes/28/aprobar",
+        "body": null,
+        "tokenRole": "admin"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "mensaje": "Solicitud aprobada exitosamente. Se envio el correo de activacion a la fundacion.",
+          "result": {
+            "solicitud": {
+              "id": 28,
+              "ruc": "1726119835001",
+              "nombre": "QA Fundacion 1726119835001",
+              "direccion": "Quito, Ecuador",
+              "telefono": "0987654321",
+              "email_contacto": "qa-fundacion@leopet.test",
+              "nombre_contacto": "Ana",
+              "apellido_contacto": "Perez",
+              "cedula_contacto": "0909090904",
+              "comentarios": "Prueba funcional QA",
+              "estado": "aprobada",
+              "ready_for_creation": false,
+              "notas_admin": "Solicitud aprobada. Correo de activacion enviado a la fundacion.",
+              "createdAt": "2026-11-21T21:47:59.318Z",
+              "updatedAt": "2026-11-21T21:48:00.808Z"
+            },
+            "fundacion": {
+              "createdAt": "2026-11-21T21:48:00.157Z",
+              "updatedAt": "2026-11-21T21:48:00.158Z",
+              "id": 26,
+              "ruc": "1726119835001",
+              "nombre": "QA Fundacion 1726119835001",
+              "direccion": "Quito, Ecuador",
+              "telefono": "0987654321",
+              "aprobado": true,
+              "comision": "0.00",
+              "logo": "/logo.png",
+              "solicitud_id": 28,
+              "descripcion": null
+            },
+            "usuario": {
+              "createdAt": "2026-11-21T21:48:00.327Z",
+              "updatedAt": "2026-11-21T21:48:00.327Z",
+              "id": 49,
+              "cedula": "0909090904",
+              "nombres": "Ana",
+              "apellidos": "Perez",
+              "telefono": "0987654321",
+              "direccion": "Quito, Ecuador",
+              "email": "qa-fundacion@leopet.test",
+              "role": 2,
+              "estado": "PENDIENTE_ACTIVACION"
+            }
+          }
+        }
+      },
+      "esperado": "200 con fundacion y usuario pendiente de activacion",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-03",
+      "tecnica": "Decision Table",
+      "hu": "HU-ADM-2",
+      "caso": "Fundacion activa su cuenta",
+      "ejecutadoEn": "2026-11-21T21:48:03.837Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "POST",
+        "endpoint": "/auth/activar-cuenta",
+        "body": {
+          "password": "[REDACTED]",
+          "token": "[REDACTED]"
+        },
+        "tokenRole": "publico"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "mensaje": "Cuenta activada exitosamente. Ya puedes iniciar sesion."
+        }
+      },
+      "esperado": "200 cuenta activada",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-02",
+      "tecnica": "Decision Table",
+      "hu": "HU-FND-1",
+      "caso": "Login fundacion activada",
+      "ejecutadoEn": "2026-11-21T21:48:04.584Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "POST",
+        "endpoint": "/auth/login",
+        "body": {
+          "email": "qa-fundacion@leopet.test",
+          "password": "[REDACTED]"
+        },
+        "tokenRole": "publico"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "result": {
+            "id": 49,
+            "role": 2,
+            "cedula": "0909090904",
+            "nombres": "Ana",
+            "apellidos": "Perez",
+            "telefono": "0987654321",
+            "email": "qa-fundacion@leopet.test",
+            "direccion": "Quito, Ecuador",
+            "createdAt": "2026-11-21T21:48:00.327Z",
+            "updatedAt": "2026-11-21T21:48:03.358Z",
+            "fundacionId": 26,
+            "token": "[REDACTED]"
+          },
+          "expiresIn": 28800,
+          "tokenType": "Bearer"
+        }
+      },
+      "esperado": "200 con token role=2 y fundacionId",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-03",
+      "tecnica": "Decision Table",
+      "hu": "HU-ADM-2",
+      "caso": "Admin rechaza solicitud",
+      "ejecutadoEn": "2026-11-21T21:48:05.914Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "PUT",
+        "endpoint": "/admin/solicitudes/29/rechazar",
+        "body": {
+          "notas_admin": "QA - solicitud duplicada"
+        },
+        "tokenRole": "admin"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "mensaje": "Solicitud rechazada exitosamente. Se envio el correo de rechazo.",
+          "result": {
+            "id": 29,
+            "ruc": "1790016919002",
+            "nombre": "QA Fundacion 1790016919002",
+            "direccion": "Quito, Ecuador",
+            "telefono": "0987654321",
+            "email_contacto": "qa-rechazada@leopet.test",
+            "nombre_contacto": "Ana",
+            "apellido_contacto": "Perez",
+            "cedula_contacto": "3012345678",
+            "comentarios": "Prueba funcional QA",
+            "estado": "rechazada",
+            "ready_for_creation": false,
+            "notas_admin": "QA - solicitud duplicada",
+            "createdAt": "2026-11-21T21:48:04.903Z",
+            "updatedAt": "2026-11-21T21:48:05.457Z"
+          }
+        }
+      },
+      "esperado": "200 con solicitud rechazada y sin fundacion",
+      "resultado": "PASS"
+    },
+    {
+      "id": "HU-FND-2",
+      "tecnica": "EP",
+      "hu": "HU-FND-2",
+      "caso": "Fundacion publica tres animales",
+      "ejecutadoEn": "2026-11-21T21:48:11.073Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "POST",
+        "endpoint": "/animal",
+        "body": {
+          "especie": "PERRO/GATO"
+        },
+        "tokenRole": "fundacion"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "mensaje": "Animal creado exitosamente.",
+          "result": {
+            "createdAt": "2026-11-21T21:48:10.917Z",
+            "updatedAt": "2026-11-21T21:48:10.917Z",
+            "fecha_registro": "2026-11-21",
+            "esterilizacion": false,
+            "desparasitacion": false,
+            "id": 22,
+            "nombre": "QA Gato",
+            "status": "REQUIERE_PADRINOS",
+            "especie": "GATO",
+            "raza": "Mestizo",
+            "descripcion": "Animal de prueba funcional",
+            "historia": "Rescatado en prueba QA",
+            "imagen": "/images/qa.png",
+            "galeria": [
+              "/images/qa.png"
+            ],
+            "fundacion_id": 26,
+            "visible": true,
+            "sexo": "HEMBRA",
+            "peso": null,
+            "monto_meta_mensual": "80.00",
+            "monto_recaudado_actual": "0.00",
+            "fecha_nacimiento_estimada": null,
+            "enfermedades": "Ninguna",
+            "vacunacion": true,
+            "fecha_rescate": null
+          }
+        }
+      },
+      "esperado": "200 con galeria e historia persistidos",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-05",
+      "tecnica": "Decision Table",
+      "hu": "HU-DON-7",
+      "caso": "Donador crea manada con monto valido",
+      "ejecutadoEn": "2026-11-21T21:48:11.914Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "POST",
+        "endpoint": "/manada",
+        "body": {
+          "nombre": "Manada QA",
+          "monto": "100.00"
+        },
+        "tokenRole": "donador"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "mensaje": "Manada creada exitosamente",
+          "manada": {
+            "createdAt": "2026-11-21T21:48:11.417Z",
+            "updatedAt": "2026-11-21T21:48:11.423Z",
+            "id": 7,
+            "nombre": "Manada QA",
+            "userId": 48,
+            "status": true
+          }
+        }
+      },
+      "esperado": "200 con manada",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-05",
+      "tecnica": "Decision Table",
+      "hu": "HU-DON-7",
+      "caso": "Agregar 2 animales a la manada",
+      "ejecutadoEn": "2026-11-21T21:48:12.588Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "POST",
+        "endpoint": "/manada/7/animals",
+        "body": {
+          "animalId": [
+            20,
+            21
+          ]
+        },
+        "tokenRole": "donador"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "mensaje": "Animales agregados exitosamente a la manada",
+          "data": [
+            {
+              "createdAt": "2026-11-21T21:48:12.421Z",
+              "updatedAt": "2026-11-21T21:48:12.421Z",
+              "id": 10,
+              "manada_id": 7,
+              "animal_id": 20
+            },
+            {
+              "createdAt": "2026-11-21T21:48:12.420Z",
+              "updatedAt": "2026-11-21T21:48:12.420Z",
+              "id": 9,
+              "manada_id": 7,
+              "animal_id": 21
+            }
+          ]
+        }
+      },
+      "esperado": "200 con relacion creada",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-06",
+      "tecnica": "Decision Table",
+      "hu": "Transversal/Comisiones",
+      "caso": "Fundacion crea actualizacion",
+      "ejecutadoEn": "2026-11-21T21:48:13.417Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "POST",
+        "endpoint": "/actualizacion/",
+        "body": {
+          "animal_id": 20
+        },
+        "tokenRole": "fundacion"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "mensaje": "Actualizacion registrada exitosamente.",
+          "result": {
+            "createdAt": "2026-11-21T21:48:13.242Z",
+            "updatedAt": "2026-11-21T21:48:13.243Z",
+            "fecha": "2026-11-21T21:48:13.242Z",
+            "id": 5,
+            "descripcion": "Actualizacion QA",
+            "estado_salud": "Estable",
+            "animal_id": 20,
+            "fundacion_id": 26,
+            "galeria": null,
+            "imagen": "/images/qa-update.png",
+            "visible": true,
+            "calificacion": null
+          }
+        }
+      },
+      "esperado": "200 con actualizacion",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-01",
+      "tecnica": "Decision Table",
+      "hu": "HU-DON-1",
+      "caso": "Password incorrecto",
+      "ejecutadoEn": "2026-11-21T21:48:14.161Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "POST",
+        "endpoint": "/auth/login",
+        "body": {
+          "email": "qa-donor@leopet.test",
+          "password": "[REDACTED]"
+        },
+        "tokenRole": "publico"
+      },
+      "response": {
+        "status": 401,
+        "body": "Credenciales incorrectas."
+      },
+      "esperado": "401",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-01",
+      "tecnica": "Decision Table",
+      "hu": "HU-DON-1",
+      "caso": "Email inexistente",
+      "ejecutadoEn": "2026-11-21T21:48:14.334Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "POST",
+        "endpoint": "/auth/login",
+        "body": {
+          "email": "no-existe-qa@leopet.test"
+        },
+        "tokenRole": "publico"
+      },
+      "response": {
+        "status": 401,
+        "body": "Credenciales incorrectas."
+      },
+      "esperado": "401",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-01",
+      "tecnica": "Decision Table",
+      "hu": "HU-ADM-1",
+      "caso": "Admin deshabilita donador",
+      "ejecutadoEn": "2026-11-21T21:48:14.825Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "PUT",
+        "endpoint": "/usuario/48/status",
+        "body": {
+          "estado": "INACTIVO"
+        },
+        "tokenRole": "admin"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "message": "Estado del usuario actualizado correctamente.",
+          "estado": "INACTIVO"
+        }
+      },
+      "esperado": "200 estado INACTIVO",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-01",
+      "tecnica": "Decision Table",
+      "hu": "HU-DON-1",
+      "caso": "Login con cuenta deshabilitada",
+      "ejecutadoEn": "2026-11-21T21:48:14.991Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "POST",
+        "endpoint": "/auth/login",
+        "body": {
+          "email": "qa-donor@leopet.test"
+        },
+        "tokenRole": "publico"
+      },
+      "response": {
+        "status": 401,
+        "body": "Usuario deshabilitado."
+      },
+      "esperado": "401 Usuario deshabilitado",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-02",
+      "tecnica": "Decision Table",
+      "hu": "HU-FND-1",
+      "caso": "Fundacion intenta acceder a accion de donador",
+      "ejecutadoEn": "2026-11-21T21:48:15.789Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "POST",
+        "endpoint": "/manada",
+        "body": {
+          "nombre": "Manada no permitida",
+          "monto": "10.00"
+        },
+        "tokenRole": "fundacion"
+      },
+      "response": {
+        "status": 403,
+        "body": {
+          "message": "Acceso denegado: Permisos insuficientes"
+        }
+      },
+      "esperado": "403",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-02",
+      "tecnica": "BVA",
+      "hu": "HU-ADM-1",
+      "caso": "Intento fallido 1",
+      "ejecutadoEn": "2026-11-21T21:48:22.653Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "POST",
+        "endpoint": "/auth/login",
+        "body": {
+          "email": "qa-admin@leopet.test"
+        },
+        "tokenRole": "publico"
+      },
+      "response": {
+        "status": 401,
+        "body": "Credenciales incorrectas."
+      },
+      "esperado": "401",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-02",
+      "tecnica": "BVA",
+      "hu": "HU-ADM-1",
+      "caso": "Intento fallido 2",
+      "ejecutadoEn": "2026-11-21T21:48:22.653Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "POST",
+        "endpoint": "/auth/login",
+        "body": {
+          "email": "qa-admin@leopet.test"
+        },
+        "tokenRole": "publico"
+      },
+      "response": {
+        "status": 401,
+        "body": "Credenciales incorrectas."
+      },
+      "esperado": "401",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-02",
+      "tecnica": "BVA",
+      "hu": "HU-ADM-1",
+      "caso": "Intento fallido 3",
+      "ejecutadoEn": "2026-11-21T21:48:22.653Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "POST",
+        "endpoint": "/auth/login",
+        "body": {
+          "email": "qa-admin@leopet.test"
+        },
+        "tokenRole": "publico"
+      },
+      "response": {
+        "status": 401,
+        "body": "Credenciales incorrectas."
+      },
+      "esperado": "401 y bloqueo tras 3 intentos",
+      "resultado": "GAP"
+    },
+    {
+      "id": "TC-02",
+      "tecnica": "BVA",
+      "hu": "HU-ADM-1",
+      "caso": "Intento fallido 4",
+      "ejecutadoEn": "2026-11-21T21:48:22.653Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "POST",
+        "endpoint": "/auth/login",
+        "body": {
+          "email": "qa-admin@leopet.test"
+        },
+        "tokenRole": "publico"
+      },
+      "response": {
+        "status": 401,
+        "body": "Credenciales incorrectas."
+      },
+      "esperado": "401 y bloqueo tras 3 intentos",
+      "resultado": "GAP"
+    },
+    {
+      "id": "TC-03",
+      "tecnica": "Decision Table",
+      "hu": "HU-ADM-2",
+      "caso": "Listado admin refleja estados",
+      "ejecutadoEn": "2026-11-21T21:48:25.395Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "GET",
+        "endpoint": "/admin/solicitudes?limit=100",
+        "body": null,
+        "tokenRole": "admin"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "limit": 100,
+          "page": 1,
+          "totalPages": 1,
+          "total": 3,
+          "result": [
+            {
+              "id": 30,
+              "ruc": "3012345678001",
+              "nombre": "QA Fundacion 3012345678001",
+              "direccion": "Quito, Ecuador",
+              "telefono": "0987654321",
+              "email_contacto": "qa-vacia@leopet.test",
+              "nombre_contacto": "Ana",
+              "apellido_contacto": "Perez",
+              "cedula_contacto": "0926687856",
+              "comentarios": "Prueba funcional QA",
+              "estado": "aprobada",
+              "ready_for_creation": false,
+              "notas_admin": "Solicitud aprobada. Correo de activacion enviado a la fundacion.",
+              "createdAt": "2026-11-21T21:48:06.234Z",
+              "updatedAt": "2026-11-21T21:48:07.681Z"
+            },
+            {
+              "id": 29,
+              "ruc": "1790016919002",
+              "nombre": "QA Fundacion 1790016919002",
+              "direccion": "Quito, Ecuador",
+              "telefono": "0987654321",
+              "email_contacto": "qa-rechazada@leopet.test",
+              "nombre_contacto": "Ana",
+              "apellido_contacto": "Perez",
+              "cedula_contacto": "3012345678",
+              "comentarios": "Prueba funcional QA",
+              "estado": "rechazada",
+              "ready_for_creation": false,
+              "notas_admin": "QA - solicitud duplicada",
+              "createdAt": "2026-11-21T21:48:04.903Z",
+              "updatedAt": "2026-11-21T21:48:05.457Z"
+            },
+            {
+              "id": 28,
+              "ruc": "1726119835001",
+              "nombre": "QA Fundacion 1726119835001",
+              "direccion": "Quito, Ecuador",
+              "telefono": "0987654321",
+              "email_contacto": "qa-fundacion@leopet.test",
+              "nombre_contacto": "Ana",
+              "apellido_contacto": "Perez",
+              "cedula_contacto": "0909090904",
+              "comentarios": "Prueba funcional QA",
+              "estado": "aprobada",
+              "ready_for_creation": false,
+              "notas_admin": "Solicitud aprobada. Correo de activacion enviado a la fundacion.",
+              "createdAt": "2026-11-21T21:47:59.318Z",
+              "updatedAt": "2026-11-21T21:48:00.808Z"
+            }
+          ]
+        }
+      },
+      "esperado": "200 con solicitudes aprobada y rechazada",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-04",
+      "tecnica": "EP",
+      "hu": "HU-DON-3",
+      "caso": "Filtro por especie PERRO",
+      "ejecutadoEn": "2026-11-21T21:48:25.909Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "GET",
+        "endpoint": "/animal?fundacionId=26&especie=PERRO",
+        "body": null,
+        "tokenRole": "publico"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "limit": 10,
+          "page": 1,
+          "totalPages": 1,
+          "total": 2,
+          "result": [
+            {
+              "id": 20,
+              "nombre": "QA Urgente",
+              "status": "EN_TRATAMIENTO",
+              "especie": "PERRO",
+              "raza": "Mestizo",
+              "descripcion": "Animal de prueba funcional",
+              "historia": "Rescatado en prueba QA",
+              "imagen": "/images/qa.png",
+              "galeria": [
+                "/images/qa.png"
+              ],
+              "fundacion_id": 26,
+              "fundacion": "QA Fundacion 1726119835001",
+              "sexo": "HEMBRA",
+              "fecha_nacimiento_estimada": null,
+              "enfermedades": "Ninguna",
+              "esterilizacion": false,
+              "vacunacion": true,
+              "desparasitacion": false,
+              "fecha_rescate": null,
+              "fecha_registro": "2026-11-21"
+            },
+            {
+              "id": 21,
+              "nombre": "QA Normal",
+              "status": "REQUIERE_PADRINOS",
+              "especie": "PERRO",
+              "raza": "Mestizo",
+              "descripcion": "Animal de prueba funcional",
+              "historia": "Rescatado en prueba QA",
+              "imagen": "/images/qa.png",
+              "galeria": [
+                "/images/qa.png"
+              ],
+              "fundacion_id": 26,
+              "fundacion": "QA Fundacion 1726119835001",
+              "sexo": "HEMBRA",
+              "fecha_nacimiento_estimada": null,
+              "enfermedades": "Ninguna",
+              "esterilizacion": false,
+              "vacunacion": true,
+              "desparasitacion": false,
+              "fecha_rescate": null,
+              "fecha_registro": "2026-11-21"
+            }
+          ]
+        }
+      },
+      "esperado": "200 solo perros",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-04",
+      "tecnica": "EP",
+      "hu": "HU-DON-3",
+      "caso": "Filtro por manada",
+      "ejecutadoEn": "2026-11-21T21:48:27.364Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "GET",
+        "endpoint": "/animal?manada=7",
+        "body": null,
+        "tokenRole": "donador"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "limit": 10,
+          "page": 1,
+          "totalPages": 1,
+          "total": 2,
+          "result": [
+            {
+              "id": 20,
+              "nombre": "QA Urgente",
+              "status": "EN_TRATAMIENTO",
+              "especie": "PERRO",
+              "raza": "Mestizo",
+              "descripcion": "Animal de prueba funcional",
+              "historia": "Rescatado en prueba QA",
+              "imagen": "/images/qa.png",
+              "galeria": [
+                "/images/qa.png"
+              ],
+              "fundacion_id": 26,
+              "fundacion": "QA Fundacion 1726119835001",
+              "sexo": "HEMBRA",
+              "fecha_nacimiento_estimada": null,
+              "enfermedades": "Ninguna",
+              "esterilizacion": false,
+              "vacunacion": true,
+              "desparasitacion": false,
+              "fecha_rescate": null,
+              "fecha_registro": "2026-11-21",
+              "historial": [
+                {
+                  "id": 5,
+                  "animal_id": 20,
+                  "fundacion_id": 26,
+                  "fecha": "2026-11-21T21:48:13.242Z",
+                  "descripcion": "Actualizacion QA",
+                  "estado_salud": "Estable",
+                  "imagen": "/images/qa-update.png",
+                  "calificacion": null,
+                  "visible": true,
+                  "createdAt": "2026-11-21T21:48:13.242Z",
+                  "updatedAt": "2026-11-21T21:48:13.243Z",
+                  "galeria": null
+                }
+              ]
+            },
+            {
+              "id": 21,
+              "nombre": "QA Normal",
+              "status": "REQUIERE_PADRINOS",
+              "especie": "PERRO",
+              "raza": "Mestizo",
+              "descripcion": "Animal de prueba funcional",
+              "historia": "Rescatado en prueba QA",
+              "imagen": "/images/qa.png",
+              "galeria": [
+                "/images/qa.png"
+              ],
+              "fundacion_id": 26,
+              "fundacion": "QA Fundacion 1726119835001",
+              "sexo": "HEMBRA",
+              "fecha_nacimiento_estimada": null,
+              "enfermedades": "Ninguna",
+              "esterilizacion": false,
+              "vacunacion": true,
+              "desparasitacion": false,
+              "fecha_rescate": null,
+              "fecha_registro": "2026-11-21"
+            }
+          ]
+        }
+      },
+      "esperado": "200 animales de la manada",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-04",
+      "tecnica": "Decision Table",
+      "hu": "HU-DON-3",
+      "caso": "EN_TRATAMIENTO aparece antes que REQUIERE_PADRINOS",
+      "ejecutadoEn": "2026-11-21T21:48:27.858Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "GET",
+        "endpoint": "/animal?fundacionId=26",
+        "body": null,
+        "tokenRole": "publico"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "limit": 10,
+          "page": 1,
+          "totalPages": 1,
+          "total": 3,
+          "result": [
+            {
+              "id": 20,
+              "nombre": "QA Urgente",
+              "status": "EN_TRATAMIENTO",
+              "especie": "PERRO",
+              "raza": "Mestizo",
+              "descripcion": "Animal de prueba funcional",
+              "historia": "Rescatado en prueba QA",
+              "imagen": "/images/qa.png",
+              "galeria": [
+                "/images/qa.png"
+              ],
+              "fundacion_id": 26,
+              "fundacion": "QA Fundacion 1726119835001",
+              "sexo": "HEMBRA",
+              "fecha_nacimiento_estimada": null,
+              "enfermedades": "Ninguna",
+              "esterilizacion": false,
+              "vacunacion": true,
+              "desparasitacion": false,
+              "fecha_rescate": null,
+              "fecha_registro": "2026-11-21"
+            },
+            {
+              "id": 22,
+              "nombre": "QA Gato",
+              "status": "REQUIERE_PADRINOS",
+              "especie": "GATO",
+              "raza": "Mestizo",
+              "descripcion": "Animal de prueba funcional",
+              "historia": "Rescatado en prueba QA",
+              "imagen": "/images/qa.png",
+              "galeria": [
+                "/images/qa.png"
+              ],
+              "fundacion_id": 26,
+              "fundacion": "QA Fundacion 1726119835001",
+              "sexo": "HEMBRA",
+              "fecha_nacimiento_estimada": null,
+              "enfermedades": "Ninguna",
+              "esterilizacion": false,
+              "vacunacion": true,
+              "desparasitacion": false,
+              "fecha_rescate": null,
+              "fecha_registro": "2026-11-21"
+            },
+            {
+              "id": 21,
+              "nombre": "QA Normal",
+              "status": "REQUIERE_PADRINOS",
+              "especie": "PERRO",
+              "raza": "Mestizo",
+              "descripcion": "Animal de prueba funcional",
+              "historia": "Rescatado en prueba QA",
+              "imagen": "/images/qa.png",
+              "galeria": [
+                "/images/qa.png"
+              ],
+              "fundacion_id": 26,
+              "fundacion": "QA Fundacion 1726119835001",
+              "sexo": "HEMBRA",
+              "fecha_nacimiento_estimada": null,
+              "enfermedades": "Ninguna",
+              "esterilizacion": false,
+              "vacunacion": true,
+              "desparasitacion": false,
+              "fecha_rescate": null,
+              "fecha_registro": "2026-11-21"
+            }
+          ]
+        }
+      },
+      "esperado": "Primer resultado en tratamiento",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-04",
+      "tecnica": "Decision Table",
+      "hu": "HU-DON-3",
+      "caso": "Orden cambia tras apadrinamiento",
+      "ejecutadoEn": "2026-11-21T21:48:30.472Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "GET",
+        "endpoint": "/animal?fundacionId=26",
+        "body": null,
+        "tokenRole": "publico"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "limit": 10,
+          "page": 1,
+          "totalPages": 1,
+          "total": 3,
+          "result": [
+            {
+              "id": 22,
+              "nombre": "QA Gato",
+              "status": "REQUIERE_PADRINOS",
+              "especie": "GATO",
+              "raza": "Mestizo",
+              "descripcion": "Animal de prueba funcional",
+              "historia": "Rescatado en prueba QA",
+              "imagen": "/images/qa.png",
+              "galeria": [
+                "/images/qa.png"
+              ],
+              "fundacion_id": 26,
+              "fundacion": "QA Fundacion 1726119835001",
+              "sexo": "HEMBRA",
+              "fecha_nacimiento_estimada": null,
+              "enfermedades": "Ninguna",
+              "esterilizacion": false,
+              "vacunacion": true,
+              "desparasitacion": false,
+              "fecha_rescate": null,
+              "fecha_registro": "2026-11-21"
+            },
+            {
+              "id": 21,
+              "nombre": "QA Normal",
+              "status": "REQUIERE_PADRINOS",
+              "especie": "PERRO",
+              "raza": "Mestizo",
+              "descripcion": "Animal de prueba funcional",
+              "historia": "Rescatado en prueba QA",
+              "imagen": "/images/qa.png",
+              "galeria": [
+                "/images/qa.png"
+              ],
+              "fundacion_id": 26,
+              "fundacion": "QA Fundacion 1726119835001",
+              "sexo": "HEMBRA",
+              "fecha_nacimiento_estimada": null,
+              "enfermedades": "Ninguna",
+              "esterilizacion": false,
+              "vacunacion": true,
+              "desparasitacion": false,
+              "fecha_rescate": null,
+              "fecha_registro": "2026-11-21"
+            },
+            {
+              "id": 20,
+              "nombre": "QA Urgente",
+              "status": "APADRINADO",
+              "especie": "PERRO",
+              "raza": "Mestizo",
+              "descripcion": "Animal de prueba funcional",
+              "historia": "Rescatado en prueba QA",
+              "imagen": "/images/qa.png",
+              "galeria": [
+                "/images/qa.png"
+              ],
+              "fundacion_id": 26,
+              "fundacion": "QA Fundacion 1726119835001",
+              "sexo": "HEMBRA",
+              "fecha_nacimiento_estimada": null,
+              "enfermedades": "Ninguna",
+              "esterilizacion": false,
+              "vacunacion": true,
+              "desparasitacion": false,
+              "fecha_rescate": null,
+              "fecha_registro": "2026-11-21"
+            }
+          ]
+        }
+      },
+      "esperado": "Primer resultado REQUIERE_PADRINOS",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-04",
+      "tecnica": "BVA",
+      "hu": "HU-DON-4",
+      "caso": "page=0 fuera de rango",
+      "ejecutadoEn": "2026-11-21T21:48:30.493Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "GET",
+        "endpoint": "/animal?page=0",
+        "body": null,
+        "tokenRole": "publico"
+      },
+      "response": {
+        "status": 400,
+        "body": {
+          "status": "fail",
+          "errors": [
+            {
+              "campo": "page",
+              "mensaje": "El campo page debe ser un numero entero positivo"
+            }
+          ]
+        }
+      },
+      "esperado": "400",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-04",
+      "tecnica": "BVA",
+      "hu": "HU-DON-4",
+      "caso": "page=1 limite inferior",
+      "ejecutadoEn": "2026-11-21T21:48:30.986Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "GET",
+        "endpoint": "/animal?page=1&limit=1",
+        "body": null,
+        "tokenRole": "publico"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "limit": 1,
+          "page": 1,
+          "totalPages": 5,
+          "total": 5,
+          "result": [
+            {
+              "id": 22,
+              "nombre": "QA Gato",
+              "status": "REQUIERE_PADRINOS",
+              "especie": "GATO",
+              "raza": "Mestizo",
+              "descripcion": "Animal de prueba funcional",
+              "historia": "Rescatado en prueba QA",
+              "imagen": "/images/qa.png",
+              "galeria": [
+                "/images/qa.png"
+              ],
+              "fundacion_id": 26,
+              "fundacion": "QA Fundacion 1726119835001",
+              "sexo": "HEMBRA",
+              "fecha_nacimiento_estimada": null,
+              "enfermedades": "Ninguna",
+              "esterilizacion": false,
+              "vacunacion": true,
+              "desparasitacion": false,
+              "fecha_rescate": null,
+              "fecha_registro": "2026-11-21"
+            }
+          ]
+        }
+      },
+      "esperado": "200 maximo 1 resultado",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-04",
+      "tecnica": "BVA",
+      "hu": "HU-DON-4",
+      "caso": "limit=100 limite superior valido",
+      "ejecutadoEn": "2026-11-21T21:48:32.141Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "GET",
+        "endpoint": "/animal?limit=100",
+        "body": null,
+        "tokenRole": "publico"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "limit": 100,
+          "page": 1,
+          "totalPages": 1,
+          "total": 5,
+          "result": [
+            {
+              "id": 22,
+              "nombre": "QA Gato",
+              "status": "REQUIERE_PADRINOS",
+              "especie": "GATO",
+              "raza": "Mestizo",
+              "descripcion": "Animal de prueba funcional",
+              "historia": "Rescatado en prueba QA",
+              "imagen": "/images/qa.png",
+              "galeria": [
+                "/images/qa.png"
+              ],
+              "fundacion_id": 26,
+              "fundacion": "QA Fundacion 1726119835001",
+              "sexo": "HEMBRA",
+              "fecha_nacimiento_estimada": null,
+              "enfermedades": "Ninguna",
+              "esterilizacion": false,
+              "vacunacion": true,
+              "desparasitacion": false,
+              "fecha_rescate": null,
+              "fecha_registro": "2026-11-21"
+            },
+            {
+              "id": 21,
+              "nombre": "QA Normal",
+              "status": "REQUIERE_PADRINOS",
+              "especie": "PERRO",
+              "raza": "Mestizo",
+              "descripcion": "Animal de prueba funcional",
+              "historia": "Rescatado en prueba QA",
+              "imagen": "/images/qa.png",
+              "galeria": [
+                "/images/qa.png"
+              ],
+              "fundacion_id": 26,
+              "fundacion": "QA Fundacion 1726119835001",
+              "sexo": "HEMBRA",
+              "fecha_nacimiento_estimada": null,
+              "enfermedades": "Ninguna",
+              "esterilizacion": false,
+              "vacunacion": true,
+              "desparasitacion": false,
+              "fecha_rescate": null,
+              "fecha_registro": "2026-11-21"
+            },
+            {
+              "id": 3,
+              "nombre": "Perrito 1",
+              "status": "REQUIERE_PADRINOS",
+              "especie": "PERRO",
+              "raza": "Mestizo",
+              "descripcion": "Animal de prueba 1",
+              "historia": null,
+              "imagen": "http://example.com/image1.jpg",
+              "galeria": [],
+              "fundacion_id": 4,
+              "fundacion": "Fundación Duplicate Test 1795294092668",
+              "sexo": "MACHO",
+              "fecha_nacimiento_estimada": null,
+              "enfermedades": null,
+              "esterilizacion": false,
+              "vacunacion": false,
+              "desparasitacion": false,
+              "fecha_rescate": null,
+              "fecha_registro": "2026-11-21"
+            },
+            {
+              "id": 4,
+              "nombre": "Perrito 2",
+              "status": "REQUIERE_PADRINOS",
+              "especie": "PERRO",
+              "raza": "Mestizo",
+              "descripcion": "Animal de prueba 2",
+              "historia": null,
+              "imagen": "http://example.com/image2.jpg",
+              "galeria": [],
+              "fundacion_id": 4,
+              "fundacion": "Fundación Duplicate Test 1795294092668",
+              "sexo": "MACHO",
+              "fecha_nacimiento_estimada": null,
+              "enfermedades": null,
+              "esterilizacion": false,
+              "vacunacion": false,
+              "desparasitacion": false,
+              "fecha_rescate": null,
+              "fecha_registro": "2026-11-21"
+            },
+            {
+              "id": 20,
+              "nombre": "QA Urgente",
+              "status": "APADRINADO",
+              "especie": "PERRO",
+              "raza": "Mestizo",
+              "descripcion": "Animal de prueba funcional",
+              "historia": "Rescatado en prueba QA",
+              "imagen": "/images/qa.png",
+              "galeria": [
+                "/images/qa.png"
+              ],
+              "fundacion_id": 26,
+              "fundacion": "QA Fundacion 1726119835001",
+              "sexo": "HEMBRA",
+              "fecha_nacimiento_estimada": null,
+              "enfermedades": "Ninguna",
+              "esterilizacion": false,
+              "vacunacion": true,
+              "desparasitacion": false,
+              "fecha_rescate": null,
+              "fecha_registro": "2026-11-21"
+            }
+          ]
+        }
+      },
+      "esperado": "200",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-04",
+      "tecnica": "BVA",
+      "hu": "HU-DON-4",
+      "caso": "limit=101 fuera de rango",
+      "ejecutadoEn": "2026-11-21T21:48:32.144Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "GET",
+        "endpoint": "/animal?limit=101",
+        "body": null,
+        "tokenRole": "publico"
+      },
+      "response": {
+        "status": 400,
+        "body": {
+          "status": "fail",
+          "errors": [
+            {
+              "campo": "limit",
+              "mensaje": "El campo limit debe ser un numero entero entre 1 y 100"
+            }
+          ]
+        }
+      },
+      "esperado": "400",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-04",
+      "tecnica": "EP",
+      "hu": "HU-DON-4",
+      "caso": "Reset sin filtros",
+      "ejecutadoEn": "2026-11-21T21:48:32.863Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "GET",
+        "endpoint": "/animal",
+        "body": null,
+        "tokenRole": "publico"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "limit": 10,
+          "page": 1,
+          "totalPages": 1,
+          "total": 5,
+          "result": [
+            {
+              "id": 22,
+              "nombre": "QA Gato",
+              "status": "REQUIERE_PADRINOS",
+              "especie": "GATO",
+              "raza": "Mestizo",
+              "descripcion": "Animal de prueba funcional",
+              "historia": "Rescatado en prueba QA",
+              "imagen": "/images/qa.png",
+              "galeria": [
+                "/images/qa.png"
+              ],
+              "fundacion_id": 26,
+              "fundacion": "QA Fundacion 1726119835001",
+              "sexo": "HEMBRA",
+              "fecha_nacimiento_estimada": null,
+              "enfermedades": "Ninguna",
+              "esterilizacion": false,
+              "vacunacion": true,
+              "desparasitacion": false,
+              "fecha_rescate": null,
+              "fecha_registro": "2026-11-21"
+            },
+            {
+              "id": 21,
+              "nombre": "QA Normal",
+              "status": "REQUIERE_PADRINOS",
+              "especie": "PERRO",
+              "raza": "Mestizo",
+              "descripcion": "Animal de prueba funcional",
+              "historia": "Rescatado en prueba QA",
+              "imagen": "/images/qa.png",
+              "galeria": [
+                "/images/qa.png"
+              ],
+              "fundacion_id": 26,
+              "fundacion": "QA Fundacion 1726119835001",
+              "sexo": "HEMBRA",
+              "fecha_nacimiento_estimada": null,
+              "enfermedades": "Ninguna",
+              "esterilizacion": false,
+              "vacunacion": true,
+              "desparasitacion": false,
+              "fecha_rescate": null,
+              "fecha_registro": "2026-11-21"
+            },
+            {
+              "id": 3,
+              "nombre": "Perrito 1",
+              "status": "REQUIERE_PADRINOS",
+              "especie": "PERRO",
+              "raza": "Mestizo",
+              "descripcion": "Animal de prueba 1",
+              "historia": null,
+              "imagen": "http://example.com/image1.jpg",
+              "galeria": [],
+              "fundacion_id": 4,
+              "fundacion": "Fundación Duplicate Test 1795294092668",
+              "sexo": "MACHO",
+              "fecha_nacimiento_estimada": null,
+              "enfermedades": null,
+              "esterilizacion": false,
+              "vacunacion": false,
+              "desparasitacion": false,
+              "fecha_rescate": null,
+              "fecha_registro": "2026-11-21"
+            },
+            {
+              "id": 4,
+              "nombre": "Perrito 2",
+              "status": "REQUIERE_PADRINOS",
+              "especie": "PERRO",
+              "raza": "Mestizo",
+              "descripcion": "Animal de prueba 2",
+              "historia": null,
+              "imagen": "http://example.com/image2.jpg",
+              "galeria": [],
+              "fundacion_id": 4,
+              "fundacion": "Fundación Duplicate Test 1795294092668",
+              "sexo": "MACHO",
+              "fecha_nacimiento_estimada": null,
+              "enfermedades": null,
+              "esterilizacion": false,
+              "vacunacion": false,
+              "desparasitacion": false,
+              "fecha_rescate": null,
+              "fecha_registro": "2026-11-21"
+            },
+            {
+              "id": 20,
+              "nombre": "QA Urgente",
+              "status": "APADRINADO",
+              "especie": "PERRO",
+              "raza": "Mestizo",
+              "descripcion": "Animal de prueba funcional",
+              "historia": "Rescatado en prueba QA",
+              "imagen": "/images/qa.png",
+              "galeria": [
+                "/images/qa.png"
+              ],
+              "fundacion_id": 26,
+              "fundacion": "QA Fundacion 1726119835001",
+              "sexo": "HEMBRA",
+              "fecha_nacimiento_estimada": null,
+              "enfermedades": "Ninguna",
+              "esterilizacion": false,
+              "vacunacion": true,
+              "desparasitacion": false,
+              "fecha_rescate": null,
+              "fecha_registro": "2026-11-21"
+            }
+          ]
+        }
+      },
+      "esperado": "200 con resultados",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-04",
+      "tecnica": "EP",
+      "hu": "HU-DON-2",
+      "caso": "Fundacion sin animales",
+      "ejecutadoEn": "2026-11-21T21:48:33.189Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "GET",
+        "endpoint": "/fundacion/animales?fundacionId=27&limit=10",
+        "body": null,
+        "tokenRole": "publico"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "limit": 10,
+          "page": 1,
+          "totalPages": 1,
+          "count": 5,
+          "result": [
+            {
+              "id": 3,
+              "nombre": "Perrito 1",
+              "status": "REQUIERE_PADRINOS",
+              "especie": "PERRO",
+              "raza": "Mestizo",
+              "descripcion": "Animal de prueba 1",
+              "historia": null,
+              "imagen": "http://example.com/image1.jpg",
+              "galeria": [],
+              "fundacion_id": 4,
+              "visible": true,
+              "createdAt": "2026-11-21T20:48:13.548Z",
+              "updatedAt": "2026-11-21T20:48:13.549Z",
+              "monto_meta_mensual": "0.00",
+              "monto_recaudado_actual": "0.00",
+              "fecha_nacimiento_estimada": null,
+              "peso": null,
+              "sexo": "MACHO",
+              "enfermedades": null,
+              "fecha_rescate": null,
+              "fecha_registro": "2026-11-21",
+              "esterilizacion": false,
+              "vacunacion": false,
+              "desparasitacion": false
+            },
+            {
+              "id": 4,
+              "nombre": "Perrito 2",
+              "status": "REQUIERE_PADRINOS",
+              "especie": "PERRO",
+              "raza": "Mestizo",
+              "descripcion": "Animal de prueba 2",
+              "historia": null,
+              "imagen": "http://example.com/image2.jpg",
+              "galeria": [],
+              "fundacion_id": 4,
+              "visible": true,
+              "createdAt": "2026-11-21T20:48:13.705Z",
+              "updatedAt": "2026-11-21T20:48:13.705Z",
+              "monto_meta_mensual": "0.00",
+              "monto_recaudado_actual": "0.00",
+              "fecha_nacimiento_estimada": null,
+              "peso": null,
+              "sexo": "MACHO",
+              "enfermedades": null,
+              "fecha_rescate": null,
+              "fecha_registro": "2026-11-21",
+              "esterilizacion": false,
+              "vacunacion": false,
+              "desparasitacion": false
+            },
+            {
+              "id": 21,
+              "nombre": "QA Normal",
+              "status": "REQUIERE_PADRINOS",
+              "especie": "PERRO",
+              "raza": "Mestizo",
+              "descripcion": "Animal de prueba funcional",
+              "historia": "Rescatado en prueba QA",
+              "imagen": "/images/qa.png",
+              "galeria": [
+                "/images/qa.png"
+              ],
+              "fundacion_id": 26,
+              "visible": true,
+              "createdAt": "2026-11-21T21:48:10.122Z",
+              "updatedAt": "2026-11-21T21:48:10.123Z",
+              "monto_meta_mensual": "50.00",
+              "monto_recaudado_actual": "0.00",
+              "fecha_nacimiento_estimada": null,
+              "peso": null,
+              "sexo": "HEMBRA",
+              "enfermedades": "Ninguna",
+              "fecha_rescate": null,
+              "fecha_registro": "2026-11-21",
+              "esterilizacion": false,
+              "vacunacion": true,
+              "desparasitacion": false
+            },
+            {
+              "id": 22,
+              "nombre": "QA Gato",
+              "status": "REQUIERE_PADRINOS",
+              "especie": "GATO",
+              "raza": "Mestizo",
+              "descripcion": "Animal de prueba funcional",
+              "historia": "Rescatado en prueba QA",
+              "imagen": "/images/qa.png",
+              "galeria": [
+                "/images/qa.png"
+              ],
+              "fundacion_id": 26,
+              "visible": true,
+              "createdAt": "2026-11-21T21:48:10.917Z",
+              "updatedAt": "2026-11-21T21:48:10.917Z",
+              "monto_meta_mensual": "80.00",
+              "monto_recaudado_actual": "0.00",
+              "fecha_nacimiento_estimada": null,
+              "peso": null,
+              "sexo": "HEMBRA",
+              "enfermedades": "Ninguna",
+              "fecha_rescate": null,
+              "fecha_registro": "2026-11-21",
+              "esterilizacion": false,
+              "vacunacion": true,
+              "desparasitacion": false
+            },
+            {
+              "id": 20,
+              "nombre": "QA Urgente",
+              "status": "APADRINADO",
+              "especie": "PERRO",
+              "raza": "Mestizo",
+              "descripcion": "Animal de prueba funcional",
+              "historia": "Rescatado en prueba QA",
+              "imagen": "/images/qa.png",
+              "galeria": [
+                "/images/qa.png"
+              ],
+              "fundacion_id": 26,
+              "visible": true,
+              "createdAt": "2026-11-21T21:48:08.807Z",
+              "updatedAt": "2026-11-21T21:48:29.530Z",
+              "monto_meta_mensual": "500.00",
+              "monto_recaudado_actual": "0.00",
+              "fecha_nacimiento_estimada": null,
+              "peso": null,
+              "sexo": "HEMBRA",
+              "enfermedades": "Ninguna",
+              "fecha_rescate": null,
+              "fecha_registro": "2026-11-21",
+              "esterilizacion": false,
+              "vacunacion": true,
+              "desparasitacion": false
+            }
+          ]
+        }
+      },
+      "esperado": "200 filtrando por fundacion con count=0 y mensaje informativo",
+      "resultado": "GAP"
+    },
+    {
+      "id": "HU-DON-5",
+      "tecnica": "Decision Table",
+      "hu": "HU-DON-5",
+      "caso": "Detalle publico",
+      "ejecutadoEn": "2026-11-21T21:48:33.508Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "GET",
+        "endpoint": "/animal/22",
+        "body": null,
+        "tokenRole": "publico"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "result": {
+            "id": 22,
+            "nombre": "QA Gato",
+            "status": "REQUIERE_PADRINOS",
+            "especie": "GATO",
+            "raza": "Mestizo",
+            "descripcion": "Animal de prueba funcional",
+            "historia": "Rescatado en prueba QA",
+            "imagen": "/images/qa.png",
+            "galeria": [
+              "/images/qa.png"
+            ],
+            "fundacion_id": 26,
+            "fundacion": "QA Fundacion 1726119835001",
+            "sexo": "HEMBRA",
+            "fecha_nacimiento_estimada": null,
+            "enfermedades": "Ninguna",
+            "esterilizacion": false,
+            "vacunacion": true,
+            "desparasitacion": false,
+            "fecha_rescate": null,
+            "fecha_registro": "2026-11-21"
+          }
+        }
+      },
+      "esperado": "200 con historia/enfermedades/vacunacion y sin montos",
+      "resultado": "PASS"
+    },
+    {
+      "id": "HU-DON-5",
+      "tecnica": "Decision Table",
+      "hu": "HU-DON-5",
+      "caso": "Detalle administrador",
+      "ejecutadoEn": "2026-11-21T21:48:33.975Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "GET",
+        "endpoint": "/animal/22",
+        "body": null,
+        "tokenRole": "admin"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "result": {
+            "id": 22,
+            "nombre": "QA Gato",
+            "status": "REQUIERE_PADRINOS",
+            "especie": "GATO",
+            "raza": "Mestizo",
+            "descripcion": "Animal de prueba funcional",
+            "historia": "Rescatado en prueba QA",
+            "imagen": "/images/qa.png",
+            "galeria": [
+              "/images/qa.png"
+            ],
+            "fundacion_id": 26,
+            "fundacion": "QA Fundacion 1726119835001",
+            "sexo": "HEMBRA",
+            "fecha_nacimiento_estimada": null,
+            "enfermedades": "Ninguna",
+            "esterilizacion": false,
+            "vacunacion": true,
+            "desparasitacion": false,
+            "fecha_rescate": null,
+            "fecha_registro": "2026-11-21",
+            "peso": null,
+            "visible": true,
+            "monto_meta_mensual": "80.00",
+            "monto_recaudado_actual": "0.00",
+            "createdAt": "2026-11-21T21:48:10.917Z",
+            "updatedAt": "2026-11-21T21:48:10.917Z"
+          }
+        }
+      },
+      "esperado": "200 con montos y audit fields",
+      "resultado": "PASS"
+    },
+    {
+      "id": "HU-DON-5",
+      "tecnica": "EP",
+      "hu": "HU-DON-5",
+      "caso": "Animal inexistente",
+      "ejecutadoEn": "2026-11-21T21:48:34.137Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "GET",
+        "endpoint": "/animal/999999999",
+        "body": null,
+        "tokenRole": "publico"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "result": []
+        }
+      },
+      "esperado": "404",
+      "resultado": "GAP"
+    },
+    {
+      "id": "HU-ADM-3",
+      "tecnica": "Decision Table",
+      "hu": "HU-ADM-3",
+      "caso": "Deshabilitar con booleano",
+      "ejecutadoEn": "2026-11-21T21:48:34.606Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "PUT",
+        "endpoint": "/usuario/48/status",
+        "body": {
+          "habilitado": false
+        },
+        "tokenRole": "admin"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "message": "Estado del usuario actualizado correctamente.",
+          "estado": "INACTIVO"
+        }
+      },
+      "esperado": "200 estado INACTIVO",
+      "resultado": "PASS"
+    },
+    {
+      "id": "HU-ADM-3",
+      "tecnica": "Decision Table",
+      "hu": "HU-ADM-3",
+      "caso": "Admin no puede deshabilitarse",
+      "ejecutadoEn": "2026-11-21T21:48:35.407Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "PUT",
+        "endpoint": "/usuario/47/status",
+        "body": {
+          "estado": "INACTIVO"
+        },
+        "tokenRole": "admin"
+      },
+      "response": {
+        "status": 400,
+        "body": {
+          "error": "No puedes deshabilitar tu propia cuenta."
+        }
+      },
+      "esperado": "400",
+      "resultado": "PASS"
+    },
+    {
+      "id": "HU-FND-2",
+      "tecnica": "EP",
+      "hu": "HU-FND-2",
+      "caso": "Firma de carga (storage local en este entorno)",
+      "ejecutadoEn": "2026-11-21T21:48:35.742Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "GET",
+        "endpoint": "/otros/cloudinary-signature",
+        "body": null,
+        "tokenRole": "fundacion"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "signature": "4cccc866870dde29f3b456c621836c399700a0c4",
+          "timestamp": 1795297715,
+          "folder": "mascotas",
+          "apiKey": "254739396789973",
+          "cloudName": "fwbvh0gh"
+        }
+      },
+      "esperado": "200 con firma Cloudinary o 503 documentando modo local",
+      "resultado": "PASS"
+    },
+    {
+      "id": "HU-FND-2",
+      "tecnica": "EP",
+      "hu": "HU-FND-2",
+      "caso": "Guardar borrador incompleto",
+      "ejecutadoEn": "2026-11-21T21:48:36.082Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "POST",
+        "endpoint": "/animal",
+        "body": {
+          "status": "BORRADOR"
+        },
+        "tokenRole": "fundacion"
+      },
+      "response": {
+        "status": 400,
+        "body": {
+          "status": "fail",
+          "errors": [
+            {
+              "campo": "nombre",
+              "mensaje": "El campo nombre es obligatorio"
+            },
+            {
+              "campo": "nombre",
+              "mensaje": "El campo nombre debe ser de tipo String"
+            },
+            {
+              "campo": "especie",
+              "mensaje": "El campo especie es obligatorio"
+            },
+            {
+              "campo": "especie",
+              "mensaje": "El campo especie debe ser uno de: PERRO, GATO, OTRO"
+            },
+            {
+              "campo": "sexo",
+              "mensaje": "El campo sexo es obligatorio"
+            },
+            {
+              "campo": "sexo",
+              "mensaje": "El campo sexo debe ser MACHO o HEMBRA"
+            }
+          ]
+        }
+      },
+      "esperado": "200 borrador persistido",
+      "resultado": "GAP"
+    },
+    {
+      "id": "TC-05",
+      "tecnica": "BVA",
+      "hu": "HU-DON-7",
+      "caso": "Manada con N=2 animales",
+      "ejecutadoEn": "2026-11-21T21:48:36.735Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "GET",
+        "endpoint": "/manada/7/animals",
+        "body": null,
+        "tokenRole": "donador"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "result": [
+            {
+              "id": 21,
+              "nombre": "QA Normal",
+              "status": "REQUIERE_PADRINOS",
+              "especie": "PERRO",
+              "raza": "Mestizo",
+              "descripcion": "Animal de prueba funcional",
+              "galeria": [
+                "/images/qa.png"
+              ],
+              "fundacion_id": 26,
+              "fundacion": "QA Fundacion 1726119835001",
+              "historial": [],
+              "createdAt": "2026-11-21T21:48:10.122Z",
+              "updatedAt": "2026-11-21T21:48:10.123Z"
+            },
+            {
+              "id": 20,
+              "nombre": "QA Urgente",
+              "status": "APADRINADO",
+              "especie": "PERRO",
+              "raza": "Mestizo",
+              "descripcion": "Animal de prueba funcional",
+              "galeria": [
+                "/images/qa.png"
+              ],
+              "fundacion_id": 26,
+              "fundacion": "QA Fundacion 1726119835001",
+              "historial": [
+                {
+                  "id": 5,
+                  "animal_id": 20,
+                  "fundacion_id": 26,
+                  "fecha": "2026-11-21T21:48:13.242Z",
+                  "descripcion": "Actualizacion QA",
+                  "estado_salud": "Estable",
+                  "imagen": "/images/qa-update.png",
+                  "calificacion": null,
+                  "visible": true,
+                  "createdAt": "2026-11-21T21:48:13.242Z",
+                  "updatedAt": "2026-11-21T21:48:13.243Z",
+                  "galeria": null
+                }
+              ],
+              "createdAt": "2026-11-21T21:48:08.807Z",
+              "updatedAt": "2026-11-21T21:48:29.530Z"
+            }
+          ]
+        }
+      },
+      "esperado": "200 con 2 animales",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-05",
+      "tecnica": "BVA",
+      "hu": "HU-DON-7",
+      "caso": "Arreglo vacio de animales",
+      "ejecutadoEn": "2026-11-21T21:48:36.892Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "POST",
+        "endpoint": "/manada/7/animals",
+        "body": {
+          "animalId": []
+        },
+        "tokenRole": "donador"
+      },
+      "response": {
+        "status": 400,
+        "body": {
+          "status": "fail",
+          "errors": [
+            {
+              "campo": "animalId",
+              "mensaje": "El campo animalId debe ser un arreglo de ids"
+            }
+          ]
+        }
+      },
+      "esperado": "400",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-05",
+      "tecnica": "BVA",
+      "hu": "HU-DON-7",
+      "caso": "Agregar animal ya incluido",
+      "ejecutadoEn": "2026-11-21T21:48:37.362Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "POST",
+        "endpoint": "/manada/7/animals",
+        "body": {
+          "animalId": [
+            21
+          ]
+        },
+        "tokenRole": "donador"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "mensaje": "Animales agregados exitosamente a la manada",
+          "data": [
+            {
+              "animal_id": 21,
+              "mensaje": "Este animal ya se encuentra agregado a la manada"
+            }
+          ]
+        }
+      },
+      "esperado": "200 con mensaje de animal ya agregado",
+      "resultado": "PASS"
+    },
+    {
+      "id": "HU-DON-7",
+      "tecnica": "EP",
+      "hu": "HU-DON-7",
+      "caso": "Donacion asociada a la manada",
+      "ejecutadoEn": "2026-11-21T21:48:37.564Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "POST",
+        "endpoint": "/donacion",
+        "body": {
+          "monto": "100.00",
+          "manadaId": 7
+        },
+        "tokenRole": "donador"
+      },
+      "response": {
+        "status": 502,
+        "body": {
+          "error": "No se pudo iniciar el checkout con PayPal."
+        }
+      },
+      "esperado": "Checkout PayPal funcional; 502 documenta limitacion del mock",
+      "resultado": "GAP"
+    },
+    {
+      "id": "TC-06",
+      "tecnica": "Decision Table",
+      "hu": "Transversal/Comisiones",
+      "caso": "Padrino califica con 4 estrellas",
+      "ejecutadoEn": "2026-11-21T21:48:38.861Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "POST",
+        "endpoint": "/actualizacion/5/ratings",
+        "body": {
+          "estrellas": 4
+        },
+        "tokenRole": "donador"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "mensaje": "Rating registrado exitosamente.",
+          "result": {
+            "createdAt": "2026-11-21T21:48:38.524Z",
+            "updatedAt": "2026-11-21T21:48:38.526Z",
+            "id": 4,
+            "actualizacionId": 5,
+            "userId": 48,
+            "estrellas": 4,
+            "comentario": null
+          }
+        }
+      },
+      "esperado": "Tests skipped esperan que createRating cree comision automaticamente",
+      "resultado": "GAP"
+    },
+    {
+      "id": "TC-06",
+      "tecnica": "Decision Table",
+      "hu": "Transversal/Comisiones",
+      "caso": "Frontend crea comision 20%",
+      "ejecutadoEn": "2026-11-21T21:48:40.051Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "POST",
+        "endpoint": "/comision",
+        "body": {
+          "fundacionId": 26,
+          "total_comision": 20
+        },
+        "tokenRole": "fundacion"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "mensaje": "Comision Creada exitosamente.",
+          "result": {
+            "createdAt": "2026-11-21T21:48:39.718Z",
+            "updatedAt": "2026-11-21T21:48:39.720Z",
+            "id": 6,
+            "fundacion_id": 26,
+            "total_comision": "20.00",
+            "total_pago": "100.00",
+            "visible": true
+          }
+        }
+      },
+      "esperado": "200 comision creada",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-06",
+      "tecnica": "Decision Table",
+      "hu": "Transversal/Comisiones",
+      "caso": "Fundacion consulta reporte de comisiones",
+      "ejecutadoEn": "2026-11-21T21:48:40.553Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "GET",
+        "endpoint": "/comision/fundacion",
+        "body": null,
+        "tokenRole": "fundacion"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "mensaje": "Comisiones obtenidas exitosamente.",
+          "result": [
+            {
+              "id": 6,
+              "fundacion_id": 26,
+              "createdAt": "2026-11-21T21:48:39.718Z",
+              "updatedAt": "2026-11-21T21:48:39.720Z",
+              "visible": true,
+              "total_comision": "20.00",
+              "total_pago": "100.00"
+            }
+          ]
+        }
+      },
+      "esperado": "200 con al menos una comision",
+      "resultado": "PASS"
+    },
+    {
+      "id": "TC-06",
+      "tecnica": "BVA",
+      "hu": "Transversal/Comisiones",
+      "caso": "Estrellas=6 fuera de rango",
+      "ejecutadoEn": "2026-11-21T21:48:40.709Z",
+      "baseUrl": "http://localhost:8181",
+      "request": {
+        "method": "POST",
+        "endpoint": "/actualizacion/5/ratings",
+        "body": {
+          "estrellas": 6
+        },
+        "tokenRole": "donador"
+      },
+      "response": {
+        "status": 400,
+        "body": {
+          "status": "fail",
+          "errors": [
+            {
+              "campo": "estrellas",
+              "mensaje": "La calificacion debe ser un número entero entre 1 y 5."
+            }
+          ]
+        }
+      },
+      "esperado": "400",
+      "resultado": "PASS"
+    }
+  ]
+}

@@ -495,6 +495,7 @@ exports.getAnimalPadrinosCalificacion = async (req, res) => {
           },
           include: [{
             model: db.Comision,
+            as: 'comisionPadre',
             where: {
               fundacion_id: fundacionId,
             },

@@ -36,4 +36,6 @@ module.exports = {
 
   // Timeout para tests (útil para tests de integración)
   testTimeout: 30000, // 30 segundos para tests de integración con DB
+
+  maxWorkers: 1,
 };

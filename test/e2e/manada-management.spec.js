@@ -98,7 +98,7 @@ describe('E2E: Manada Management', () => {
       });
 
     donorToken = res.body.result.token;
-  });
+  }, 120000);
 
   afterAll(async () => {
     // Cerrar conexión a la BD

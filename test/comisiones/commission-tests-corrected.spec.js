@@ -19,6 +19,7 @@ describe('Commission System - Corrected Tests', () => {
   let actualizacion;
   let manada;
   let donacion;
+  let fundacion;
   const testPassword = 'password123';
   let Usuario;
   let Animal;
@@ -48,10 +49,11 @@ describe('Commission System - Corrected Tests', () => {
 
     // Crear usuario donador
     const hashedPassword = bcrypt.hashSync(testPassword, 10);
+    const suffix = Date.now().toString().slice(-9);
     donadorUser = await Usuario.create({
       email: `comision-donador-${Date.now()}@example.com`,
       password: hashedPassword,
-      cedula: '1111111111',
+      cedula: `3${suffix}`,
       nombres: 'Comision Donador',
       apellidos: 'Test',
       telefono: '0987654321',
@@ -62,7 +64,7 @@ describe('Commission System - Corrected Tests', () => {
     fundacionUser = await Usuario.create({
       email: `comision-fundacion-${Date.now()}@example.com`,
       password: hashedPassword,
-      cedula: '2222222222',
+      cedula: `4${suffix}`,
       nombres: 'Comision Fundacion',
       apellidos: 'Test',
       telefono: '0987654322',
@@ -70,7 +72,7 @@ describe('Commission System - Corrected Tests', () => {
     });
 
     // Crear fundación
-    const fundacion = await Fundacion.create({
+    fundacion = await Fundacion.create({
       nombre: 'Comision Test Fundacion',
       descripcion: 'Test de comisiones',
       ruc: `${Date.now().toString().slice(-13)}`,
@@ -153,8 +155,8 @@ describe('Commission System - Corrected Tests', () => {
     if (animal) {
       await Animal.destroy({ where: { id: animal.id } });
     }
-    if (fundacionUser && fundacionUser.id) {
-      await Fundacion.destroy({ where: { id: fundacionUser.id } });
+    if (fundacion) {
+      await Fundacion.destroy({ where: { id: fundacion.id } });
     }
     if (donadorUser) {
       await Usuario.destroy({ where: { id: donadorUser.id } });
@@ -192,12 +194,15 @@ describe('Commission System - Corrected Tests', () => {
         nombre: 'ECT Test Animal 2',
         status: 'REQUIERE_PADRINOS',
         especie: 'GATO',
+        sexo: 'HEMBRA',
         raza: 'Mestizo',
         descripcion: 'Animal de prueba 2',
         imagen: 'http://example.com/test-animal2.jpg',
         fundacion_id: animal.fundacion_id,
         visible: true,
       });
+
+      await ManadaAnimal.create({ manada_id: manada.id, animal_id: animal2.id });
 
       const actualizacion2 = await ActualizacionAnimal.create({
         descripcion: 'ECT test 2',
@@ -233,6 +238,7 @@ describe('Commission System - Corrected Tests', () => {
       await RatingActualizacion.destroy({ where: { actualizacionId: actualizacion2.id } });
       await ActualizacionAnimal.destroy({ where: { id: actualizacion2.id } });
       await Donacion.destroy({ where: { animal_id: animal2.id } });
+      await ManadaAnimal.destroy({ where: { animal_id: animal2.id } });
       await Animal.destroy({ where: { id: animal2.id } });
     });
 
@@ -241,12 +247,15 @@ describe('Commission System - Corrected Tests', () => {
         nombre: 'ECT Test Animal 3',
         status: 'REQUIERE_PADRINOS',
         especie: 'OTRO',
+        sexo: 'MACHO',
         raza: 'Mestizo',
         descripcion: 'Animal de prueba 3',
         imagen: 'http://example.com/test-animal3.jpg',
         fundacion_id: animal.fundacion_id,
         visible: true,
       });
+
+      await ManadaAnimal.create({ manada_id: manada.id, animal_id: animal3.id });
 
       const actualizacion3 = await ActualizacionAnimal.create({
         descripcion: 'ECT test 3',
@@ -282,6 +291,7 @@ describe('Commission System - Corrected Tests', () => {
       await RatingActualizacion.destroy({ where: { actualizacionId: actualizacion3.id } });
       await ActualizacionAnimal.destroy({ where: { id: actualizacion3.id } });
       await Donacion.destroy({ where: { animal_id: animal3.id } });
+      await ManadaAnimal.destroy({ where: { animal_id: animal3.id } });
       await Animal.destroy({ where: { id: animal3.id } });
     });
 
@@ -371,12 +381,15 @@ describe('Commission System - Corrected Tests', () => {
         nombre: 'BVA Test Animal',
         status: 'REQUIERE_PADRINOS',
         especie: 'OTRO',
+        sexo: 'HEMBRA',
         raza: 'Mestizo',
         descripcion: 'Animal de prueba 4',
         imagen: 'http://example.com/test-animal4.jpg',
         fundacion_id: animal.fundacion_id,
         visible: true,
       });
+
+      await ManadaAnimal.create({ manada_id: manada.id, animal_id: animal4.id });
 
       const actualizacion4 = await ActualizacionAnimal.create({
         descripcion: 'BVA test',
@@ -412,6 +425,7 @@ describe('Commission System - Corrected Tests', () => {
       await RatingActualizacion.destroy({ where: { actualizacionId: actualizacion4.id } });
       await ActualizacionAnimal.destroy({ where: { id: actualizacion4.id } });
       await Donacion.destroy({ where: { animal_id: animal4.id } });
+      await ManadaAnimal.destroy({ where: { animal_id: animal4.id } });
       await Animal.destroy({ where: { id: animal4.id } });
     });
 
@@ -477,7 +491,7 @@ describe('Commission System - Corrected Tests', () => {
       expect(response.status).toBe(400);
     });
 
-    it('DT-3: Valid rating but invalid actualizacion_id → DB constraint error', async () => {
+    it('DT-3: Valid rating but invalid actualizacion_id → 404 not found', async () => {
       const loginRes = await supertest(app)
         .post('/auth/login')
         .send({ email: donadorUser.email, password: testPassword });
@@ -488,11 +502,12 @@ describe('Commission System - Corrected Tests', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({ estrellas: 3 });
 
-      // DB constraint fails, returns 500
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(404);
     });
 
     it('DT-CALC-1: 1 star → Valid rating accepted', async () => {
+      await RatingActualizacion.destroy({ where: { actualizacionId: actualizacion.id } });
+
       const loginRes = await supertest(app)
         .post('/auth/login')
         .send({ email: donadorUser.email, password: testPassword });
@@ -512,12 +527,15 @@ describe('Commission System - Corrected Tests', () => {
         nombre: 'DTT Test Animal',
         status: 'REQUIERE_PADRINOS',
         especie: 'OTRO',
+        sexo: 'MACHO',
         raza: 'Mestizo',
         descripcion: 'Animal de prueba 5',
         imagen: 'http://example.com/test-animal5.jpg',
         fundacion_id: animal.fundacion_id,
         visible: true,
       });
+
+      await ManadaAnimal.create({ manada_id: manada.id, animal_id: animal5.id });
 
       const actualizacion5 = await ActualizacionAnimal.create({
         descripcion: 'DTT test',
@@ -553,6 +571,7 @@ describe('Commission System - Corrected Tests', () => {
       await RatingActualizacion.destroy({ where: { actualizacionId: actualizacion5.id } });
       await ActualizacionAnimal.destroy({ where: { id: actualizacion5.id } });
       await Donacion.destroy({ where: { animal_id: animal5.id } });
+      await ManadaAnimal.destroy({ where: { animal_id: animal5.id } });
       await Animal.destroy({ where: { id: animal5.id } });
     });
   });

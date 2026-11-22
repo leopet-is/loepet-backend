@@ -39,7 +39,7 @@ describe('E2E: Favorito flow', () => {
       .post('/auth/login')
       .send({ email: USER_EMAIL, password: PASSWORD });
     token = res.body.result.token;
-  });
+  }, 120000);
 
   afterAll(async () => {
     await db.sequelize.close();
